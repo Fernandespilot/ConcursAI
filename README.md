@@ -1,5 +1,6 @@
 
-🌟 Visão de Produto – ConcursAI
+                                                              
+                                                          Visão de Produto – ConcursAI
 
 Para candidatos de concursos públicos e cursinhos preparatórios,
 que enfrentam dificuldade em acompanhar múltiplos editais longos e complexos, perdendo prazos e gastando tempo com informações irrelevantes,
