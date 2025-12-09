@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "titulo": "Analista de TI - TRF",
+    "orgao": "Tribunal Regional Federal",
+    "salario": "R$ 8.500,00",
+    "vagas": 10,
+    "status": "Aberto",
+    "site_origem": "sistema",
+    "url": "https://exemplo.com/trf",
+    "data_coleta": "2025-10-16 07:28:54.672390",
+    "created_at": "2025-10-16 11:28:54"
+  },
+  {
+    "id": 2,
+    "titulo": "Desenvolvedor Python - Prefeitura SP",
+    "orgao": "Prefeitura de São Paulo",
+    "salario": "R$ 6.200,00",
+    "vagas": 5,
+    "status": "Aberto",
+    "site_origem": "sistema",
+    "url": "https://exemplo.com/sp",
+    "data_coleta": "2025-10-16 07:28:54.672390",
+    "created_at": "2025-10-16 11:28:54"
+  },
+  {
+    "id": 3,
+    "titulo": "Especialista em Dados - IBGE",
+    "orgao": "Instituto Brasileiro de Geografia",
+    "salario": "R$ 9.800,00",
+    "vagas": 8,
+    "status": "Em breve",
+    "site_origem": "sistema",
+    "url": "https://exemplo.com/ibge",
+    "data_coleta": "2025-10-16 07:28:54.672390",
+    "created_at": "2025-10-16 11:28:54"
+  }
+]

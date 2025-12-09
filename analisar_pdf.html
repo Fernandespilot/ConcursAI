@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 ConcursAI - Análise de PDFs com IA</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .upload-zone:hover {
+            border-color: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .upload-zone.dragging {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: white;
+            color: white;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+        }
+
+        .result-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .badge-banca {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .badge-area {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .topicos-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .topico-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topico-name {
+            font-weight: 500;
+        }
+
+        .topico-freq {
+            background: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .mermaid-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .recomendacoes {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .chat-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+        }
+
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+
+        .chat-history {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .chat-message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: 20%;
+        }
+
+        .chat-message.bot {
+            background: #f5f7fa;
+            margin-right: 20%;
+        }
+
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .success {
+            background: #44ff44;
+            color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 ConcursAI - Análise Inteligente de Provas</h1>
+            <p>Anexe um PDF de prova e receba análise completa com fluxograma de estudo personalizado</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Upload Section -->
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">📤 Upload de PDF</h2>
+                
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">📄</div>
+                    <h3>Arraste o PDF aqui</h3>
+                    <p style="margin: 10px 0;">ou</p>
+                    <input type="file" id="fileInput" class="file-input" accept=".pdf">
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">
+                        Selecionar Arquivo
+                    </button>
+                </div>
+
+                <div id="fileInfo" style="margin-top: 15px; display: none;">
+                    <p><strong>Arquivo selecionado:</strong> <span id="fileName"></span></p>
+                    <p><strong>Tamanho:</strong> <span id="fileSize"></span> MB</p>
+                    <button class="btn" id="analyzeBtn" onclick="analisarPDF()">
+                        🔍 Analisar Prova
+                    </button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analisando PDF... Isso pode levar alguns segundos.</p>
+                    <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                        ✅ Extraindo texto<br>
+                        ✅ Identificando banca e área<br>
+                        ✅ Analisando tópicos mais cobrados<br>
+                        ✅ Gerando fluxograma de estudo
+                    </p>
+                </div>
+
+                <div id="errorMsg"></div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="card">
+                <h2 style="margin-bottom: 15px;">ℹ️ Como Funciona</h2>
+                <div style="line-height: 1.8;">
+                    <p><strong>1️⃣ Upload do PDF</strong></p>
+                    <p style="margin-left: 20px; color: #666;">
+                        Anexe qualquer PDF de prova de concurso (CESPE, FCC, FGV, etc.)
+                    </p>
+
+                    <p style="margin-top: 15px;"><strong>2️⃣ Análise Automática</strong></p>
+                    <p style="margin-left: 20px; color: #666;">
+                        • Identifica automaticamente a banca<br>
+                        • Detecta a área de conhecimento<br>
+                        • Extrai todos os tópicos cobrados<br>
+                        • Calcula frequência de cada assunto
+                    </p>
+
+                    <p style="margin-top: 15px;"><strong>3️⃣ Fluxograma Personalizado</strong></p>
+                    <p style="margin-left: 20px; color: #666;">
+                        Gera fluxograma visual mostrando:<br>
+                        • Prioridades de estudo (alta/média)<br>
+                        • Percentual de cada tópico<br>
+                        • Cronograma sugerido
+                    </p>
+
+                    <p style="margin-top: 15px;"><strong>4️⃣ Recomendações</strong></p>
+                    <p style="margin-left: 20px; color: #666;">
+                        • Estratégias específicas da banca<br>
+                        • Dicas de como estudar cada tópico<br>
+                        • Comparação com base de dados
+                    </p>
+
+                    <p style="margin-top: 15px;"><strong>5️⃣ Chat Interativo</strong></p>
+                    <p style="margin-left: 20px; color: #666;">
+                        Faça perguntas sobre o PDF:<br>
+                        "Quais questões sobre Python?"<br>
+                        "O que mais caiu sobre Direito Civil?"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results" id="results">
+            <div class="card full-width">
+                <div class="result-section">
+                    <h3>📋 Informações da Prova</h3>
+                    <div id="provaInfo"></div>
+                </div>
+
+                <div class="result-section">
+                    <h3>🎯 Tópicos Mais Cobrados</h3>
+                    <div class="topicos-list" id="topicosList"></div>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <div class="result-section">
+                    <h3>📊 Fluxograma de Estudo Personalizado</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid" id="fluxograma"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <div class="result-section">
+                    <h3>💡 Recomendações de Estudo</h3>
+                    <div class="recomendacoes" id="recomendacoes"></div>
+                </div>
+            </div>
+
+            <div class="card full-width">
+                <div class="result-section">
+                    <h3>💬 Faça Perguntas Sobre o PDF</h3>
+                    <div class="chat-section">
+                        <p style="margin-bottom: 10px;">
+                            Agora você pode fazer perguntas específicas sobre o conteúdo do PDF analisado:
+                        </p>
+                        <div class="chat-input-group">
+                            <input 
+                                type="text" 
+                                class="chat-input" 
+                                id="chatInput" 
+                                placeholder="Ex: Quais as questões sobre Python? O que mais caiu sobre Redes?"
+                                onkeypress="if(event.key==='Enter') perguntarPDF()"
+                            >
+                            <button class="btn" onclick="perguntarPDF()">Enviar</button>
+                        </div>
+                        <div class="chat-history" id="chatHistory" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+
+        let selectedFile = null;
+        let currentAnaliseId = null;
+
+        // Drag and Drop
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragging');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragging');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragging');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type === 'application/pdf') {
+                handleFileSelect(files[0]);
+            } else {
+                alert('⚠️ Por favor, selecione um arquivo PDF válido.');
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = (file.size / 1024 / 1024).toFixed(2);
+            document.getElementById('fileInfo').style.display = 'block';
+            document.getElementById('errorMsg').innerHTML = '';
+        }
+
+        async function analisarPDF() {
+            if (!selectedFile) {
+                alert('⚠️ Selecione um arquivo PDF primeiro.');
+                return;
+            }
+
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const loading = document.getElementById('loading');
+            const errorMsg = document.getElementById('errorMsg');
+            const results = document.getElementById('results');
+
+            // Mostrar loading
+            analyzeBtn.disabled = true;
+            loading.style.display = 'block';
+            errorMsg.innerHTML = '';
+            results.style.display = 'none';
+
+            try {
+                // Criar FormData
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                // Fazer upload e análise
+                const response = await fetch('http://localhost:8000/chat/analisar-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erro ao analisar PDF');
+                }
+
+                const data = await response.json();
+
+                // Guardar ID da análise
+                currentAnaliseId = data.analise.id_analise;
+
+                // Exibir resultados
+                exibirResultados(data);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                errorMsg.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            } finally {
+                analyzeBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function exibirResultados(data) {
+            const { analise, fluxograma, recomendacoes } = data;
+
+            // Informações da prova
+            document.getElementById('provaInfo').innerHTML = `
+                <p>
+                    <span class="badge badge-banca">📋 ${analise.banca ? analise.banca.toUpperCase() : 'Banca não identificada'}</span>
+                    <span class="badge badge-area">📚 ${analise.area ? analise.area : 'Área não identificada'}</span>
+                </p>
+                <p style="margin-top: 10px; color: #666;">
+                    <strong>Arquivo:</strong> ${analise.arquivo} (${analise.tamanho_mb} MB)<br>
+                    <strong>Tópicos identificados:</strong> ${analise.num_topicos}<br>
+                    <strong>Páginas:</strong> ${analise.metadados.num_paginas}
+                </p>
+            `;
+
+            // Tópicos
+            const topicosList = document.getElementById('topicosList');
+            topicosList.innerHTML = '';
+            
+            const topicos = Object.entries(analise.topicos).slice(0, 12);
+            const totalFreq = Object.values(analise.topicos).reduce((a, b) => a + b, 0);
+            
+            topicos.forEach(([topico, freq]) => {
+                const percentual = (freq / totalFreq * 100).toFixed(1);
+                const item = document.createElement('div');
+                item.className = 'topico-item';
+                item.innerHTML = `
+                    <span class="topico-name">${topico}</span>
+                    <span class="topico-freq">${percentual}%</span>
+                `;
+                topicosList.appendChild(item);
+            });
+
+            // Fluxograma
+            const fluxogramaDiv = document.getElementById('fluxograma');
+            // Remover as marcações de código markdown do fluxograma
+            const fluxogramaLimpo = fluxograma.replace(/```mermaid\n?/g, '').replace(/```$/g, '');
+            fluxogramaDiv.textContent = fluxogramaLimpo;
+            mermaid.init(undefined, fluxogramaDiv);
+
+            // Recomendações (renderizar markdown)
+            document.getElementById('recomendacoes').innerHTML = marked.parse(recomendacoes);
+
+            // Mostrar resultados
+            document.getElementById('results').style.display = 'block';
+
+            // Scroll suave para resultados
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function perguntarPDF() {
+            const chatInput = document.getElementById('chatInput');
+            const chatHistory = document.getElementById('chatHistory');
+            const pergunta = chatInput.value.trim();
+
+            if (!pergunta) {
+                alert('⚠️ Digite uma pergunta.');
+                return;
+            }
+
+            if (!currentAnaliseId) {
+                alert('⚠️ Analise um PDF primeiro.');
+                return;
+            }
+
+            // Adicionar pergunta do usuário ao chat
+            chatHistory.style.display = 'block';
+            const userMsg = document.createElement('div');
+            userMsg.className = 'chat-message user';
+            userMsg.innerHTML = `<strong>Você:</strong><br>${pergunta}`;
+            chatHistory.appendChild(userMsg);
+
+            chatInput.value = '';
+            chatInput.disabled = true;
+
+            try {
+                // Fazer pergunta
+                const response = await fetch(`http://localhost:8000/chat/perguntar-pdf?pergunta=${encodeURIComponent(pergunta)}`, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erro ao processar pergunta');
+                }
+
+                const data = await response.json();
+
+                // Adicionar resposta do bot
+                const botMsg = document.createElement('div');
+                botMsg.className = 'chat-message bot';
+                botMsg.innerHTML = `<strong>🤖 ConcursAI:</strong><br>${data.resposta}`;
+                chatHistory.appendChild(botMsg);
+
+                // Scroll para última mensagem
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+            } catch (error) {
+                console.error('Erro:', error);
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'chat-message bot';
+                errorMsg.innerHTML = `<strong>❌ Erro:</strong><br>${error.message}`;
+                chatHistory.appendChild(errorMsg);
+            } finally {
+                chatInput.disabled = false;
+                chatInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>

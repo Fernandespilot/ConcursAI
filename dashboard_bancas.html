@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Análise de Bancas - ConcursAI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        select, button {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select {
+            background: white;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 1.5em;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .pattern-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .pattern-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pattern-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .pattern-value {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .topics-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .topic-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .armadilha-item {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .armadilha-title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        .armadilha-desc {
+            color: #856404;
+            font-size: 0.95em;
+        }
+
+        .questoes-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .questao-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .questao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .questao-numero {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .questao-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-banca {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-area {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-dificuldade {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .questao-texto {
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 1.05em;
+            color: #333;
+        }
+
+        .alternativas {
+            margin: 20px 0;
+        }
+
+        .alternativa {
+            padding: 12px 15px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .alternativa:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .alternativa.correta {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .alternativa.incorreta {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .questao-explicacao {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .questao-explicacao.show {
+            display: block;
+        }
+
+        .questao-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .banca-comparison-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .banca-comparison-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .comparison-stat {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Dashboard Análise de Bancas</h1>
+            <p>Sistema Inteligente de Análise e Preparação para Concursos</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="bancaSelect">📋 Banca:</label>
+                <select id="bancaSelect" onchange="carregarDados()">
+                    <option value="CEBRASPE">CEBRASPE</option>
+                    <option value="FGV">FGV</option>
+                    <option value="FCC">FCC</option>
+                    <option value="TODAS">Todas (Comparar)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="areaSelect">📚 Área:</label>
+                <select id="areaSelect" onchange="carregarDados()">
+                    <option value="TODAS">Todas</option>
+                    <option value="Língua Portuguesa">Língua Portuguesa</option>
+                    <option value="Raciocínio Lógico">Raciocínio Lógico</option>
+                    <option value="Informática">Informática</option>
+                    <option value="Jurídica">Jurídica</option>
+                    <option value="Conhecimentos Gerais">Conhecimentos Gerais</option>
+                </select>
+            </div>
+
+            <button onclick="gerarQuestoes()">🎓 Gerar Questões Personalizadas</button>
+            <button onclick="exportarRelatorio()">📊 Exportar Relatório</button>
+        </div>
+
+        <div id="dashboardContent">
+            <div class="loading">Carregando dados...</div>
+        </div>
+    </div>
+
+    <script>
+        let dadosAtuais = null;
+
+        // Simular dados (em produção, viriam do backend)
+        const dadosSimulados = {
+            CEBRASPE: {
+                estatisticas: {
+                    total_questoes: 1234,
+                    com_gabarito: 1156,
+                    areas_cobertas: 8,
+                    nivel_predominante: "MÉDIO"
+                },
+                distribuicao_areas: {
+                    "Língua Portuguesa": 35,
+                    "Conhecimentos Gerais": 28,
+                    "Raciocínio Lógico": 18,
+                    "Informática": 12,
+                    "Jurídica": 7
+                },
+                padroes_cobranca: {
+                    "Legislação": 42,
+                    "Interpretação": 38,
+                    "Teoria": 28,
+                    "Jurisprudência": 15,
+                    "Prática": 12
+                },
+                nivel_dificuldade: {
+                    "Fácil": 25,
+                    "Médio": 52,
+                    "Difícil": 23
+                },
+                top_topicos: [
+                    "Constituição Federal",
+                    "Administração Pública",
+                    "Interpretação de Texto",
+                    "Morfologia",
+                    "Sintaxe"
+                ],
+                armadilhas: [
+                    {
+                        titulo: "Negação Dupla",
+                        descricao: "Usa 'não...não' para confundir. Aparece em 24% das questões.",
+                        frequencia: 24
+                    },
+                    {
+                        titulo: "Termos Absolutos",
+                        descricao: "Palavras como 'sempre', 'nunca', 'todo'. Aparece em 18% das questões.",
+                        frequencia: 18
+                    },
+                    {
+                        titulo: "Exceto/Salvo",
+                        descricao: "Inverte a lógica da questão. Aparece em 15% das questões.",
+                        frequencia: 15
+                    }
+                ],
+                gabaritos: {
+                    A: 19,
+                    B: 21,
+                    C: 22,
+                    D: 20,
+                    E: 18
+                },
+                estilo: {
+                    "Assertivas": 78,
+                    "Interrogativas": 22,
+                    "Texto Longo": 65,
+                    "Diretas": 42
+                }
+            },
+            FGV: {
+                estatisticas: {
+                    total_questoes: 987,
+                    com_gabarito: 945,
+                    areas_cobertas: 9,
+                    nivel_predominante: "DIFÍCIL"
+                },
+                distribuicao_areas: {
+                    "Jurídica": 42,
+                    "Língua Portuguesa": 25,
+                    "Raciocínio Lógico": 15,
+                    "Conhecimentos Gerais": 10,
+                    "Informática": 8
+                },
+                padroes_cobranca: {
+                    "Interpretação": 48,
+                    "Jurisprudência": 35,
+                    "Prática": 32,
+                    "Teoria": 25,
+                    "Legislação": 20
+                },
+                nivel_dificuldade: {
+                    "Fácil": 15,
+                    "Médio": 31,
+                    "Difícil": 54
+                },
+                top_topicos: [
+                    "Direito Administrativo",
+                    "Direito Constitucional",
+                    "Interpretação Textual",
+                    "Raciocínio Analítico",
+                    "Gestão Pública"
+                ],
+                armadilhas: [
+                    {
+                        titulo: "Interpretação Sutil",
+                        descricao: "Requer leitura muito atenta. Aparece em 35% das questões.",
+                        frequencia: 35
+                    },
+                    {
+                        titulo: "Palavras Confusas",
+                        descricao: "Usa 'pode', 'deve', 'poderá'. Aparece em 28% das questões.",
+                        frequencia: 28
+                    },
+                    {
+                        titulo: "Detalhes Mínimos",
+                        descricao: "Cobra pequenos detalhes decisivos. Aparece em 22% das questões.",
+                        frequencia: 22
+                    }
+                ],
+                gabaritos: {
+                    A: 18,
+                    B: 19,
+                    C: 24,
+                    D: 21,
+                    E: 18
+                },
+                estilo: {
+                    "Interrogativas": 65,
+                    "Assertivas": 35,
+                    "Texto Longo": 72,
+                    "Indiretas": 68
+                }
+            },
+            FCC: {
+                estatisticas: {
+                    total_questoes: 856,
+                    com_gabarito: 798,
+                    areas_cobertas: 7,
+                    nivel_predominante: "MÉDIO"
+                },
+                distribuicao_areas: {
+                    "Língua Portuguesa": 32,
+                    "Jurídica": 28,
+                    "Informática": 18,
+                    "Raciocínio Lógico": 12,
+                    "Conhecimentos Gerais": 10
+                },
+                padroes_cobranca: {
+                    "Teoria": 45,
+                    "Legislação": 35,
+                    "Interpretação": 30,
+                    "Prática": 18,
+                    "Cálculo": 12
+                },
+                nivel_dificuldade: {
+                    "Fácil": 32,
+                    "Médio": 48,
+                    "Difícil": 20
+                },
+                top_topicos: [
+                    "Gramática",
+                    "Direito Processual",
+                    "Tecnologia da Informação",
+                    "Regência Verbal",
+                    "Lógica Proposicional"
+                ],
+                armadilhas: [
+                    {
+                        titulo: "Gramática Rebuscada",
+                        descricao: "Usa termos gramaticais complexos. Aparece em 30% das questões.",
+                        frequencia: 30
+                    },
+                    {
+                        titulo: "Pegadinhas Lógicas",
+                        descricao: "Raciocínio que parece óbvio mas não é. Aparece em 25% das questões.",
+                        frequencia: 25
+                    },
+                    {
+                        titulo: "Sinônimos Falsos",
+                        descricao: "Palavras parecidas com significados diferentes. Aparece em 20% das questões.",
+                        frequencia: 20
+                    }
+                ],
+                gabaritos: {
+                    A: 21,
+                    B: 20,
+                    C: 20,
+                    D: 19,
+                    E: 20
+                },
+                estilo: {
+                    "Assertivas": 55,
+                    "Interrogativas": 45,
+                    "Texto Médio": 58,
+                    "Diretas": 62
+                }
+            }
+        };
+
+        function carregarDados() {
+            const banca = document.getElementById('bancaSelect').value;
+            const area = document.getElementById('areaSelect').value;
+
+            if (banca === 'TODAS') {
+                mostrarComparacao();
+            } else {
+                dadosAtuais = dadosSimulados[banca];
+                renderizarDashboard(banca, area);
+            }
+        }
+
+        function renderizarDashboard(banca, area) {
+            const content = document.getElementById('dashboardContent');
+            
+            content.innerHTML = `
+                <div class="dashboard-grid">
+                    ${renderizarEstatisticas()}
+                    ${renderizarDistribuicaoAreas()}
+                    ${renderizarPadroesCobranca()}
+                    ${renderizarNivelDificuldade()}
+                </div>
+
+                <div class="dashboard-grid">
+                    ${renderizarTopTopicos()}
+                    ${renderizarArmadilhas()}
+                    ${renderizarDistribuicaoGabaritos()}
+                    ${renderizarEstiloBanca()}
+                </div>
+            `;
+
+            // Renderizar gráficos
+            setTimeout(() => {
+                criarGraficoAreas();
+                criarGraficoPadroes();
+                criarGraficoDificuldade();
+                criarGraficoGabaritos();
+            }, 100);
+        }
+
+        function renderizarEstatisticas() {
+            const stats = dadosAtuais.estatisticas;
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">📊</span>
+                        Estatísticas Gerais
+                    </div>
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-value">${stats.total_questoes}</div>
+                            <div class="stat-label">Questões</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${stats.com_gabarito}</div>
+                            <div class="stat-label">Com Gabarito</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${stats.areas_cobertas}</div>
+                            <div class="stat-label">Áreas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${stats.nivel_predominante}</div>
+                            <div class="stat-label">Nível</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarDistribuicaoAreas() {
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">📚</span>
+                        Distribuição por Áreas
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartAreas"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarPadroesCobranca() {
+            const padroes = dadosAtuais.padroes_cobranca;
+            const items = Object.entries(padroes).map(([nome, valor]) => `
+                <li class="pattern-item">
+                    <span class="pattern-name">${nome}</span>
+                    <span class="pattern-value">${valor}%</span>
+                </li>
+            `).join('');
+
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">🎯</span>
+                        Como a Banca Cobra
+                    </div>
+                    <ul class="pattern-list">
+                        ${items}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function renderizarNivelDificuldade() {
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">📈</span>
+                        Nível de Dificuldade
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartDificuldade"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarTopTopicos() {
+            const tags = dadosAtuais.top_topicos.map(topico => 
+                `<span class="topic-tag">${topico}</span>`
+            ).join('');
+
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">🔥</span>
+                        Tópicos Mais Cobrados
+                    </div>
+                    <div class="topics-cloud">
+                        ${tags}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarArmadilhas() {
+            const items = dadosAtuais.armadilhas.map(arm => `
+                <div class="armadilha-item">
+                    <div class="armadilha-title">⚠️ ${arm.titulo} (${arm.frequencia}%)</div>
+                    <div class="armadilha-desc">${arm.descricao}</div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">⚠️</span>
+                        Armadilhas Comuns
+                    </div>
+                    ${items}
+                </div>
+            `;
+        }
+
+        function renderizarDistribuicaoGabaritos() {
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">✅</span>
+                        Distribuição de Gabaritos
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chartGabaritos"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarEstiloBanca() {
+            const estilo = dadosAtuais.estilo;
+            const items = Object.entries(estilo).map(([nome, valor]) => `
+                <li class="pattern-item">
+                    <span class="pattern-name">${nome}</span>
+                    <span class="pattern-value">${valor}%</span>
+                </li>
+            `).join('');
+
+            return `
+                <div class="card">
+                    <div class="card-title">
+                        <span class="card-icon">✍️</span>
+                        Estilo da Banca
+                    </div>
+                    <ul class="pattern-list">
+                        ${items}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function criarGraficoAreas() {
+            const ctx = document.getElementById('chartAreas');
+            if (!ctx) return;
+
+            const dados = dadosAtuais.distribuicao_areas;
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(dados),
+                    datasets: [{
+                        data: Object.values(dados),
+                        backgroundColor: [
+                            '#667eea', '#764ba2', '#f093fb', '#4facfe',
+                            '#43e97b', '#fa709a', '#fee140', '#30cfd0'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function criarGraficoPadroes() {
+            const ctx = document.getElementById('chartPadroes');
+            if (!ctx) return;
+
+            const dados = dadosAtuais.padroes_cobranca;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dados),
+                    datasets: [{
+                        label: 'Percentual',
+                        data: Object.values(dados),
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function criarGraficoDificuldade() {
+            const ctx = document.getElementById('chartDificuldade');
+            if (!ctx) return;
+
+            const dados = dadosAtuais.nivel_dificuldade;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dados),
+                    datasets: [{
+                        label: 'Percentual',
+                        data: Object.values(dados),
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function criarGraficoGabaritos() {
+            const ctx = document.getElementById('chartGabaritos');
+            if (!ctx) return;
+
+            const dados = dadosAtuais.gabaritos;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dados),
+                    datasets: [{
+                        label: 'Percentual',
+                        data: Object.values(dados),
+                        backgroundColor: '#764ba2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 30
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function mostrarComparacao() {
+            const content = document.getElementById('dashboardContent');
+            const bancas = ['CEBRASPE', 'FGV', 'FCC'];
+            
+            const cards = bancas.map(banca => {
+                const dados = dadosSimulados[banca];
+                return `
+                    <div class="banca-comparison-card">
+                        <h3>${banca}</h3>
+                        <div class="comparison-stat">
+                            <strong>${dados.estatisticas.total_questoes}</strong> questões
+                        </div>
+                        <div class="comparison-stat">
+                            Nível: <strong>${dados.estatisticas.nivel_predominante}</strong>
+                        </div>
+                        <div class="comparison-stat">
+                            Cobra mais: <strong>${Object.keys(dados.padroes_cobranca)[0]}</strong>
+                        </div>
+                        <div class="comparison-stat">
+                            Área forte: <strong>${Object.keys(dados.distribuicao_areas)[0]}</strong>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            content.innerHTML = `
+                <div class="comparison-section">
+                    <div class="card-title">
+                        <span class="card-icon">🔍</span>
+                        Comparação entre Bancas
+                    </div>
+                    <div class="comparison-grid">
+                        ${cards}
+                    </div>
+                </div>
+            `;
+        }
+
+        function gerarQuestoes() {
+            const banca = document.getElementById('bancaSelect').value;
+            const area = document.getElementById('areaSelect').value;
+            
+            if (banca === 'TODAS') {
+                alert('Selecione uma banca específica para gerar questões.');
+                return;
+            }
+
+            window.location.href = `gerador_questoes.html?banca=${banca}&area=${area}`;
+        }
+
+        function exportarRelatorio() {
+            const banca = document.getElementById('bancaSelect').value;
+            alert(`Exportando relatório da banca ${banca}...\nEm breve será baixado um PDF com a análise completa.`);
+        }
+
+        // Inicializar
+        window.onload = () => {
+            carregarDados();
+        };
+    </script>
+</body>
+</html>

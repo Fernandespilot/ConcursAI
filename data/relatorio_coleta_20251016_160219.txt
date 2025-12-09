@@ -1,0 +1,26 @@
+
+🎯 RELATÓRIO COMPLETO DE COLETA DE CONCURSOS
+============================================
+Data/Hora: 2025-10-16 16:02:19
+
+📊 RESUMO GERAL
+- Total de concursos coletados: 67
+- Total de vagas disponíveis: 0
+- Concursos com informação salarial: 0
+- Salário médio: R$ nan
+- Maior salário: R$ 0.00
+
+📈 CONCURSOS POR FONTE
+- Concursos Brasil: 67 concursos\n
+🎓 TOP 10 ESCOLARIDADES
+- : 67 concursos\n
+🏢 TOP 15 ÓRGÃOS/INSTITUIÇÕES
+- : 67 concursos\n
+👥 VAGAS POR ESCOLARIDADE
+- : 0 vagas\n
+📋 STATUS DOS CONCURSOS
+- : 67 concursos\n
+============================================
+Relatório gerado automaticamente pelo ConcursAI
+Sistema de coleta e análise de concursos públicos
+============================================

@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Chat com IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Chat Container */
+        .chat-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            height: calc(100vh - 300px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .sidebar-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .example-questions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .example-btn {
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+            border: 2px solid #e0e0e0;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        
+        .example-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+        
+        .stats-mini {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .stat-mini {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+            border-radius: 12px;
+        }
+        
+        .stat-mini-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-mini-label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            background: linear-gradient(135deg, #f8f9ff, #ffffff);
+        }
+        
+        .chat-header h3 {
+            font-size: 1.3rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: #fafbff;
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.user {
+            text-align: right;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            max-width: 70%;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.ai .message-bubble {
+            background: white;
+            color: #333;
+            border: 2px solid #e0e0e0;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            color: #666;
+        }
+        
+        .typing-indicator.active {
+            display: flex;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .chat-input-container {
+            padding: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+            background: white;
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            resize: none;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            min-height: 50px;
+            max-height: 150px;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-send {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-send:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .chat-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                flex-direction: row;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                flex-direction: column;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    🎯 ConcursAI
+                </a>
+                <nav class="nav-links">
+                    <a href="index.html" class="nav-link">🏠 Início</a>
+                    <a href="concursos.html" class="nav-link">🔍 Concursos</a>
+                    <a href="chat.html" class="nav-link active">💬 Chat IA</a>
+                    <a href="interface_pdf_final.html" class="nav-link">📄 Analisar PDF</a>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Hero -->
+            <div class="hero">
+                <h1>💬 Chat com Assistente IA</h1>
+                <p>Tire suas dúvidas sobre concursos públicos com inteligência artificial</p>
+            </div>
+            
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <!-- Examples -->
+                    <div class="sidebar-panel">
+                        <h3 class="panel-title">💡 Perguntas Sugeridas</h3>
+                        <div class="example-questions">
+                            <button class="example-btn" onclick="sendExample('Quais concursos abertos para nível superior?')">
+                                💼 Concursos nível superior
+                            </button>
+                            <button class="example-btn" onclick="sendExample('Mostre concursos com salário acima de R$ 10.000')">
+                                💰 Salários acima de 10k
+                            </button>
+                            <button class="example-btn" onclick="sendExample('Concursos da área de TI')">
+                                💻 Área de TI
+                            </button>
+                            <button class="example-btn" onclick="sendExample('Próximas inscrições abertas')">
+                                📅 Inscrições abertas
+                            </button>
+                            <button class="example-btn" onclick="sendExample('Como se preparar para concurso público?')">
+                                📚 Como se preparar
+                            </button>
+                            <button class="example-btn" onclick="sendExample('Diferenças entre Analista e Técnico')">
+                                🎯 Analista vs Técnico
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="sidebar-panel">
+                        <h3 class="panel-title">📊 Estatísticas</h3>
+                        <div class="stats-mini">
+                            <div class="stat-mini">
+                                <div class="stat-mini-value" id="messages-count">0</div>
+                                <div class="stat-mini-label">Mensagens</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-mini-value">450</div>
+                                <div class="stat-mini-label">Concursos</div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                
+                <!-- Chat -->
+                <div class="chat-panel">
+                    <div class="chat-header">
+                        <h3>🤖 Assistente ConcursAI</h3>
+                        <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                            Seu especialista em concursos públicos
+                        </p>
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai">
+                            <div class="message-bubble">
+                                <strong>🤖 Olá! Sou o Assistente ConcursAI</strong><br><br>
+                                Posso ajudá-lo com:
+                                <ul style="margin: 1rem 0 0 1.5rem; line-height: 1.8;">
+                                    <li>📋 Buscar concursos específicos</li>
+                                    <li>💡 Explicar requisitos de editais</li>
+                                    <li>💰 Comparar salários e benefícios</li>
+                                    <li>📚 Dicas de preparação</li>
+                                    <li>🎯 Orientações sobre carreiras públicas</li>
+                                </ul>
+                                <br>
+                                <strong>Como posso ajudá-lo hoje?</strong>
+                            </div>
+                            <div class="message-time">Agora</div>
+                        </div>
+                    </div>
+                    
+                    <div class="typing-indicator" id="typing-indicator">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                        <span>Assistente está digitando...</span>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea 
+                                class="chat-input" 
+                                id="chat-input" 
+                                placeholder="Digite sua pergunta aqui..."
+                                rows="1"
+                                onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                            ></textarea>
+                            <button class="btn-send" id="btn-send" onclick="sendMessage()">
+                                📤 Enviar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        let messageCount = 1; // Já tem a mensagem de boas-vindas
+        
+        // Verificar se há contexto de concurso
+        const contexto = localStorage.getItem('concurso_contexto');
+        if (contexto) {
+            const concurso = JSON.parse(contexto);
+            setTimeout(() => {
+                addMessage('user', `Me conte mais sobre o concurso: ${concurso.titulo}`);
+                setTimeout(() => {
+                    const resposta = `
+                        📋 <strong>${concurso.titulo}</strong><br><br>
+                        🏛️ <strong>Órgão:</strong> ${concurso.orgao}<br>
+                        📍 <strong>Estado:</strong> ${concurso.estado}<br>
+                        💼 <strong>Cargo:</strong> ${concurso.cargo}<br>
+                        👥 <strong>Vagas:</strong> ${concurso.vagas}<br>
+                        💰 <strong>Salário:</strong> ${concurso.salario}<br>
+                        🎓 <strong>Escolaridade:</strong> ${concurso.escolaridade}<br>
+                        📅 <strong>Inscrições:</strong> ${concurso.inscricoes}<br><br>
+                        <strong>Posso ajudá-lo com mais alguma informação sobre este concurso?</strong>
+                    `;
+                    addMessage('ai', resposta);
+                }, 1500);
+            }, 500);
+            localStorage.removeItem('concurso_contexto');
+        }
+        
+        // Auto-resize textarea
+        document.getElementById('chat-input').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+        
+        // Enviar mensagem de exemplo
+        function sendExample(text) {
+            document.getElementById('chat-input').value = text;
+            sendMessage();
+        }
+        
+        // Enviar mensagem
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Adicionar mensagem do usuário
+            addMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Desabilitar botão
+            document.getElementById('btn-send').disabled = true;
+            
+            // Mostrar indicador de digitação
+            document.getElementById('typing-indicator').classList.add('active');
+            
+            // Simular resposta da IA
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            document.getElementById('typing-indicator').classList.remove('active');
+            
+            // Gerar resposta
+            const resposta = gerarResposta(message);
+            addMessage('ai', resposta);
+            
+            // Reabilitar botão
+            document.getElementById('btn-send').disabled = false;
+        }
+        
+        // Adicionar mensagem
+        function addMessage(type, text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const time = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble">${text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            messageCount++;
+            document.getElementById('messages-count').textContent = messageCount;
+        }
+        
+        // Gerar resposta inteligente
+        function gerarResposta(pergunta) {
+            const p = pergunta.toLowerCase();
+            
+            // Concursos nível superior
+            if (p.includes('nível superior') || p.includes('nivel superior') || p.includes('graduação')) {
+                return `
+                    📚 <strong>Concursos para Nível Superior</strong><br><br>
+                    Encontrei <strong>5 concursos</strong> ativos para nível superior:<br><br>
+                    1️⃣ <strong>TRT-SP - Analista Judiciário</strong><br>
+                    💰 R$ 12.455,30 | 👥 50 vagas<br><br>
+                    2️⃣ <strong>Polícia Federal - Agente</strong><br>
+                    💰 R$ 12.522,50 | 👥 500 vagas<br><br>
+                    3️⃣ <strong>Receita Federal - Auditor Fiscal</strong><br>
+                    💰 R$ 21.029,09 | 👥 150 vagas<br><br>
+                    4️⃣ <strong>Prefeitura BH - Analista de TI</strong><br>
+                    💰 R$ 8.500,00 | 👥 30 vagas<br><br>
+                    <a href="concursos.html" style="color: #667eea;">🔍 Ver todos os detalhes</a>
+                `;
+            }
+            
+            // Salários altos
+            if (p.includes('salário') || p.includes('salario') || p.includes('10.000') || p.includes('10000')) {
+                return `
+                    💰 <strong>Concursos com Maiores Salários</strong><br><br>
+                    🥇 <strong>Receita Federal - Auditor Fiscal</strong><br>
+                    R$ 21.029,09 | 150 vagas | Nacional<br><br>
+                    🥈 <strong>Polícia Federal - Agente</strong><br>
+                    R$ 12.522,50 | 500 vagas | Nacional<br><br>
+                    🥉 <strong>TRT-SP - Analista Judiciário</strong><br>
+                    R$ 12.455,30 | 50 vagas | São Paulo<br><br>
+                    Todos com <strong>excelentes benefícios</strong> e estabilidade!<br><br>
+                    <a href="concursos.html" style="color: #667eea;">🔍 Ver mais opções</a>
+                `;
+            }
+            
+            // Área de TI
+            if (p.includes('ti') || p.includes('tecnologia') || p.includes('informação') || p.includes('programador')) {
+                return `
+                    💻 <strong>Concursos na Área de TI</strong><br><br>
+                    Ótima área para concursos! Encontrei:<br><br>
+                    1️⃣ <strong>Prefeitura BH - Analista de TI</strong><br>
+                    💰 R$ 8.500,00 | 👥 30 vagas | Superior em TI<br><br>
+                    2️⃣ <strong>TRT-SP - Analista TI</strong><br>
+                    💰 R$ 12.455,30 | 👥 10 vagas | Superior<br><br>
+                    <strong>📚 Matérias comuns:</strong><br>
+                    • Programação (Java, Python, C#)<br>
+                    • Banco de Dados (SQL, Oracle)<br>
+                    • Redes e Segurança<br>
+                    • Engenharia de Software<br><br>
+                    <a href="concursos.html" style="color: #667eea;">🔍 Ver todos os concursos de TI</a>
+                `;
+            }
+            
+            // Inscrições
+            if (p.includes('inscrições') || p.includes('inscricoes') || p.includes('prazo')) {
+                return `
+                    📅 <strong>Inscrições Abertas Agora</strong><br><br>
+                    <strong>Atenção aos prazos!</strong><br><br>
+                    🔥 <strong>Polícia Federal - Agente</strong><br>
+                    📆 Até 15/12/2025 | R$ 12.522,50<br><br>
+                    🔥 <strong>Receita Federal - Auditor</strong><br>
+                    📆 Até 20/12/2025 | R$ 21.029,09<br><br>
+                    🔥 <strong>TRT-SP - Analista</strong><br>
+                    📆 Até 20/12/2025 | R$ 12.455,30<br><br>
+                    <strong>⚠️ Não perca os prazos!</strong><br><br>
+                    <a href="concursos.html" style="color: #667eea;">🔍 Ver calendário completo</a>
+                `;
+            }
+            
+            // Como se preparar
+            if (p.includes('preparar') || p.includes('estudar') || p.includes('dicas')) {
+                return `
+                    📚 <strong>Como se Preparar para Concursos</strong><br><br>
+                    <strong>1. Planejamento</strong><br>
+                    • Escolha um concurso específico<br>
+                    • Analise o edital completo<br>
+                    • Faça um cronograma realista<br><br>
+                    <strong>2. Estudo</strong><br>
+                    • 4-6 horas diárias (ideal)<br>
+                    • Faça resumos e mapas mentais<br>
+                    • Resolva MUITAS questões anteriores<br><br>
+                    <strong>3. Revisão</strong><br>
+                    • Revise semanalmente<br>
+                    • Use técnicas de memorização<br>
+                    • Faça simulados<br><br>
+                    <strong>4. Saúde Mental</strong><br>
+                    • Mantenha rotina de exercícios<br>
+                    • Durma 7-8 horas<br>
+                    • Tenha momentos de lazer<br><br>
+                    💡 <strong>Dica:</strong> Foco e consistência > quantidade de horas!
+                `;
+            }
+            
+            // Analista vs Técnico
+            if (p.includes('analista') && p.includes('técnico') || p.includes('diferença')) {
+                return `
+                    🎯 <strong>Analista vs Técnico</strong><br><br>
+                    <strong>📊 TÉCNICO</strong><br>
+                    • Escolaridade: Nível Médio<br>
+                    • Salário: R$ 3.000 - R$ 7.000<br>
+                    • Atividades: Operacionais, suporte<br>
+                    • Exemplo: Técnico Judiciário<br><br>
+                    <strong>📈 ANALISTA</strong><br>
+                    • Escolaridade: Nível Superior<br>
+                    • Salário: R$ 5.000 - R$ 15.000+<br>
+                    • Atividades: Gestão, planejamento<br>
+                    • Exemplo: Analista Judiciário<br><br>
+                    <strong>💡 Qual escolher?</strong><br>
+                    • Tem superior? → Analista (maior salário)<br>
+                    • Só ensino médio? → Técnico (mais vagas)<br>
+                    • Ambos têm estabilidade e carreira!
+                `;
+            }
+            
+            // Resposta padrão
+            return `
+                Entendi sua pergunta! 🤔<br><br>
+                Com base nos <strong>450 concursos ativos</strong> e <strong>85.000 vagas</strong> no nosso sistema,
+                posso ajudá-lo de várias formas:<br><br>
+                • 🔍 <a href="concursos.html" style="color: #667eea;">Buscar concursos específicos</a><br>
+                • 📄 <a href="interface_pdf_final.html" style="color: #667eea;">Analisar um edital em PDF</a><br>
+                • 💡 Tirar dúvidas sobre requisitos<br>
+                • 📚 Orientações sobre preparação<br><br>
+                <strong>Pode reformular sua pergunta ou escolher um dos tópicos acima?</strong>
+            `;
+        }
+    </script>
+</body>
+</html>

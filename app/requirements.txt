@@ -1,0 +1,17 @@
+# Adicionando aioredis para cache Redis (opcional)
+aioredis==2.0.1
+
+# Adicionando bcrypt para hashing de senhas
+bcrypt==4.1.2
+
+# Adicionando PyJWT para tokens JWT
+PyJWT==2.8.0
+
+# Dependências existentes mantidas
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.1
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+httpx==0.25.2

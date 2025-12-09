@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Inteligência Artificial para Concursos Públicos</title>
+    <meta name="description" content="Plataforma de IA para análise inteligente de editais de concursos públicos. Chat com assistente, análise de PDFs e busca semântica.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --background-color: #f8f9ff;
+            --text-color: #333333;
+            --text-light: #666666;
+            --white: #ffffff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.7;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary-color);
+            margin: 3px 0;
+            transition: var(--transition);
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+        }
+        
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+        
+        .hero-content p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .hero-demo {
+            position: relative;
+        }
+        
+        .demo-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-hover);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .chat-demo {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        .message.user {
+            text-align: right;
+        }
+        
+        .message.ai {
+            text-align: left;
+        }
+        
+        .message-bubble {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            border-radius: 15px;
+            max-width: 80%;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+        }
+        
+        .message.ai .message-bubble {
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .chat-send {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .chat-send:hover {
+            background: var(--secondary-color);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background: var(--white);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+        }
+        
+        .feature-card {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--white);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        
+        .feature-card p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        
+        /* How it Works */
+        .how-it-works {
+            padding: 6rem 0;
+            background: var(--background-color);
+        }
+        
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .step-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .step-card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0;
+            color: var(--text-color);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .cta-content h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-content p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1a1a1a;
+            color: var(--white);
+            padding: 3rem 0 1rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+        
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #333;
+            padding-top: 1rem;
+            text-align: center;
+            color: #999;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: flex;
+            }
+            
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+            
+            .cta-content h2 {
+                font-size: 2rem;
+            }
+            
+            .features-grid,
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Chat Modal */
+        .chat-modal {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 400px;
+            height: 600px;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-hover);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            overflow: hidden;
+        }
+        
+        .chat-modal.active {
+            display: flex;
+        }
+        
+        .chat-modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-modal-close {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .chat-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            z-index: 999;
+        }
+        
+        .chat-fab:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        @media (max-width: 480px) {
+            .chat-modal {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 100px);
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+        
+        /* Scraping Section Animations */
+        .scraping-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .scraping-section a:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4) !important;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .scraping-section .btn-primary {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .scraping-section .btn-primary:hover {
+            animation: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-robot"></i>
+                ConcursAI
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Recursos</a></li>
+                <li><a href="#how-it-works">Como Funciona</a></li>
+                <li><a href="#pricing">Preços</a></li>
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="scraping.html" style="color: var(--accent-color); font-weight: 600;">
+                    <i class="fas fa-spider"></i>
+                    Scraping Auto
+                </a></li>
+                <li><a href="dashboard.html" class="btn-primary">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a></li>
+            </ul>
+            <div class="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content fade-in-up">
+                <h1>Inteligência Artificial para Concursos Públicos</h1>
+                <p>Transforme seus estudos com nossa plataforma de IA avançada. Analise editais, converse com documentos e prepare-se de forma inteligente para concursos públicos.</p>
+                <div class="hero-buttons">
+                    <a href="interface_pdf_final.html" class="btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Começar Agora
+                    </a>
+                    <a href="#demo" class="btn-secondary">
+                        <i class="fas fa-play"></i>
+                        Ver Demo
+                    </a>
+                </div>
+            </div>
+            <div class="hero-demo fade-in-up">
+                <div class="demo-card">
+                    <div class="chat-demo">
+                        <div class="chat-header">
+                            <div class="chat-avatar">AI</div>
+                            <div>
+                                <strong>Assistente ConcursAI</strong>
+                                <div style="font-size: 0.8rem; color: #666;">Online</div>
+                            </div>
+                        </div>
+                        <div class="chat-messages" id="demoMessages">
+                            <div class="message ai">
+                                <div class="message-bubble">
+                                    Olá! Sou sua assistente de IA. Como posso ajudar com seu edital hoje?
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" placeholder="Digite sua pergunta..." id="demoInput">
+                            <button class="chat-send" onclick="sendDemoMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Recursos Poderosos</h2>
+                <p>Nossa plataforma oferece ferramentas avançadas de IA para maximizar sua preparação para concursos públicos</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <h3>Análise de PDFs</h3>
+                    <p>Upload e análise inteligente de editais em PDF. Nossa IA extrai informações importantes como vagas, salários, requisitos e cronogramas automaticamente.</p>
+                </div>
+                
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h3>Chat Inteligente</h3>
+                    <p>Converse com seus documentos usando linguagem natural. Faça perguntas específicas e obtenha respostas precisas baseadas no conteúdo do edital.</p>
+                </div>
+                
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Busca Semântica</h3>
+                    <p>Encontre informações relevantes mesmo sem saber os termos exatos. Nossa busca semântica entende o contexto e encontra o que você precisa.</p>
+                </div>
+                
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Análises Detalhadas</h3>
+                    <p>Relatórios estruturados com resumos, cronogramas, requisitos e dicas de estudo personalizadas para cada cargo e concurso.</p>
+                </div>
+                
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>IA Avançada</h3>
+                    <p>Powered by LangChain e Ollama, nossa IA utiliza modelos de linguagem de última geração para análises profundas e respostas precisas.</p>
+                </div>
+                
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Acesso Total</h3>
+                    <p>Plataforma responsiva que funciona em qualquer dispositivo. Estude onde e quando quiser com total flexibilidade.</p>
+                </div>
+                
+                <div class="feature-card fade-in-up" style="border: 2px solid var(--accent-color);">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <i class="fas fa-spider"></i>
+                    </div>
+                    <h3>🕷️ Scraping Automático</h3>
+                    <p>Coleta automática de editais de múltiplas bancas (Cebraspe, FGV). Agende coletas diárias/semanais e tenha sempre os editais mais recentes indexados.</p>
+                    <a href="scraping.html" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: var(--accent-color); color: white; border-radius: 50px; text-decoration: none; font-weight: 600;">
+                        <i class="fas fa-rocket"></i> Acessar Scraping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scraping Section -->
+    <section class="scraping-section" id="scraping" style="padding: 6rem 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="container">
+            <div class="section-header" style="color: white;">
+                <h2 style="color: white;">🕷️ Sistema de Scraping Automático</h2>
+                <p style="color: rgba(255, 255, 255, 0.9);">Mantenha sua base de editais sempre atualizada com coleta automática de múltiplas bancas organizadoras</p>
+            </div>
+            
+            <div class="scraping-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+                <div class="scraping-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Coleta Inteligente</h3>
+                    <p style="line-height: 1.6; color: rgba(255, 255, 255, 0.9);">
+                        Scraping automático de editais de concursos públicos direto dos sites oficiais das bancas (Cebraspe, FGV e mais).
+                    </p>
+                </div>
+                
+                <div class="scraping-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">⏰</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Agendamento Flexível</h3>
+                    <p style="line-height: 1.6; color: rgba(255, 255, 255, 0.9);">
+                        Configure coletas diárias ou semanais. Deixe o sistema trabalhar para você enquanto você estuda.
+                    </p>
+                </div>
+                
+                <div class="scraping-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔄</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">Indexação Automática</h3>
+                    <p style="line-height: 1.6; color: rgba(255, 255, 255, 0.9);">
+                        PDFs coletados são automaticamente processados e indexados na base vetorial para busca semântica instantânea.
+                    </p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="scraping.html" class="btn-primary" style="background: white; color: var(--primary-color); font-size: 1.1rem; padding: 1rem 2.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                    <i class="fas fa-spider"></i>
+                    Acessar Sistema de Scraping
+                </a>
+                <div style="margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.8;">
+                    ✨ Configure coletas automáticas em segundos
+                </div>
+            </div>
+            
+            <!-- Status Dashboard Preview -->
+            <div style="margin-top: 4rem; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.3);">
+                <h3 style="text-align: center; margin-bottom: 2rem; font-size: 1.5rem;">📊 Painel de Controle</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
+                        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">125</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">PDFs Coletados</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
+                        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">120</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">PDFs Indexados</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
+                        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">2</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Jobs Agendados</div>
+                    </div>
+                    <div style="text-align: center; padding: 1.5rem; background: rgba(255, 255, 255, 0.1); border-radius: 15px;">
+                        <div style="font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem;">🟢</div>
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Sistema Ativo</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2>Como Funciona</h2>
+                <p>Em apenas 3 passos simples, transforme seus editais em conhecimento estruturado</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card fade-in-up">
+                    <div class="step-number">1</div>
+                    <h4>Upload do Edital</h4>
+                    <p>Faça upload do PDF do edital diretamente na plataforma. Suportamos arquivos de até 50MB.</p>
+                </div>
+                
+                <div class="step-card fade-in-up">
+                    <div class="step-number">2</div>
+                    <h4>Processamento IA</h4>
+                    <p>Nossa IA analisa o documento, extrai informações e cria embeddings para busca semântica.</p>
+                </div>
+                
+                <div class="step-card fade-in-up">
+                    <div class="step-number">3</div>
+                    <h4>Converse e Analise</h4>
+                    <p>Chat com o documento, obtenha análises detalhadas e prepare-se de forma inteligente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Pronto para Revolucionar seus Estudos?</h2>
+                <p>Junte-se a milhares de candidatos que já usam nossa plataforma para se preparar de forma mais eficiente</p>
+                <a href="interface_pdf_final.html" class="btn-primary" style="background: white; color: var(--primary-color); font-size: 1.1rem; padding: 1rem 2rem;">
+                    <i class="fas fa-rocket"></i>
+                    Começar Gratuitamente
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>ConcursAI</h4>
+                    <p>Plataforma de inteligência artificial para análise de editais de concursos públicos.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Recursos</h4>
+                    <a href="interface_pdf.html">Análise de PDFs</a>
+                    <a href="interface_html5_moderna.html">Interface Moderna</a>
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="api_fastapi.py">API</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Suporte</h4>
+                    <a href="#docs">Documentação</a>
+                    <a href="#help">Central de Ajuda</a>
+                    <a href="#contact">Contato</a>
+                    <a href="#status">Status</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Conecte-se</h4>
+                    <a href="#github">GitHub</a>
+                    <a href="#twitter">Twitter</a>
+                    <a href="#linkedin">LinkedIn</a>
+                    <a href="#youtube">YouTube</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ConcursAI. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chat FAB -->
+    <button class="chat-fab" onclick="toggleChat()">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- Chat Modal -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-modal-header">
+            <h4>🤖 Assistente ConcursAI</h4>
+            <button class="chat-modal-close" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatModalMessages" style="flex: 1; padding: 1rem; overflow-y: auto;">
+            <div class="message ai">
+                <div class="message-bubble">
+                    Olá! 👋 Sou sua assistente de IA. Como posso ajudar você hoje?
+                </div>
+            </div>
+        </div>
+        <div class="chat-input" style="padding: 1rem;">
+            <input type="text" placeholder="Digite sua mensagem..." id="chatModalInput" onkeypress="handleChatKeyPress(event)">
+            <button class="chat-send" onclick="sendChatMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Demo Chat Functionality
+        const demoMessages = [
+            "Quais são os requisitos para o cargo de Analista?",
+            "Qual é o salário oferecido?",
+            "Quando são as inscrições?",
+            "Como posso me preparar para a prova?"
+        ];
+        
+        const demoResponses = [
+            "Para o cargo de Analista, os requisitos são: Ensino Superior Completo, experiência mínima de 2 anos e conhecimentos específicos na área.",
+            "O salário oferecido é de R$ 8.500,00 + benefícios incluindo vale alimentação, plano de saúde e vale transporte.",
+            "As inscrições ocorrem de 15/11/2024 a 30/11/2024 através do site oficial do concurso.",
+            "Recomendo focar em: 1) Conhecimentos específicos, 2) Legislação, 3) Português e 4) Raciocínio Lógico. Posso criar um plano de estudos personalizado!"
+        ];
+        
+        let demoIndex = 0;
+        
+        function sendDemoMessage() {
+            const input = document.getElementById('demoInput');
+            const messages = document.getElementById('demoMessages');
+            
+            if (input.value.trim()) {
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'message user';
+                userMsg.innerHTML = `<div class="message-bubble">${input.value}</div>`;
+                messages.appendChild(userMsg);
+                
+                // Clear input
+                const userInput = input.value;
+                input.value = '';
+                
+                // Scroll to bottom
+                messages.scrollTop = messages.scrollHeight;
+                
+                // Add AI response after delay
+                setTimeout(() => {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message ai';
+                    
+                    // Smart response based on input
+                    let response = "Entendi sua pergunta! Com base no edital analisado, posso fornecer informações específicas. Para uma análise completa, faça upload do seu PDF na plataforma.";
+                    
+                    if (userInput.toLowerCase().includes('salário') || userInput.toLowerCase().includes('remuneração')) {
+                        response = demoResponses[1];
+                    } else if (userInput.toLowerCase().includes('requisito') || userInput.toLowerCase().includes('exigência')) {
+                        response = demoResponses[0];
+                    } else if (userInput.toLowerCase().includes('inscrição') || userInput.toLowerCase().includes('prazo')) {
+                        response = demoResponses[2];
+                    } else if (userInput.toLowerCase().includes('estudo') || userInput.toLowerCase().includes('preparar')) {
+                        response = demoResponses[3];
+                    }
+                    
+                    aiMsg.innerHTML = `<div class="message-bubble">${response}</div>`;
+                    messages.appendChild(aiMsg);
+                    messages.scrollTop = messages.scrollHeight;
+                }, 1000);
+            }
+        }
+        
+        // Auto demo messages
+        function startAutoDemo() {
+            setTimeout(() => {
+                if (demoIndex < demoMessages.length) {
+                    const input = document.getElementById('demoInput');
+                    input.value = demoMessages[demoIndex];
+                    sendDemoMessage();
+                    demoIndex++;
+                    startAutoDemo();
+                }
+            }, 5000);
+        }
+        
+        // Start auto demo after page load
+        setTimeout(startAutoDemo, 3000);
+        
+        // Chat Modal Functionality
+        function toggleChat() {
+            const modal = document.getElementById('chatModal');
+            modal.classList.toggle('active');
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chatModalInput');
+            const messages = document.getElementById('chatModalMessages');
+            
+            if (input.value.trim()) {
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'message user';
+                userMsg.innerHTML = `<div class="message-bubble">${input.value}</div>`;
+                messages.appendChild(userMsg);
+                
+                const userInput = input.value;
+                input.value = '';
+                messages.scrollTop = messages.scrollHeight;
+                
+                // Add typing indicator
+                const typingMsg = document.createElement('div');
+                typingMsg.className = 'message ai';
+                typingMsg.id = 'typing';
+                typingMsg.innerHTML = '<div class="message-bubble">🤖 Digitando...</div>';
+                messages.appendChild(typingMsg);
+                messages.scrollTop = messages.scrollHeight;
+                
+                // Remove typing and add response
+                setTimeout(() => {
+                    document.getElementById('typing').remove();
+                    
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message ai';
+                    
+                    let response = "Posso ajudar você com isso! Para análises mais detalhadas, recomendo fazer upload do seu edital na plataforma completa.";
+                    
+                    if (userInput.toLowerCase().includes('como') && userInput.toLowerCase().includes('funciona')) {
+                        response = "É simples: 1) Faça upload do PDF do edital, 2) Nossa IA processa o documento, 3) Converse e obtenha análises detalhadas!";
+                    } else if (userInput.toLowerCase().includes('preço') || userInput.toLowerCase().includes('custo')) {
+                        response = "Nossa plataforma oferece um plano gratuito para testes e planos premium com recursos avançados. Acesse a plataforma para mais detalhes!";
+                    } else if (userInput.toLowerCase().includes('upload') || userInput.toLowerCase().includes('pdf')) {
+                        response = "Para fazer upload: clique em 'Começar Agora', depois arraste seu PDF para a área de upload ou clique para selecionar o arquivo.";
+                    }
+                    
+                    aiMsg.innerHTML = `<div class="message-bubble">${response}</div>`;
+                    messages.appendChild(aiMsg);
+                    messages.scrollTop = messages.scrollHeight;
+                }, 2000);
+            }
+        }
+        
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        // Demo input enter key
+        document.getElementById('demoInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendDemoMessage();
+            }
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Navbar background on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+        
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.feature-card, .step-card').forEach(card => {
+            observer.observe(card);
+        });
+        
+        // Scraping Status Integration
+        const API_URL = 'http://localhost:8000';
+        
+        async function atualizarStatusScraping() {
+            try {
+                const response = await fetch(`${API_URL}/scraping/status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update stats in the preview dashboard
+                    const statsContainer = document.querySelector('.scraping-section [style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"]');
+                    if (statsContainer && data.estatisticas) {
+                        const stats = statsContainer.children;
+                        if (stats[0]) stats[0].querySelector('div:first-child').textContent = data.estatisticas.total_coletados || '0';
+                        if (stats[1]) stats[1].querySelector('div:first-child').textContent = data.estatisticas.total_indexados || '0';
+                        if (stats[2]) stats[2].querySelector('div:first-child').textContent = data.scheduler?.jobs_ativos || '0';
+                        if (stats[3]) {
+                            const statusIcon = data.scheduler?.rodando ? '🟢' : '🔴';
+                            stats[3].querySelector('div:first-child').textContent = statusIcon;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('API de scraping não disponível ainda');
+            }
+        }
+        
+        // Update scraping status when section is visible
+        const scrapingSection = document.querySelector('.scraping-section');
+        if (scrapingSection) {
+            const scrapingObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        atualizarStatusScraping();
+                        // Update every 30 seconds while visible
+                        const intervalId = setInterval(() => {
+                            if (entry.isIntersecting) {
+                                atualizarStatusScraping();
+                            } else {
+                                clearInterval(intervalId);
+                            }
+                        }, 30000);
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            scrapingObserver.observe(scrapingSection);
+        }
+        
+        // Initial status check after page load
+        setTimeout(atualizarStatusScraping, 2000);
+    </script>
+</body>
+</html>

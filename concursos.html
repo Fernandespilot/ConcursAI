@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Buscar Concursos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        /* Search Panel */
+        .search-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) auto;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        .input-group input,
+        .input-group select {
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-search {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-end;
+        }
+        
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Results */
+        .results-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .concurso-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .concurso-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+        }
+        
+        .concurso-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .concurso-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .info-icon {
+            font-size: 1.2rem;
+            color: #667eea;
+        }
+        
+        .concurso-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f9ff;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .search-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .search-grid,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    🎯 ConcursAI
+                </a>
+                <nav class="nav-links">
+                    <a href="index.html" class="nav-link">🏠 Início</a>
+                    <a href="concursos.html" class="nav-link active">🔍 Concursos</a>
+                    <a href="chat.html" class="nav-link">💬 Chat IA</a>
+                    <a href="interface_pdf_final.html" class="nav-link">📄 Analisar PDF</a>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Hero -->
+            <div class="hero">
+                <h1>🔍 Buscar Concursos Públicos</h1>
+                <p>Encontre as melhores oportunidades em todo o Brasil</p>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value" id="total-concursos">450</div>
+                    <div class="stat-label">Concursos Ativos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="total-vagas">85.000</div>
+                    <div class="stat-label">Vagas Disponíveis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🗺️</div>
+                    <div class="stat-value">27</div>
+                    <div class="stat-label">Estados Cobertos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏛️</div>
+                    <div class="stat-value">15+</div>
+                    <div class="stat-label">Bancas Cadastradas</div>
+                </div>
+            </div>
+            
+            <!-- Search Panel -->
+            <div class="search-panel">
+                <h2 class="panel-title">
+                    🎯 Filtrar Concursos
+                </h2>
+                <div class="search-grid">
+                    <div class="input-group">
+                        <label>📍 Estado</label>
+                        <select id="estado-filter">
+                            <option value="">Todos os Estados</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="BA">Bahia</option>
+                            <option value="PR">Paraná</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>💼 Cargo</label>
+                        <input type="text" id="cargo-filter" placeholder="Ex: Analista, Técnico, Professor...">
+                    </div>
+                    <div class="input-group">
+                        <label>🏛️ Órgão</label>
+                        <input type="text" id="orgao-filter" placeholder="Ex: TRT, Prefeitura, INSS...">
+                    </div>
+                    <button class="btn-search" onclick="buscarConcursos()">
+                        🔍 Buscar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading -->
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p>Buscando concursos...</p>
+            </div>
+            
+            <!-- Results -->
+            <div class="results-panel" id="results-panel">
+                <h2 class="panel-title">
+                    📊 Resultados da Busca
+                </h2>
+                <div class="results-grid" id="results-grid"></div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // Dados de exemplo
+        const concursosDemo = [
+            {
+                id: 1,
+                titulo: 'TRT 2ª Região - Analista Judiciário',
+                orgao: 'Tribunal Regional do Trabalho - SP',
+                estado: 'SP',
+                cargo: 'Analista Judiciário - Área Administrativa',
+                vagas: '50',
+                salario: 'R$ 12.455,30',
+                escolaridade: 'Nível Superior',
+                inscricoes: '01/12 a 20/12/2025',
+                link: '#'
+            },
+            {
+                id: 2,
+                titulo: 'Prefeitura de Guarulhos - Professor',
+                orgao: 'Prefeitura Municipal de Guarulhos',
+                estado: 'SP',
+                cargo: 'Professor de Educação Básica',
+                vagas: '200',
+                salario: 'R$ 3.850,00',
+                escolaridade: 'Licenciatura',
+                inscricoes: '05/12 a 15/12/2025',
+                link: '#'
+            },
+            {
+                id: 3,
+                titulo: 'INSS - Técnico do Seguro Social',
+                orgao: 'Instituto Nacional do Seguro Social',
+                estado: 'Nacional',
+                cargo: 'Técnico do Seguro Social',
+                vagas: '1.000',
+                salario: 'R$ 5.905,79',
+                escolaridade: 'Nível Médio',
+                inscricoes: '10/12 a 30/12/2025',
+                link: '#'
+            },
+            {
+                id: 4,
+                titulo: 'Polícia Federal - Agente',
+                orgao: 'Departamento de Polícia Federal',
+                estado: 'Nacional',
+                cargo: 'Agente de Polícia Federal',
+                vagas: '500',
+                salario: 'R$ 12.522,50',
+                escolaridade: 'Nível Superior',
+                inscricoes: '15/11 a 15/12/2025',
+                link: '#'
+            },
+            {
+                id: 5,
+                titulo: 'Receita Federal - Auditor Fiscal',
+                orgao: 'Receita Federal do Brasil',
+                estado: 'Nacional',
+                cargo: 'Auditor Fiscal da Receita Federal',
+                vagas: '150',
+                salario: 'R$ 21.029,09',
+                escolaridade: 'Nível Superior',
+                inscricoes: '20/11 a 20/12/2025',
+                link: '#'
+            },
+            {
+                id: 6,
+                titulo: 'TJ-RJ - Técnico Judiciário',
+                orgao: 'Tribunal de Justiça do Rio de Janeiro',
+                estado: 'RJ',
+                cargo: 'Técnico Judiciário',
+                vagas: '80',
+                salario: 'R$ 7.200,00',
+                escolaridade: 'Nível Médio',
+                inscricoes: '01/12 a 25/12/2025',
+                link: '#'
+            },
+            {
+                id: 7,
+                titulo: 'Prefeitura BH - Analista de TI',
+                orgao: 'Prefeitura de Belo Horizonte',
+                estado: 'MG',
+                cargo: 'Analista de Tecnologia da Informação',
+                vagas: '30',
+                salario: 'R$ 8.500,00',
+                escolaridade: 'Superior em TI',
+                inscricoes: '05/12 a 18/12/2025',
+                link: '#'
+            },
+            {
+                id: 8,
+                titulo: 'Banco do Brasil - Escriturário',
+                orgao: 'Banco do Brasil S.A.',
+                estado: 'Nacional',
+                cargo: 'Escriturário',
+                vagas: '2.000',
+                salario: 'R$ 3.622,23',
+                escolaridade: 'Nível Médio',
+                inscricoes: '10/11 a 10/12/2025',
+                link: '#'
+            }
+        ];
+        
+        // Carregar estatísticas
+        async function carregarEstatisticas() {
+            try {
+                const response = await fetch('http://localhost:8001/api/v1/stats/overview');
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('total-concursos').textContent = data.total_concursos || 450;
+                    document.getElementById('total-vagas').textContent = (data.total_vagas || 85000).toLocaleString();
+                }
+            } catch (error) {
+                console.log('Usando dados demo');
+            }
+        }
+        
+        // Buscar concursos
+        async function buscarConcursos() {
+            const loading = document.getElementById('loading');
+            const resultsGrid = document.getElementById('results-grid');
+            
+            loading.classList.remove('hidden');
+            resultsGrid.innerHTML = '';
+            
+            const estado = document.getElementById('estado-filter').value;
+            const cargo = document.getElementById('cargo-filter').value.toLowerCase();
+            const orgao = document.getElementById('orgao-filter').value.toLowerCase();
+            
+            // Simular delay de busca
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Filtrar concursos
+            let concursosFiltrados = concursosDemo;
+            
+            if (estado) {
+                concursosFiltrados = concursosFiltrados.filter(c => c.estado === estado);
+            }
+            
+            if (cargo) {
+                concursosFiltrados = concursosFiltrados.filter(c => 
+                    c.cargo.toLowerCase().includes(cargo) || 
+                    c.titulo.toLowerCase().includes(cargo)
+                );
+            }
+            
+            if (orgao) {
+                concursosFiltrados = concursosFiltrados.filter(c => 
+                    c.orgao.toLowerCase().includes(orgao) ||
+                    c.titulo.toLowerCase().includes(orgao)
+                );
+            }
+            
+            loading.classList.add('hidden');
+            exibirResultados(concursosFiltrados);
+        }
+        
+        // Exibir resultados
+        function exibirResultados(concursos) {
+            const resultsGrid = document.getElementById('results-grid');
+            
+            if (concursos.length === 0) {
+                resultsGrid.innerHTML = '<p style="text-align:center; color:#666; padding:3rem;">Nenhum concurso encontrado com esses filtros. Tente ajustar sua busca.</p>';
+                return;
+            }
+            
+            resultsGrid.innerHTML = concursos.map(c => `
+                <div class="concurso-card">
+                    <div class="concurso-title">${c.titulo}</div>
+                    <div class="concurso-info">
+                        <div class="info-item">
+                            <span class="info-icon">🏛️</span>
+                            <span><strong>Órgão:</strong> ${c.orgao}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">📍</span>
+                            <span><strong>Estado:</strong> ${c.estado}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">💼</span>
+                            <span><strong>Cargo:</strong> ${c.cargo}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">👥</span>
+                            <span><strong>Vagas:</strong> ${c.vagas}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">💰</span>
+                            <span><strong>Salário:</strong> ${c.salario}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🎓</span>
+                            <span><strong>Escolaridade:</strong> ${c.escolaridade}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">📅</span>
+                            <span><strong>Inscrições:</strong> ${c.inscricoes}</span>
+                        </div>
+                    </div>
+                    <div class="concurso-actions">
+                        <button class="btn btn-primary" onclick="verDetalhes(${c.id})">
+                            👁️ Ver Detalhes
+                        </button>
+                        <button class="btn btn-secondary" onclick="perguntarSobre(${c.id})">
+                            💬 Perguntar sobre este concurso
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Ver detalhes
+        function verDetalhes(id) {
+            alert(`Carregando detalhes completos do concurso #${id}...`);
+        }
+        
+        // Perguntar sobre concurso
+        function perguntarSobre(id) {
+            const concurso = concursosDemo.find(c => c.id === id);
+            localStorage.setItem('concurso_contexto', JSON.stringify(concurso));
+            window.location.href = 'chat.html';
+        }
+        
+        // Inicializar
+        window.onload = function() {
+            carregarEstatisticas();
+            buscarConcursos();
+        };
+    </script>
+</body>
+</html>

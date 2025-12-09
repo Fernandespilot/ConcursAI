@@ -1,0 +1,37 @@
+# ConcursAI - Requirements com Llama-3.1 (GGUF) + Scraping
+
+# LLM Engine (CPU otimizado)
+llama-cpp-python==0.2.32
+
+# LangChain ecosystem
+langchain==0.1.0
+langchain-community==0.0.13
+
+# Vector Store
+chromadb==0.4.22
+
+# Embeddings
+sentence-transformers==2.3.1
+
+# PDF Processing
+pypdf==3.17.4
+PyPDF2==3.0.1
+
+# Web Interface
+streamlit==1.29.0
+
+# Hugging Face
+huggingface-hub==0.20.2
+
+# Web Scraping
+scrapy==2.11.0
+beautifulsoup4==4.12.2
+requests==2.31.0
+
+# Scheduling
+apscheduler==3.10.4
+
+# Utilities
+numpy==1.24.3
+tqdm==4.66.1
+lxml==4.9.3

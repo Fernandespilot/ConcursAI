@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Interface de Visualização de Editais</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #333;
+            text-align: center;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .filter-select {
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-select:focus {
+            border-color: #667eea;
+        }
+        
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .results-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .results-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .results-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .edital-card {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .edital-card:hover {
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+        
+        .edital-card:last-child {
+            border-bottom: none;
+        }
+        
+        .edital-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .edital-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+            flex: 1;
+        }
+        
+        .edital-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        
+        .edital-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .meta-value {
+            font-size: 0.9rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .edital-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-description {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+            background: #f8f9ff;
+        }
+        
+        .page-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            padding: 0.8rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .page-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .page-btn.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main {
+                padding: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .edital-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .edital-actions {
+                flex-direction: column;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    📋 ConcursAI - Visualizar Editais
+                </div>
+                <div class="nav-buttons">
+                    <a href="/" class="nav-btn">🏠 Início</a>
+                    <a href="/docs" class="nav-btn">📚 API Docs</a>
+                    <a href="/static/interface_editais.html" class="nav-btn">📋 Editais</a>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>📋 Visualizar Editais</h1>
+                <p>Explore e analise editais de concursos públicos com nossa interface inteligente</p>
+            </section>
+            
+            <!-- Search Section -->
+            <section class="search-section">
+                <h2 class="search-title">🔍 Buscar Editais</h2>
+                
+                <div class="search-form">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput"
+                        placeholder="Digite cargo, órgão, ou palavras-chave..."
+                        onkeypress="handleSearchKeypress(event)"
+                    >
+                    <button class="search-btn" onclick="buscarEditais()">
+                        🔍 Buscar
+                    </button>
+                </div>
+                
+                <!-- Botões de administração -->
+                <div class="admin-actions" style="display: flex; gap: 1rem; margin-bottom: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button class="nav-btn" onclick="coletarDadosReais()" id="btnColetarReal">
+                        🕷️ Coletar PCI Concursos
+                    </button>
+                    <button class="nav-btn" onclick="atualizarDadosReais()" id="btnAtualizarDados">
+                        🔄 Atualizar Base Local
+                    </button>
+                    <button class="nav-btn" onclick="verificarStatusDados()" id="btnStatusDados">
+                        📊 Status dos Dados
+                    </button>
+                </div>
+                
+                <div class="filters">
+                    <select class="filter-select" id="filtroOrgao">
+                        <option value="">Todos os Órgãos</option>
+                    </select>
+                    <select class="filter-select" id="filtroAno">
+                        <option value="">Todos os Anos</option>
+                    </select>
+                    <select class="filter-select" id="filtroCargo">
+                        <option value="">Todos os Cargos</option>
+                    </select>
+                    <select class="filter-select" id="filtroTipo">
+                        <option value="">Todos os Tipos</option>
+                        <option value="edital">Edital</option>
+                        <option value="retificacao">Retificação</option>
+                        <option value="resultado">Resultado</option>
+                    </select>
+                </div>
+            </section>
+            
+            <!-- Results Section -->
+            <section class="results-section">
+                <div class="results-header">
+                    <div class="results-title">📋 Editais Encontrados</div>
+                    <div class="results-count" id="resultsCount">0 editais</div>
+                </div>
+                
+                <div class="results-list" id="resultsList">
+                    <!-- Loading state -->
+                    <div class="loading" id="loadingState">
+                        <div class="spinner"></div>
+                        <p>Carregando editais...</p>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination" id="pagination" style="display: none;">
+                    <button class="page-btn" id="prevBtn" onclick="carregarPagina(paginaAtual - 1)" disabled>← Anterior</button>
+                    <span id="pageInfo">Página 1 de 1</span>
+                    <button class="page-btn" id="nextBtn" onclick="carregarPagina(paginaAtual + 1)" disabled>Próxima →</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let editais = [];
+        let editaisFiltrados = [];
+        let paginaAtual = 1;
+        const editaisPorPagina = 10;
+        let totalPaginas = 1;
+        
+        // URLs da API
+        const API_BASE = '';
+        const ENDPOINTS = {
+            concursos: '/concursos',
+            buscar: '/buscar',
+            info: '/info'
+        };
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarEditais();
+            carregarFiltros();
+        });
+        
+        // Carregar editais da API
+        async function carregarEditais() {
+            try {
+                mostrarLoading(true);
+                
+                const response = await fetch(`${API_BASE}${ENDPOINTS.concursos}?limit=100`);
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar editais');
+                }
+                
+                const data = await response.json();
+                editais = data.concursos || [];
+                editaisFiltrados = [...editais];
+                
+                atualizarResultados();
+                mostrarLoading(false);
+                
+            } catch (error) {
+                console.error('Erro ao carregar editais:', error);
+                mostrarErro('Erro ao carregar editais. Verifique sua conexão.');
+                mostrarLoading(false);
+            }
+        }
+        
+        // Carregar opções dos filtros
+        async function carregarFiltros() {
+            try {
+                // Extrair valores únicos dos editais
+                const orgaos = [...new Set(editais.map(e => e.orgao).filter(Boolean))].sort();
+                const anos = [...new Set(editais.map(e => e.ano).filter(Boolean))].sort().reverse();
+                const cargos = [...new Set(editais.map(e => e.cargo).filter(Boolean))].sort();
+                
+                // Popular selects
+                popularSelect('filtroOrgao', orgaos);
+                popularSelect('filtroAno', anos);
+                popularSelect('filtroCargo', cargos);
+                
+            } catch (error) {
+                console.error('Erro ao carregar filtros:', error);
+            }
+        }
+        
+        function popularSelect(selectId, opcoes) {
+            const select = document.getElementById(selectId);
+            
+            // Limpar opções existentes (exceto a primeira)
+            while (select.children.length > 1) {
+                select.removeChild(select.lastChild);
+            }
+            
+            // Adicionar novas opções
+            opcoes.forEach(opcao => {
+                const option = document.createElement('option');
+                option.value = opcao;
+                option.textContent = opcao;
+                select.appendChild(option);
+            });
+        }
+        
+        // Buscar editais
+        async function buscarEditais() {
+            const termo = document.getElementById('searchInput').value.trim();
+            
+            if (!termo) {
+                // Se não há termo, aplicar apenas filtros
+                aplicarFiltros();
+                return;
+            }
+            
+            try {
+                mostrarLoading(true);
+                
+                const response = await fetch(`${API_BASE}${ENDPOINTS.buscar}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pergunta: termo,
+                        filtro_orgao: document.getElementById('filtroOrgao').value,
+                        filtro_ano: document.getElementById('filtroAno').value,
+                        filtro_cargo: document.getElementById('filtroCargo').value
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro na busca');
+                }
+                
+                const data = await response.json();
+                editaisFiltrados = data.documentos_relevantes || [];
+                
+                atualizarResultados();
+                mostrarLoading(false);
+                
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                mostrarErro('Erro ao realizar busca. Tente novamente.');
+                mostrarLoading(false);
+            }
+        }
+        
+        // Aplicar filtros locais
+        function aplicarFiltros() {
+            const filtroOrgao = document.getElementById('filtroOrgao').value;
+            const filtroAno = document.getElementById('filtroAno').value;
+            const filtroCargo = document.getElementById('filtroCargo').value;
+            const filtroTipo = document.getElementById('filtroTipo').value;
+            
+            editaisFiltrados = editais.filter(edital => {
+                return (!filtroOrgao || edital.orgao?.includes(filtroOrgao)) &&
+                       (!filtroAno || edital.ano?.toString() === filtroAno) &&
+                       (!filtroCargo || edital.cargo?.includes(filtroCargo)) &&
+                       (!filtroTipo || edital.tipo_documento?.includes(filtroTipo));
+            });
+            
+            paginaAtual = 1;
+            atualizarResultados();
+        }
+        
+        // Atualizar resultados exibidos
+        function atualizarResultados() {
+            totalPaginas = Math.ceil(editaisFiltrados.length / editaisPorPagina);
+            const inicio = (paginaAtual - 1) * editaisPorPagina;
+            const fim = inicio + editaisPorPagina;
+            const editaisPagina = editaisFiltrados.slice(inicio, fim);
+            
+            // Atualizar contador
+            document.getElementById('resultsCount').textContent = 
+                `${editaisFiltrados.length} edital${editaisFiltrados.length !== 1 ? 'is' : ''}`;
+            
+            // Renderizar editais
+            renderizarEditais(editaisPagina);
+            
+            // Atualizar paginação
+            atualizarPaginacao();
+        }
+        
+        // Renderizar lista de editais
+        function renderizarEditais(editaisPagina) {
+            const container = document.getElementById('resultsList');
+            
+            if (editaisPagina.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-title">Nenhum edital encontrado</div>
+                        <div class="empty-description">Tente ajustar os filtros ou buscar por outros termos</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = editaisPagina.map(edital => `
+                <div class="edital-card">
+                    <div class="edital-header">
+                        <div class="edital-title">${edital.titulo || 'Título não disponível'}</div>
+                        <div class="edital-badge">${edital.tipo_documento || 'Edital'}</div>
+                    </div>
+                    
+                    <div class="edital-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">🏢 Órgão</div>
+                            <div class="meta-value">${edital.orgao || 'Não informado'}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">👥 Cargo</div>
+                            <div class="meta-value">${edital.cargo || 'Não informado'}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">📅 Ano</div>
+                            <div class="meta-value">${edital.ano || 'Não informado'}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">📊 Fonte</div>
+                            <div class="meta-value">${edital.fonte || 'Sistema'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="edital-actions">
+                        ${edital.url ? `<a href="${edital.url}" target="_blank" class="action-btn btn-primary">🔗 Ver Original</a>` : ''}
+                        <button class="action-btn btn-secondary" onclick="analisarEdital('${edital.titulo}')">🧠 Analisar</button>
+                        <button class="action-btn btn-success" onclick="chatComEdital('${edital.titulo}')">💬 Chat</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Atualizar paginação
+        function atualizarPaginacao() {
+            const pagination = document.getElementById('pagination');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageInfo = document.getElementById('pageInfo');
+            
+            if (totalPaginas <= 1) {
+                pagination.style.display = 'none';
+                return;
+            }
+            
+            pagination.style.display = 'flex';
+            prevBtn.disabled = paginaAtual <= 1;
+            nextBtn.disabled = paginaAtual >= totalPaginas;
+            pageInfo.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+        }
+        
+        // Carregar página específica
+        function carregarPagina(pagina) {
+            if (pagina < 1 || pagina > totalPaginas) return;
+            paginaAtual = pagina;
+            atualizarResultados();
+        }
+        
+        // Handlers de eventos
+        function handleSearchKeypress(event) {
+            if (event.key === 'Enter') {
+                buscarEditais();
+            }
+        }
+        
+        // Adicionar listeners aos filtros
+        document.getElementById('filtroOrgao').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroAno').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroCargo').addEventListener('change', aplicarFiltros);
+        document.getElementById('filtroTipo').addEventListener('change', aplicarFiltros);
+        
+        // Ações dos editais
+        function analisarEdital(titulo) {
+            alert(`🧠 Análise do edital: "${titulo}"\n\nFuncionalidade em desenvolvimento.\nEm breve você poderá ver análise detalhada com IA.`);
+        }
+        
+        function chatComEdital(titulo) {
+            alert(`💬 Chat sobre o edital: "${titulo}"\n\nFuncionalidade em desenvolvimento.\nEm breve você poderá conversar com IA sobre este edital.`);
+        }
+        
+        // Funções de administração
+        async function coletarDadosReais() {
+            const btn = document.getElementById('btnColetarReal');
+            const originalText = btn.textContent;
+            
+            try {
+                btn.textContent = '�️ Coletando do PCI...';
+                btn.disabled = true;
+                
+                mostrarLoading(true);
+                showAlert('info', '🕷️ Iniciando coleta de dados diretamente do PCI Concursos...');
+                
+                const response = await fetch('/admin/coletar-pci-real', {
+                    method: 'GET'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'sucesso') {
+                    showAlert('success', `✅ ${result.mensagem}`);
+                    
+                    // Recarregar dados na interface
+                    await carregarEditais();
+                    await carregarFiltros();
+                    
+                } else {
+                    throw new Error(result.detail || result.mensagem || 'Erro na coleta');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao coletar dados reais:', error);
+                showAlert('error', `❌ Erro ao coletar dados do PCI: ${error.message}`);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                mostrarLoading(false);
+            }
+        }
+        
+        async function atualizarDadosReais() {
+            const btn = document.getElementById('btnAtualizarDados');
+            const originalText = btn.textContent;
+            
+            try {
+                btn.textContent = '🔄 Atualizando...';
+                btn.disabled = true;
+                
+                mostrarLoading(true);
+                showAlert('info', '🔄 Atualizando base de dados local...');
+                
+                const response = await fetch('/admin/atualizar-dados-direto?max_paginas=10', {
+                    method: 'GET'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.status === 'concluido') {
+                    showAlert('success', `✅ ${result.mensagem}`);
+                    
+                    // Recarregar dados na interface
+                    await carregarEditais();
+                    await carregarFiltros();
+                    
+                } else {
+                    throw new Error(result.detail || 'Erro na atualização');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao atualizar dados:', error);
+                showAlert('error', `❌ Erro ao atualizar dados: ${error.message}`);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                mostrarLoading(false);
+            }
+        }
+        
+        async function verificarStatusDados() {
+            try {
+                const response = await fetch('/admin/status-dados');
+                const status = await response.json();
+                
+                let mensagem = '📊 STATUS DOS DADOS:\\n\\n';
+                
+                if (status.api) {
+                    mensagem += `🔗 API:\\n`;
+                    mensagem += `   • Concursos carregados: ${status.api.concursos_carregados}\\n`;
+                    mensagem += `   • Arquivo CSV: ${status.api.arquivo_csv}\\n\\n`;
+                }
+                
+                if (status.pci_integrador) {
+                    mensagem += `🕷️ Integrador PCI:\\n`;
+                    mensagem += `   • Status: ${status.pci_integrador.status}\\n`;
+                    
+                    if (status.pci_integrador.total_concursos) {
+                        mensagem += `   • Total de concursos: ${status.pci_integrador.total_concursos}\\n`;
+                        mensagem += `   • Órgãos únicos: ${status.pci_integrador.orgaos_unicos}\\n`;
+                        mensagem += `   • Última modificação: ${new Date(status.pci_integrador.ultima_modificacao).toLocaleString()}\\n`;
+                    }
+                }
+                
+                mensagem += `\\n🔧 Integrador disponível: ${status.integrador_disponivel ? 'Sim' : 'Não'}`;
+                
+                alert(mensagem);
+                
+            } catch (error) {
+                showAlert('error', `❌ Erro ao verificar status: ${error.message}`);
+            }
+        }
+        
+        function showAlert(type, message) {
+            const container = document.getElementById('alertsContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                if (container.contains(alert)) {
+                    container.removeChild(alert);
+                }
+            }, 8000);
+        }
+        
+        // Utilitários
+        function mostrarLoading(mostrar) {
+            const loading = document.getElementById('loadingState');
+            if (mostrar) {
+                loading.style.display = 'block';
+                document.getElementById('pagination').style.display = 'none';
+            } else {
+                loading.style.display = 'none';
+            }
+        }
+        
+        function mostrarErro(mensagem) {
+            const container = document.getElementById('resultsList');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">❌</div>
+                    <div class="empty-title">Erro</div>
+                    <div class="empty-description">${mensagem}</div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Sistema Completo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg: #f8f9ff;
+            --white: #ffffff;
+            --text: #333;
+            --text-light: #666;
+            --border: #e0e0e0;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --radius: 20px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        select, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .chat-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            text-align: right;
+        }
+        
+        .message-content {
+            display: inline-block;
+            max-width: 70%;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+        }
+        
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .message.bot .message-content {
+            background: #f0f2f5;
+            color: var(--text);
+        }
+        
+        .prova-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .prova-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .prova-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .prova-banca {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .prova-ano {
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        
+        .prova-titulo {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        .prova-tipo {
+            display: inline-block;
+            background: #f0f2f5;
+            padding: 0.4rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .chat-input {
+            padding: 1.5rem;
+            border-top: 2px solid var(--border);
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .examples {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .example-btn {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .example-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                ConcursAI
+            </div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-number" id="totalProvas">-</div>
+                    <div class="stat-label">Provas</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="totalGabaritos">-</div>
+                    <div class="stat-label">Gabaritos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="totalArquivos">-</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-filter"></i>
+                    Filtrar Provas
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Banca</label>
+                    <select id="filterBanca">
+                        <option value="">Todas</option>
+                        <option value="cebraspe">Cebraspe</option>
+                        <option value="fcc">FCC</option>
+                        <option value="fgv">FGV</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Ano</label>
+                    <select id="filterAno">
+                        <option value="">Todos</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Tipo</label>
+                    <select id="filterTipo">
+                        <option value="">Todos</option>
+                        <option value="prova">Provas</option>
+                        <option value="gabarito">Gabaritos</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" onclick="aplicarFiltros()">
+                    <i class="fas fa-search"></i>
+                    Aplicar Filtros
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-bolt"></i>
+                    Ações Rápidas
+                </div>
+                
+                <button class="btn btn-outline" onclick="listarTodasProvas()">
+                    <i class="fas fa-list"></i>
+                    Ver Todas as Provas
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <i class="fas fa-comments"></i>
+                    Chat Inteligente
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="messages">
+                <div class="message bot">
+                    <div class="message-content">
+                        👋 <strong>Olá! Sou o assistente ConcursAI.</strong>
+                        <br><br>
+                        Posso te ajudar a encontrar provas e gabaritos de concursos!
+                        <br><br>
+                        <strong>Experimente perguntar:</strong>
+                        <div class="examples">
+                            <button class="example-btn" onclick="enviarExemplo('Mostre provas do Cebraspe 2025')">
+                                Provas Cebraspe 2025
+                            </button>
+                            <button class="example-btn" onclick="enviarExemplo('Quero gabaritos FGV 2024')">
+                                Gabaritos FGV 2024
+                            </button>
+                            <button class="example-btn" onclick="enviarExemplo('Provas de administrador')">
+                                Provas Administrador
+                            </button>
+                            <button class="example-btn" onclick="enviarExemplo('Todas as provas disponíveis')">
+                                Todas as Provas
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="Digite sua pergunta sobre provas, gabaritos, bancas ou anos..."
+                    onkeypress="if(event.key==='Enter') enviarPergunta()"
+                />
+                <button class="send-btn" id="sendBtn" onclick="enviarPergunta()">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        window.onload = async function() {
+            await carregarEstatisticas();
+        };
+        
+        async function carregarEstatisticas() {
+            try {
+                const response = await fetch(`${API_URL}/scraping/provas/estatisticas`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalArquivos').textContent = data.data.total_arquivos;
+                    document.getElementById('totalProvas').textContent = data.data.total_provas;
+                    document.getElementById('totalGabaritos').textContent = data.data.total_gabaritos;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+                document.getElementById('totalArquivos').textContent = '0';
+                document.getElementById('totalProvas').textContent = '0';
+                document.getElementById('totalGabaritos').textContent = '0';
+            }
+        }
+        
+        function enviarExemplo(texto) {
+            document.getElementById('userInput').value = texto;
+            enviarPergunta();
+        }
+        
+        async function enviarPergunta() {
+            const input = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const pergunta = input.value.trim();
+            
+            if (!pergunta) return;
+            
+            adicionarMensagem(pergunta, 'user');
+            input.value = '';
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="loading"></span> Enviando...';
+            
+            try {
+                const response = await fetch(`${API_URL}/chat/perguntar-provas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pergunta: pergunta })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    let respostaHTML = `<div style="margin-bottom: 1rem;">${data.resposta}</div>`;
+                    
+                    if (data.provas && data.provas.length > 0) {
+                        data.provas.forEach(prova => {
+                            respostaHTML += `
+                                <div class="prova-card">
+                                    <div class="prova-header">
+                                        <span class="prova-banca">${prova.banca}</span>
+                                        <span class="prova-ano">${prova.ano || 'Sem data'}</span>
+                                    </div>
+                                    <div class="prova-titulo">${prova.titulo}</div>
+                                    <span class="prova-tipo">
+                                        ${prova.tipo === 'gabarito' ? '📋 Gabarito' : '📝 Prova'}
+                                    </span>
+                                    <br>
+                                    <a href="${prova.url}" target="_blank" class="download-btn">
+                                        <i class="fas fa-download"></i>
+                                        Baixar PDF
+                                    </a>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    adicionarMensagem(respostaHTML, 'bot', true);
+                } else {
+                    adicionarMensagem('Desculpe, ocorreu um erro. Verifique se a API está rodando.', 'bot');
+                }
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                adicionarMensagem('❌ Erro ao conectar com o servidor. Certifique-se de que a API está rodando em http://localhost:8000', 'bot');
+            }
+            
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
+        }
+        
+        function adicionarMensagem(texto, tipo, isHTML = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${tipo}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (isHTML) {
+                contentDiv.innerHTML = texto;
+            } else {
+                contentDiv.textContent = texto;
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        async function aplicarFiltros() {
+            const banca = document.getElementById('filterBanca').value;
+            const ano = document.getElementById('filterAno').value;
+            const tipo = document.getElementById('filterTipo').value;
+            
+            let pergunta = 'Mostre ';
+            if (tipo) pergunta += tipo === 'prova' ? 'provas ' : 'gabaritos ';
+            if (banca) pergunta += `da banca ${banca.toUpperCase()} `;
+            if (ano) pergunta += `do ano ${ano} `;
+            if (!tipo && !banca && !ano) pergunta += 'todos os arquivos disponíveis';
+            
+            document.getElementById('userInput').value = pergunta;
+            enviarPergunta();
+        }
+        
+        function listarTodasProvas() {
+            document.getElementById('userInput').value = 'Liste todas as provas disponíveis';
+            enviarPergunta();
+        }
+    </script>
+</body>
+</html>

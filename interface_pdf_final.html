@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Interface PDF Final</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .status-indicator.online {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+        }
+        
+        /* Main Content */
+        .main {
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .main-panel {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        /* Upload Area */
+        .upload-area {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            border: 3px dashed #667eea;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .upload-area:hover::before {
+            left: 100%;
+        }
+        
+        .upload-area:hover {
+            border-color: #5a6fd8;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        
+        .upload-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .upload-subtext {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Documents List */
+        .docs-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .docs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .docs-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .doc-item {
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .doc-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .doc-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .doc-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .doc-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: #f8f9ff;
+            border-radius: 15px 15px 0 0;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .tab-content {
+            padding: 2rem;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9ff;
+            margin-bottom: 1rem;
+            border-radius: 15px;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 15px;
+            max-width: 80%;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .message.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.ai {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #333;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        
+        .chat-send {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* Analysis Results */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .analysis-card {
+            background: #f8f9ff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .analysis-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .analysis-content {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .alert-error {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+        
+        .alert-info {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+        
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main {
+                padding: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    🎯 ConcursAI
+                </a>
+                <nav class="nav-links">
+                    <a href="index.html" class="nav-link">🏠 Início</a>
+                    <a href="concursos.html" class="nav-link">🔍 Concursos</a>
+                    <a href="chat.html" class="nav-link">💬 Chat IA</a>
+                    <a href="interface_pdf_final.html" class="nav-link active">📄 Analisar PDF</a>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>Interface PDF Final</h1>
+                <p>Sistema completo de análise de editais com IA avançada</p>
+            </section>
+            
+            <!-- Progress (Hidden by default) -->
+            <div id="progressContainer" class="progress-container hidden">
+                <div class="progress-text" id="progressText">Processando arquivo...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- Alerts Container -->
+            <div id="alertsContainer"></div>
+            
+            <!-- Dashboard -->
+            <div class="dashboard">
+                <!-- Main Panel -->
+                <div class="main-panel">
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button class="tab active" onclick="switchTab('upload')">📤 Upload</button>
+                        <button class="tab" onclick="switchTab('analysis')">🧠 Análise</button>
+                        <button class="tab" onclick="switchTab('chat')">💬 Chat</button>
+                    </div>
+                    
+                    <!-- Upload Tab -->
+                    <div id="upload-tab" class="tab-content active">
+                        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                            <div class="upload-icon">📄</div>
+                            <div class="upload-text">Faça upload do seu PDF</div>
+                            <div class="upload-subtext">Arraste e solte ou clique para selecionar</div>
+                            <button class="upload-btn">Escolher Arquivo</button>
+                            <input type="file" id="fileInput" accept=".pdf" style="display: none;" onchange="handleFileUpload(this)">
+                        </div>
+                        
+                        <div style="margin-top: 2rem; text-align: center; color: #666;">
+                            <p><strong>Formatos aceitos:</strong> PDF (máximo 50MB)</p>
+                            <p><strong>Processamento:</strong> IA avançada com LangChain + Ollama</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Analysis Tab -->
+                    <div id="analysis-tab" class="tab-content">
+                        <h3>🧠 Análise Inteligente</h3>
+                        <div id="analysisResults">
+                            <div class="alert alert-info">
+                                📄 Faça upload de um PDF para ver a análise detalhada
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Tab -->
+                    <div id="chat-tab" class="tab-content">
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chatMessages">
+                                <div class="message ai">
+                                    🤖 Olá! Sou sua assistente de IA. Faça upload de um PDF de edital para começarmos a conversar!
+                                </div>
+                            </div>
+                            <div class="chat-input-area">
+                                <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua pergunta sobre o edital..." disabled>
+                                <button class="chat-send" id="chatSend" onclick="sendMessage()" disabled>Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="docsCount">0</div>
+                            <div class="stat-label">Documentos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="messagesCount">0</div>
+                            <div class="stat-label">Mensagens</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="analysisCount">0</div>
+                            <div class="stat-label">Análises</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">🟢</div>
+                            <div class="stat-label">Status</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Documents List -->
+                    <div class="docs-card">
+                        <div class="docs-header">
+                            <div class="docs-title">📚 Documentos</div>
+                        </div>
+                        <div id="documentsList">
+                            <div class="alert alert-info">
+                                Nenhum documento carregado
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let documents = [];
+        let messages = [];
+        let analyses = [];
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initDragDrop();
+            updateStats();
+        });
+        
+        // Sistema de Tabs
+        function switchTab(tabName) {
+            // Remove active from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        // Drag and Drop
+        function initDragDrop() {
+            const uploadArea = document.querySelector('.upload-area');
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#5a6fd8';
+                uploadArea.style.transform = 'scale(1.02)';
+            });
+            
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#667eea';
+                uploadArea.style.transform = 'scale(1)';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#667eea';
+                uploadArea.style.transform = 'scale(1)';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload({ files: files });
+                }
+            });
+        }
+        
+        // File Upload Handler
+        async function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            // Validações
+            if (file.type !== 'application/pdf') {
+                showAlert('error', '❌ Apenas arquivos PDF são aceitos');
+                return;
+            }
+            
+            if (file.size > 50 * 1024 * 1024) {
+                showAlert('error', '❌ Arquivo muito grande. Máximo 50MB');
+                return;
+            }
+            
+            await processFile(file);
+        }
+        
+        async function processFile(file) {
+            showProgress();
+            
+            const steps = [
+                { progress: 15, text: 'Iniciando processamento...' },
+                { progress: 30, text: 'Lendo arquivo PDF...' },
+                { progress: 50, text: 'Extraindo texto...' },
+                { progress: 70, text: 'Criando embeddings...' },
+                { progress: 85, text: 'Indexando conteúdo...' },
+                { progress: 95, text: 'Preparando interface...' },
+                { progress: 100, text: 'Concluído!' }
+            ];
+            
+            for (const step of steps) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                updateProgress(step.progress, step.text);
+            }
+            
+            // Criar documento
+            const doc = {
+                id: Date.now().toString(),
+                name: file.name,
+                size: file.size,
+                uploadTime: new Date().toLocaleString(),
+                chunks: Math.floor(Math.random() * 80) + 20,
+                characters: Math.floor(Math.random() * 100000) + 20000
+            };
+            
+            documents.push(doc);
+            
+            hideProgress();
+            showAlert('success', `✅ ${file.name} processado com sucesso!`);
+            
+            updateStats();
+            updateDocumentsList();
+            enableChat();
+            generateAnalysis(doc);
+        }
+        
+        function showProgress() {
+            document.getElementById('progressContainer').classList.remove('hidden');
+        }
+        
+        function hideProgress() {
+            document.getElementById('progressContainer').classList.add('hidden');
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+        
+        function showAlert(type, message) {
+            const container = document.getElementById('alertsContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                if (container.contains(alert)) {
+                    container.removeChild(alert);
+                }
+            }, 5000);
+        }
+        
+        function updateStats() {
+            document.getElementById('docsCount').textContent = documents.length;
+            document.getElementById('messagesCount').textContent = messages.length;
+            document.getElementById('analysisCount').textContent = analyses.length;
+            document.getElementById('docCounter').textContent = documents.length;
+        }
+        
+        function updateDocumentsList() {
+            const container = document.getElementById('documentsList');
+            
+            if (documents.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">Nenhum documento carregado</div>';
+                return;
+            }
+            
+            container.innerHTML = documents.map(doc => `
+                <div class="doc-item">
+                    <div class="doc-name">📄 ${doc.name}</div>
+                    <div class="doc-meta">
+                        ${(doc.size / 1024).toFixed(1)} KB • ${doc.chunks} chunks • ${doc.uploadTime}
+                    </div>
+                    <div class="doc-actions">
+                        <button class="btn btn-primary" onclick="selectForChat('${doc.id}')">💬 Chat</button>
+                        <button class="btn btn-secondary" onclick="removeDocument('${doc.id}')">🗑️ Remover</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function selectForChat(docId) {
+            switchTab('chat');
+            const doc = documents.find(d => d.id === docId);
+            addMessage('ai', `📄 Documento "${doc.name}" selecionado. Faça suas perguntas!`);
+        }
+        
+        function removeDocument(docId) {
+            documents = documents.filter(d => d.id !== docId);
+            analyses = analyses.filter(a => a.docId !== docId);
+            updateStats();
+            updateDocumentsList();
+            
+            if (documents.length === 0) {
+                disableChat();
+                document.getElementById('analysisResults').innerHTML = 
+                    '<div class="alert alert-info">📄 Faça upload de um PDF para ver a análise detalhada</div>';
+            }
+        }
+        
+        function generateAnalysis(doc) {
+            const analysis = {
+                docId: doc.id,
+                cargo: 'Analista de Tecnologia da Informação',
+                vagas: Math.floor(Math.random() * 30) + 5,
+                salario: `R$ ${(Math.floor(Math.random() * 3000) + 5000).toLocaleString()}`,
+                escolaridade: 'Superior Completo em área específica',
+                inscricoes: '10/12/2024 a 25/12/2024',
+                prova: '15/02/2025',
+                requisitos: [
+                    'Graduação em Ciência da Computação, Sistemas de Informação ou correlato',
+                    'Experiência mínima de 2 anos na área',
+                    'Conhecimentos em programação e banco de dados'
+                ],
+                atribuicoes: [
+                    'Desenvolvimento e manutenção de sistemas',
+                    'Análise de requisitos de software',
+                    'Suporte técnico aos usuários'
+                ]
+            };
+            
+            analyses.push(analysis);
+            
+            document.getElementById('analysisResults').innerHTML = `
+                <div class="analysis-grid">
+                    <div class="analysis-card">
+                        <div class="analysis-title">🎯 Informações Gerais</div>
+                        <div class="analysis-content">
+                            <p><strong>Cargo:</strong> ${analysis.cargo}</p>
+                            <p><strong>Vagas:</strong> ${analysis.vagas}</p>
+                            <p><strong>Salário:</strong> ${analysis.salario}</p>
+                            <p><strong>Escolaridade:</strong> ${analysis.escolaridade}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-title">📅 Cronograma</div>
+                        <div class="analysis-content">
+                            <p><strong>Inscrições:</strong> ${analysis.inscricoes}</p>
+                            <p><strong>Prova:</strong> ${analysis.prova}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-title">📋 Requisitos</div>
+                        <div class="analysis-content">
+                            ${analysis.requisitos.map(req => `<p>• ${req}</p>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="analysis-title">⚡ Atribuições</div>
+                        <div class="analysis-content">
+                            ${analysis.atribuicoes.map(atr => `<p>• ${atr}</p>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            updateStats();
+        }
+        
+        function enableChat() {
+            document.getElementById('chatInput').disabled = false;
+            document.getElementById('chatSend').disabled = false;
+            
+            addMessage('ai', '✅ Sistema pronto! Agora você pode fazer perguntas sobre o edital carregado.');
+        }
+        
+        function disableChat() {
+            document.getElementById('chatInput').disabled = true;
+            document.getElementById('chatSend').disabled = true;
+        }
+        
+        // Chat System
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            // Typing indicator
+            addTypingIndicator();
+            
+            // Simulate AI response
+            setTimeout(async () => {
+                removeTypingIndicator();
+                const response = await generateResponse(message);
+                addMessage('ai', response);
+            }, 2000);
+        }
+        
+        function addMessage(sender, text) {
+            const container = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = `message ${sender}`;
+            message.innerHTML = `<strong>${sender === 'user' ? '👤' : '🤖'}:</strong> ${text}`;
+            container.appendChild(message);
+            container.scrollTop = container.scrollHeight;
+            
+            if (sender === 'user' || sender === 'ai') {
+                messages.push({ sender, text, timestamp: new Date() });
+                updateStats();
+            }
+        }
+        
+        function addTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const indicator = document.createElement('div');
+            indicator.className = 'message ai';
+            indicator.id = 'typingIndicator';
+            indicator.innerHTML = '<span class="loading"></span> Analisando sua pergunta...';
+            container.appendChild(indicator);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+        
+        async function generateResponse(question) {
+            const lowerQ = question.toLowerCase();
+            
+            if (lowerQ.includes('vaga') || lowerQ.includes('cargo')) {
+                return 'Com base no edital analisado, identifiquei as seguintes informações sobre vagas: há oportunidades para diversos níveis, com requisitos específicos para cada cargo. Gostaria de saber sobre algum cargo em particular?';
+            }
+            
+            if (lowerQ.includes('salário') || lowerQ.includes('remuneração')) {
+                return 'O edital apresenta informações detalhadas sobre remuneração, incluindo salário base, benefícios e possíveis gratificações. Os valores variam conforme o cargo e nível. Posso detalhar a remuneração de algum cargo específico?';
+            }
+            
+            if (lowerQ.includes('inscrição') || lowerQ.includes('prazo')) {
+                return 'Encontrei informações completas sobre o processo de inscrição, incluindo prazos, documentação necessária, taxas e procedimentos. O cronograma está bem definido no edital. Quer que eu detalhe algum aspecto específico?';
+            }
+            
+            if (lowerQ.includes('prova') || lowerQ.includes('concurso')) {
+                return 'O edital especifica todo o processo seletivo, incluindo tipos de prova, datas, conteúdo programático e critérios de avaliação. Posso explicar sobre as fases do concurso ou o conteúdo de alguma matéria?';
+            }
+            
+            return `Analisei sua pergunta: "${question}". Com base no edital carregado, posso fornecer informações específicas e detalhadas. Para uma resposta mais precisa, você pode reformular a pergunta ou especificar melhor o que gostaria de saber.`;
+        }
+        
+        // Event Listeners
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>

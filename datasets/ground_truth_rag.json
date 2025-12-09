@@ -1,0 +1,511 @@
+{
+  "metadata": {
+    "versao": "1.0",
+    "criado_em": "2025-12-04",
+    "descricao": "Dataset de ground truth para validação do sistema RAG",
+    "total_perguntas": 50,
+    "categorias": ["bancas", "areas", "estrategia", "geral"]
+  },
+  "perguntas": [
+    {
+      "id": 1,
+      "pergunta": "O que o CESPE mais cobra em Tecnologia?",
+      "resposta_esperada": "Python, Redes, Segurança da Informação, Banco de Dados e DevOps",
+      "keywords_obrigatorias": ["python", "redes", "segurança", "banco de dados"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 2,
+      "pergunta": "Como estudar para FCC na área de Direito?",
+      "resposta_esperada": "Estudar legislação seca, focar em literalidade da lei, fazer questões anteriores",
+      "keywords_obrigatorias": ["legislação", "lei", "questões anteriores"],
+      "banca": "fcc",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 3,
+      "pergunta": "Qual a dificuldade do CESPE em Tecnologia?",
+      "resposta_esperada": "Média a alta, com pegadinhas em questões CERTO/ERRADO, requer atenção a detalhes",
+      "keywords_obrigatorias": ["pegadinhas", "certo/errado", "atenção"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "dificuldade"
+    },
+    {
+      "id": 4,
+      "pergunta": "O que a FGV mais cobra em Conhecimentos Gerais?",
+      "resposta_esperada": "Atualidades, História do Brasil, Geografia, Política e Economia",
+      "keywords_obrigatorias": ["atualidades", "história", "geografia", "política"],
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 5,
+      "pergunta": "Quanto tempo estudar para CESPE Jurídica?",
+      "resposta_esperada": "4 a 6 meses de estudo focado, com 4-6 horas diárias",
+      "keywords_obrigatorias": ["meses", "horas", "focado"],
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "tempo_estudo"
+    },
+    {
+      "id": 6,
+      "pergunta": "Quais linguagens de programação o CESPE mais cobra?",
+      "resposta_esperada": "Python, Java, JavaScript, C++, SQL",
+      "keywords_obrigatorias": ["python", "java", "javascript", "sql"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 7,
+      "pergunta": "Como é o estilo de questões da FCC?",
+      "resposta_esperada": "Questões objetivas e diretas, cobra literalidade da lei, menos pegadinhas que CESPE",
+      "keywords_obrigatorias": ["objetivas", "diretas", "literalidade", "lei"],
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao"
+    },
+    {
+      "id": 8,
+      "pergunta": "O que mais cai em Português no CESPE?",
+      "resposta_esperada": "Interpretação de texto, concordância verbal, regência, crase, pontuação",
+      "keywords_obrigatorias": ["interpretação", "concordância", "regência", "crase"],
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 9,
+      "pergunta": "Compare FCC e FGV na área Administrativa",
+      "resposta_esperada": "FCC cobra mais legislação seca, FGV exige mais raciocínio e análise de casos",
+      "keywords_obrigatorias": ["fcc", "fgv", "legislação", "raciocínio"],
+      "banca": null,
+      "area": "administrativa",
+      "dificuldade": "média",
+      "tipo": "comparacao"
+    },
+    {
+      "id": 10,
+      "pergunta": "O que estudar em Redes para CESPE Tecnologia?",
+      "resposta_esperada": "TCP/IP, DNS, HTTP, Firewall, VPN, topologias de rede, modelo OSI",
+      "keywords_obrigatorias": ["tcp/ip", "dns", "http", "firewall"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 11,
+      "pergunta": "Qual a melhor estratégia para CESPE?",
+      "resposta_esperada": "Ler com atenção, cuidado com palavras absolutas, gestão de tempo, anular se tiver dúvida",
+      "keywords_obrigatorias": ["atenção", "palavras absolutas", "tempo", "anular"],
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 12,
+      "pergunta": "O que a FGV cobra em Tecnologia?",
+      "resposta_esperada": "Programação, Banco de Dados, Engenharia de Software, Redes, Segurança",
+      "keywords_obrigatorias": ["programação", "banco de dados", "engenharia de software", "redes"],
+      "banca": "fgv",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 13,
+      "pergunta": "Como funciona a prova de Português do CESPE?",
+      "resposta_esperada": "Questões de interpretação de texto e gramática, formato CERTO/ERRADO, requer atenção aos detalhes",
+      "keywords_obrigatorias": ["interpretação", "gramática", "certo/errado", "atenção"],
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "tipo_questao"
+    },
+    {
+      "id": 14,
+      "pergunta": "Quais frameworks o CESPE cobra em Tecnologia?",
+      "resposta_esperada": "Spring, Django, Flask, React, Angular, Vue.js, Node.js",
+      "keywords_obrigatorias": ["spring", "django", "react", "node"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 15,
+      "pergunta": "FCC cobra mais teoria ou prática?",
+      "resposta_esperada": "FCC cobra mais teoria e conhecimento da legislação, menos questões práticas",
+      "keywords_obrigatorias": ["teoria", "legislação", "menos prática"],
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao"
+    },
+    {
+      "id": 16,
+      "pergunta": "O que estudar em Segurança da Informação para CESPE?",
+      "resposta_esperada": "Criptografia, SSL/TLS, vulnerabilidades, firewalls, políticas de segurança, ISO 27001",
+      "keywords_obrigatorias": ["criptografia", "ssl", "vulnerabilidades", "firewall"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 17,
+      "pergunta": "Qual o percentual de Português nas provas do CESPE?",
+      "resposta_esperada": "Português representa 20-25% das provas do CESPE",
+      "keywords_obrigatorias": ["20", "25", "percentual", "português"],
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "fácil",
+      "tipo": "geral"
+    },
+    {
+      "id": 18,
+      "pergunta": "FGV é mais difícil que FCC?",
+      "resposta_esperada": "FGV tende a ser mais difícil, exige mais raciocínio e menos decoreba que FCC",
+      "keywords_obrigatorias": ["fgv", "fcc", "raciocínio", "decoreba"],
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "comparacao"
+    },
+    {
+      "id": 19,
+      "pergunta": "O que estudar em Banco de Dados para concursos?",
+      "resposta_esperada": "SQL, PostgreSQL, MySQL, Oracle, normalização, transações, índices, otimização",
+      "keywords_obrigatorias": ["sql", "normalização", "transações", "índices"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 20,
+      "pergunta": "Como o CESPE avalia Direito Constitucional?",
+      "resposta_esperada": "Cobra direitos fundamentais, organização do Estado, controle de constitucionalidade",
+      "keywords_obrigatorias": ["direitos fundamentais", "organização", "constitucionalidade"],
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 21,
+      "pergunta": "Quais são as pegadinhas mais comuns do CESPE?",
+      "resposta_esperada": "Palavras absolutas como sempre, nunca, todo, apenas; inversão de conceitos; detalhes mínimos",
+      "keywords_obrigatorias": ["sempre", "nunca", "todo", "inversão", "detalhes"],
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 22,
+      "pergunta": "O que a FGV cobra em Raciocínio Lógico?",
+      "resposta_esperada": "Lógica de argumentação, sequências, probabilidade, análise combinatória",
+      "keywords_obrigatorias": ["lógica", "sequências", "probabilidade", "combinatória"],
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 23,
+      "pergunta": "Como preparar cronograma de estudos para CESPE?",
+      "resposta_esperada": "Dividir por disciplinas, focar nos tópicos mais cobrados, intercalar teoria e questões, revisões periódicas",
+      "keywords_obrigatorias": ["disciplinas", "tópicos", "questões", "revisões"],
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 24,
+      "pergunta": "O que estudar em DevOps para concursos de TI?",
+      "resposta_esperada": "Docker, Kubernetes, Jenkins, Git, CI/CD, automação, monitoramento",
+      "keywords_obrigatorias": ["docker", "kubernetes", "jenkins", "git", "ci/cd"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 25,
+      "pergunta": "FCC cobra jurisprudência ou só lei seca?",
+      "resposta_esperada": "FCC foca principalmente em lei seca, raramente cobra jurisprudência",
+      "keywords_obrigatorias": ["lei seca", "raramente", "jurisprudência"],
+      "banca": "fcc",
+      "area": "jurídica",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao"
+    },
+    {
+      "id": 26,
+      "pergunta": "Quais são os temas de Atualidades mais cobrados?",
+      "resposta_esperada": "Política nacional, economia, meio ambiente, saúde pública, tecnologia, relações internacionais",
+      "keywords_obrigatorias": ["política", "economia", "meio ambiente", "saúde"],
+      "banca": null,
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 27,
+      "pergunta": "Como é a prova de Informática da FCC?",
+      "resposta_esperada": "Cobra Windows, Linux, Office, segurança, redes e internet de forma objetiva",
+      "keywords_obrigatorias": ["windows", "linux", "office", "segurança", "redes"],
+      "banca": "fcc",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao"
+    },
+    {
+      "id": 28,
+      "pergunta": "O que estudar primeiro para CESPE Tecnologia?",
+      "resposta_esperada": "Python e Redes são prioritários, seguidos de Banco de Dados e Segurança",
+      "keywords_obrigatorias": ["python", "redes", "banco de dados", "segurança"],
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 29,
+      "pergunta": "FGV cobra inglês nas provas de TI?",
+      "resposta_esperada": "Sim, FGV frequentemente cobra inglês técnico em provas de Tecnologia",
+      "keywords_obrigatorias": ["sim", "inglês", "técnico", "tecnologia"],
+      "banca": "fgv",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "geral"
+    },
+    {
+      "id": 30,
+      "pergunta": "Qual a importância de fazer questões anteriores?",
+      "resposta_esperada": "Essencial para conhecer o estilo da banca, identificar tópicos mais cobrados e treinar tempo de prova",
+      "keywords_obrigatorias": ["estilo", "banca", "tópicos", "tempo"],
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 31,
+      "pergunta": "O que o CESPE cobra em Direito Administrativo?",
+      "resposta_esperada": "Atos administrativos, licitações, servidores públicos, improbidade administrativa, contratos",
+      "keywords_obrigatorias": ["atos administrativos", "licitações", "servidores", "improbidade"],
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 32,
+      "pergunta": "Como melhorar velocidade de leitura para CESPE?",
+      "resposta_esperada": "Treinar com textos longos, fazer questões cronometradas, técnicas de leitura dinâmica",
+      "keywords_obrigatorias": ["treinar", "cronometradas", "leitura dinâmica"],
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 33,
+      "pergunta": "O que estudar em Algoritmos para concursos?",
+      "resposta_esperada": "Estruturas de dados, ordenação, busca, complexidade, grafos, programação dinâmica",
+      "keywords_obrigatorias": ["estruturas de dados", "ordenação", "busca", "complexidade"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 34,
+      "pergunta": "FGV cobra mais direito ou administração?",
+      "resposta_esperada": "Depende do cargo, mas geralmente equilibra ambos com foco no perfil da vaga",
+      "keywords_obrigatorias": ["cargo", "equilibra", "perfil"],
+      "banca": "fgv",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "geral"
+    },
+    {
+      "id": 35,
+      "pergunta": "Quais certificações ajudam em concursos de TI?",
+      "resposta_esperada": "ITIL, COBIT, ISO 27001, certificações de Cloud (AWS, Azure), Linux",
+      "keywords_obrigatorias": ["itil", "cobit", "iso", "cloud"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 36,
+      "pergunta": "Como o CESPE cobra Redação?",
+      "resposta_esperada": "Texto dissertativo-argumentativo, análise de tema atual, estrutura formal, norma culta",
+      "keywords_obrigatorias": ["dissertativo", "argumentativo", "tema atual", "norma culta"],
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "tipo_questao"
+    },
+    {
+      "id": 37,
+      "pergunta": "O que mais cai em Matemática para concursos?",
+      "resposta_esperada": "Porcentagem, regra de três, equações, probabilidade, estatística básica",
+      "keywords_obrigatorias": ["porcentagem", "regra de três", "probabilidade", "estatística"],
+      "banca": null,
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 38,
+      "pergunta": "FCC é boa opção para iniciantes?",
+      "resposta_esperada": "Sim, FCC tem questões mais diretas e menos pegadinhas, boa para começar",
+      "keywords_obrigatorias": ["sim", "diretas", "menos pegadinhas", "começar"],
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral"
+    },
+    {
+      "id": 39,
+      "pergunta": "O que estudar em Engenharia de Software?",
+      "resposta_esperada": "UML, metodologias ágeis, Scrum, testes, análise de requisitos, padrões de projeto",
+      "keywords_obrigatorias": ["uml", "ágeis", "scrum", "testes", "padrões"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 40,
+      "pergunta": "Como anotar durante os estudos?",
+      "resposta_esperada": "Fazer resumos, mapas mentais, flashcards, anotar erros de questões para revisar",
+      "keywords_obrigatorias": ["resumos", "mapas mentais", "flashcards", "erros"],
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 41,
+      "pergunta": "O CESPE desconta ponto errado?",
+      "resposta_esperada": "Sim, em questões CERTO/ERRADO, cada erro desconta pontos, por isso é estratégico anular dúvidas",
+      "keywords_obrigatorias": ["sim", "desconta", "certo/errado", "anular"],
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral"
+    },
+    {
+      "id": 42,
+      "pergunta": "O que a FGV cobra em Economia?",
+      "resposta_esperada": "Macroeconomia, microeconomia, indicadores econômicos, política monetária",
+      "keywords_obrigatorias": ["macroeconomia", "microeconomia", "indicadores", "monetária"],
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 43,
+      "pergunta": "Como revisar para prova do CESPE?",
+      "resposta_esperada": "Revisão espaçada, fazer questões, revisar erros, mapas mentais, simulados",
+      "keywords_obrigatorias": ["espaçada", "questões", "erros", "simulados"],
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 44,
+      "pergunta": "O que estudar em Cloud Computing?",
+      "resposta_esperada": "AWS, Azure, GCP, IaaS, PaaS, SaaS, containers, serverless, escalabilidade",
+      "keywords_obrigatorias": ["aws", "azure", "iaas", "paas", "containers"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 45,
+      "pergunta": "FCC cobra atualidades?",
+      "resposta_esperada": "Sim, FCC cobra atualidades principalmente em Conhecimentos Gerais",
+      "keywords_obrigatorias": ["sim", "atualidades", "conhecimentos gerais"],
+      "banca": "fcc",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "geral"
+    },
+    {
+      "id": 46,
+      "pergunta": "Qual a melhor hora para estudar?",
+      "resposta_esperada": "Depende do biotipo, mas manhã e tarde costumam ser mais produtivos, manter consistência é essencial",
+      "keywords_obrigatorias": ["biotipo", "manhã", "consistência", "produtivo"],
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 47,
+      "pergunta": "O que o CESPE cobra em Direito Penal?",
+      "resposta_esperada": "Crimes, penas, delitos, tipificação, excludentes de ilicitude, culpabilidade",
+      "keywords_obrigatorias": ["crimes", "penas", "delitos", "culpabilidade"],
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 48,
+      "pergunta": "Como gerenciar ansiedade na prova?",
+      "resposta_esperada": "Respiração profunda, simulados prévios, chegar cedo, confiança na preparação, técnicas de relaxamento",
+      "keywords_obrigatorias": ["respiração", "simulados", "confiança", "relaxamento"],
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar"
+    },
+    {
+      "id": 49,
+      "pergunta": "O que estudar em Sistemas Operacionais?",
+      "resposta_esperada": "Processos, threads, memória, escalonamento, sistemas de arquivos, Windows, Linux",
+      "keywords_obrigatorias": ["processos", "threads", "memória", "escalonamento", "linux"],
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai"
+    },
+    {
+      "id": 50,
+      "pergunta": "FGV aceita recurso de questões?",
+      "resposta_esperada": "Sim, FGV aceita recursos dentro do prazo estabelecido no edital, deve ser bem fundamentado",
+      "keywords_obrigatorias": ["sim", "recursos", "prazo", "edital", "fundamentado"],
+      "banca": "fgv",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral"
+    }
+  ]
+}

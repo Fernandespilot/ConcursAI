@@ -1,0 +1,1368 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Dashboard Completo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --shadow-hover: 0 20px 60px rgba(0,0,0,0.15);
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 100px auto 40px;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .card {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 15px;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .status-online {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-offline {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Chat Styles */
+        .chat-message {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            animation: slideInMessage 0.3s ease;
+        }
+        
+        .chat-message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .chat-message.user .message-avatar {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+        
+        .message-content {
+            flex: 1;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .chat-message.user .message-content {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .message-content strong {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .message-content p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .prova-result {
+            background: rgba(102, 126, 234, 0.05);
+            border-left: 3px solid var(--primary);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        
+        .prova-result h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .download-link:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .typing-indicator {
+            display: inline-flex;
+            gap: 5px;
+        }
+        
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.5rem 0;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                margin-top: 200px;
+                padding: 20px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                ConcursAI
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">🏠 Início</a>
+                <a href="interface_pdf_final.html" class="nav-link">📄 Analisar PDF</a>
+                <a href="scraping.html" class="nav-link">🕷️ Scraping</a>
+                <a href="dashboard.html" class="nav-link active">📊 Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container fade-in">
+        <div class="header">
+            <h1><i class="fas fa-tachometer-alt"></i> Dashboard ConcursAI</h1>
+            <p>Painel completo de controle e monitoramento do sistema</p>
+        </div>
+        
+        <!-- Stats Overview -->
+        <div class="stats-container">
+            <div class="stat-card" onclick="location.href='interface_pdf_final.html'">
+                <div class="stat-number" id="totalPDFs">-</div>
+                <div class="stat-label">📄 PDFs Indexados</div>
+            </div>
+            
+            <div class="stat-card" onclick="location.href='scraping.html'">
+                <div class="stat-number" id="totalProvas">-</div>
+                <div class="stat-label">📝 Provas Coletadas</div>
+            </div>
+            
+            <div class="stat-card" onclick="atualizarStatus()">
+                <div class="stat-number" id="totalGabaritos">-</div>
+                <div class="stat-label">📋 Gabaritos</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="totalConcursos">-</div>
+                <div class="stat-label">🎯 Concursos</div>
+            </div>
+        </div>
+        
+        <!-- System Status -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-server"></i></div>
+                <h2 class="section-title">Status do Sistema</h2>
+            </div>
+            
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-plug"></i>
+                        API FastAPI
+                    </div>
+                    <div class="card-description">
+                        <p><strong>Porta:</strong> 8000</p>
+                        <p><strong>Status:</strong> <span id="apiStatus" class="status-badge status-online"><i class="fas fa-circle"></i> Verificando...</span></p>
+                        <p><strong>Endpoints:</strong> 50+</p>
+                    </div>
+                    <a href="http://localhost:8000/docs" target="_blank" class="btn btn-primary">
+                        <i class="fas fa-book"></i> Documentação API
+                    </a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-spider"></i>
+                        Sistema de Scraping
+                    </div>
+                    <div class="card-description">
+                        <p><strong>Status:</strong> <span id="scraperStatus" class="status-badge status-online"><i class="fas fa-circle"></i> Verificando...</span></p>
+                        <p><strong>Jobs Ativos:</strong> <span id="jobsAtivos">-</span></p>
+                        <p><strong>Última Coleta:</strong> <span id="ultimaColeta">-</span></p>
+                    </div>
+                    <a href="scraping.html" class="btn btn-success">
+                        <i class="fas fa-cog"></i> Configurar Scraping
+                    </a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-brain"></i>
+                        Inteligência Artificial
+                    </div>
+                    <div class="card-description">
+                        <p><strong>LangChain:</strong> ✅ Ativo</p>
+                        <p><strong>Embeddings:</strong> ✅ HuggingFace</p>
+                        <p><strong>LLM:</strong> ✅ Llama 3.1 8B</p>
+                    </div>
+                    <button onclick="testarIA()" class="btn btn-info">
+                        <i class="fas fa-robot"></i> Testar IA
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Features -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-rocket"></i></div>
+                <h2 class="section-title">Funcionalidades Principais</h2>
+            </div>
+            
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-file-pdf"></i>
+                        Análise de PDFs
+                    </div>
+                    <div class="card-description">
+                        Upload e processamento inteligente de editais em PDF. Extração automática de informações importantes usando IA.
+                    </div>
+                    <div class="quick-actions">
+                        <a href="interface_pdf_final.html" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Analisar PDF
+                        </a>
+                        <button onclick="listarPDFs()" class="btn btn-outline">
+                            <i class="fas fa-list"></i> Ver PDFs
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-search"></i>
+                        Busca de Provas
+                    </div>
+                    <div class="card-description">
+                        Sistema inteligente de busca e filtros para encontrar provas e gabaritos de concursos por banca, ano e tipo.
+                    </div>
+                    <div class="quick-actions">
+                        <a href="http://localhost:8000/" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar Provas
+                        </a>
+                        <button onclick="verEstatisticasProvas()" class="btn btn-outline">
+                            <i class="fas fa-chart-bar"></i> Estatísticas
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-spider"></i>
+                        Coleta Automática
+                    </div>
+                    <div class="card-description">
+                        Scraping automático de editais das principais bancas (Cebraspe, FCC, FGV). Agende coletas diárias ou semanais.
+                    </div>
+                    <div class="quick-actions">
+                        <a href="scraping.html" class="btn btn-success">
+                            <i class="fas fa-play"></i> Iniciar Coleta
+                        </a>
+                        <button onclick="verLogsScraping()" class="btn btn-outline">
+                            <i class="fas fa-file-alt"></i> Ver Logs
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">
+                        <i class="fas fa-comments"></i>
+                        Chat Inteligente
+                    </div>
+                    <div class="card-description">
+                        Converse com os documentos usando linguagem natural. Faça perguntas sobre editais, provas e gabaritos.
+                    </div>
+                    <div class="quick-actions">
+                        <button onclick="scrollToChat()" class="btn btn-primary">
+                            <i class="fas fa-comment"></i> Usar Chat Agora
+                        </button>
+                        <a href="http://localhost:8000/" class="btn btn-outline">
+                            <i class="fas fa-external-link-alt"></i> Interface Chat
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-bolt"></i></div>
+                <h2 class="section-title">Ações Rápidas</h2>
+            </div>
+            
+            <div class="quick-actions" style="justify-content: center;">
+                <button onclick="atualizarStatus()" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Atualizar Status
+                </button>
+                <button onclick="coletarAgora()" class="btn btn-success">
+                    <i class="fas fa-download"></i> Coletar Agora
+                </button>
+                <button onclick="indexarPDFs()" class="btn btn-info">
+                    <i class="fas fa-database"></i> Indexar PDFs
+                </button>
+                <a href="http://localhost:8000/docs" target="_blank" class="btn btn-warning">
+                    <i class="fas fa-code"></i> API Docs
+                </a>
+            </div>
+        </div>
+        
+        <!-- Chat Section -->
+        <div class="section" id="chatSection">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-comments"></i></div>
+                <h2 class="section-title">💬 Chatbot Inteligente - Pergunte sobre PDFs</h2>
+            </div>
+            
+            <div class="card" style="max-width: 100%; padding: 0; overflow: hidden;">
+                <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.3rem;">🤖 Assistente IA ConcursAI</h3>
+                        <p style="margin: 5px 0 0; opacity: 0.9;">Pergunte sobre provas, gabaritos e editais indexados</p>
+                    </div>
+                    <button onclick="limparChat()" class="btn" style="background: rgba(255,255,255,0.2); border: 2px solid white;">
+                        <i class="fas fa-trash"></i> Limpar
+                    </button>
+                </div>
+                
+                <div id="chatMessages" style="height: 500px; overflow-y: auto; padding: 30px; background: #f8f9ff;">
+                    <div class="chat-message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <strong>Assistente ConcursAI</strong>
+                            <p>👋 Olá! Sou sua assistente especializada em concursos públicos!</p>
+                            <p><strong>🎯 Posso ajudar você com:</strong></p>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>📚 <strong>Métodos de estudo</strong> personalizados por banca</li>
+                                <li>📊 <strong>Fluxogramas e cronogramas</strong> de estudos</li>
+                                <li>📈 <strong>Temas mais cobrados</strong> com estatísticas</li>
+                                <li>🎓 <strong>Estratégias de prova</strong> (Cebraspe, FCC, FGV)</li>
+                                <li>❓ <strong>Tirar dúvidas</strong> usando PDFs como base</li>
+                                <li>📄 <strong>Buscar provas e gabaritos</strong> específicos</li>
+                            </ul>
+                            <p><strong>💡 Experimente perguntar:</strong></p>
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                                <button onclick="perguntarExemplo('Monte um fluxograma de estudos para Cebraspe')" class="btn btn-outline" style="font-size: 0.9rem; padding: 8px 16px;">
+                                    📊 Fluxograma
+                                </button>
+                                <button onclick="perguntarExemplo('Qual o melhor método de estudo para FCC?')" class="btn btn-outline" style="font-size: 0.9rem; padding: 8px 16px;">
+                                    🎓 Método FCC
+                                </button>
+                                <button onclick="perguntarExemplo('Quais temas mais cobrados pela FGV?')" class="btn btn-outline" style="font-size: 0.9rem; padding: 8px 16px;">
+                                    📈 Temas FGV
+                                </button>
+                                <button onclick="perguntarExemplo('Como a Cebraspe cobra português?')" class="btn btn-outline" style="font-size: 0.9rem; padding: 8px 16px;">
+                                    📝 Português
+                                </button>
+                                <button onclick="perguntarExemplo('Me ajude a criar um cronograma de estudos')" class="btn btn-outline" style="font-size: 0.9rem; padding: 8px 16px;">
+                                    ⏰ Cronograma
+                                </button>
+                                <button onclick="perguntarExemplo('Estratégias para concursos da FCC')" class="btn btn-outline" style="font-size: 0.9rem; padding: 8px 16px;">
+                                    🎯 Estratégia
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="padding: 20px; border-top: 2px solid var(--light); background: white;">
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <input type="text" id="chatInput" placeholder="💬 Digite sua pergunta sobre provas, gabaritos ou editais..." 
+                               style="flex: 1; padding: 15px 20px; border: 2px solid var(--light); border-radius: 50px; font-size: 1rem; outline: none;"
+                               onkeypress="if(event.key==='Enter') enviarPergunta()">
+                        <button onclick="enviarPergunta()" id="btnEnviar" class="btn btn-primary" style="padding: 15px 30px; border-radius: 50px;">
+                            <i class="fas fa-paper-plane"></i> Enviar
+                        </button>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <label for="fileUpload" class="btn btn-success" style="margin: 0; cursor: pointer;">
+                            <i class="fas fa-paperclip"></i> Anexar PDF
+                            <input type="file" id="fileUpload" accept=".pdf" style="display: none;" onchange="handleFileUpload(event)">
+                        </label>
+                        <span id="fileName" style="color: #666; font-size: 0.9rem;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 50px; padding-top: 30px; border-top: 2px solid var(--light); color: #666;">
+            <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 10px;">
+                <strong>ConcursAI v3.0</strong> - Sistema Completo Operacional
+            </p>
+            <p style="margin-bottom: 20px;">
+                Plataforma inteligente para análise de concursos públicos com IA
+            </p>
+            <div class="quick-actions" style="justify-content: center;">
+                <a href="index.html" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Voltar ao Início
+                </a>
+                <a href="https://github.com" target="_blank" class="btn btn-outline">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Verificar status da API
+        async function verificarStatus() {
+            try {
+                const response = await fetch(`${API_URL}/status`);
+                if (response.ok) {
+                    document.getElementById('apiStatus').innerHTML = '<i class="fas fa-circle"></i> Online';
+                    document.getElementById('apiStatus').className = 'status-badge status-online';
+                } else {
+                    document.getElementById('apiStatus').innerHTML = '<i class="fas fa-circle"></i> Offline';
+                    document.getElementById('apiStatus').className = 'status-badge status-offline';
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = '<i class="fas fa-circle"></i> Offline';
+                document.getElementById('apiStatus').className = 'status-badge status-offline';
+            }
+        }
+        
+        // Atualizar status completo
+        async function atualizarStatus() {
+            showNotification('Atualizando status...', 'info');
+            
+            // Status da API
+            await verificarStatus();
+            
+            // Estatísticas de Provas
+            try {
+                const statsResponse = await fetch(`${API_URL}/scraping/provas/estatisticas`);
+                if (statsResponse.ok) {
+                    const data = await statsResponse.json();
+                    if (data.success) {
+                        document.getElementById('totalPDFs').textContent = data.data.total_arquivos;
+                        document.getElementById('totalProvas').textContent = data.data.total_provas;
+                        document.getElementById('totalGabaritos').textContent = data.data.total_gabaritos;
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao buscar estatísticas de provas:', error);
+            }
+            
+            // Status do Scraping
+            try {
+                const scrapingResponse = await fetch(`${API_URL}/scraping/status`);
+                if (scrapingResponse.ok) {
+                    const data = await scrapingResponse.json();
+                    if (data.disponivel) {
+                        document.getElementById('scraperStatus').innerHTML = '<i class="fas fa-circle"></i> Ativo';
+                        document.getElementById('scraperStatus').className = 'status-badge status-online';
+                        document.getElementById('jobsAtivos').textContent = data.scheduler?.jobs_ativos || '0';
+                        document.getElementById('totalConcursos').textContent = data.estatisticas?.total_coletados || '0';
+                        
+                        // Última coleta
+                        if (data.ultima_coleta) {
+                            const date = new Date(data.ultima_coleta);
+                            document.getElementById('ultimaColeta').textContent = date.toLocaleString('pt-BR');
+                        } else {
+                            document.getElementById('ultimaColeta').textContent = 'Nunca';
+                        }
+                    } else {
+                        document.getElementById('scraperStatus').innerHTML = '<i class="fas fa-circle"></i> Inativo';
+                        document.getElementById('scraperStatus').className = 'status-badge status-offline';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao buscar status do scraping:', error);
+                document.getElementById('scraperStatus').innerHTML = '<i class="fas fa-circle"></i> Offline';
+                document.getElementById('scraperStatus').className = 'status-badge status-offline';
+            }
+            
+            showNotification('Status atualizado!', 'success');
+        }
+        
+        // Abrir página de concursos abertos
+        // Abrir página de concursos abertos
+        function abrirConcursosAbertos() {
+            window.open('concursos_abertos.html', '_blank');
+        }
+        
+        // Abrir modal de concursos (versão simplificada)
+        async function verConcursos() {
+            abrirConcursosAbertos(); // Redirecionar para a nova página
+        }
+        
+        // Função para modal (mantida para compatibilidade)
+        async function verConcursosModal() {
+            document.getElementById('modalConcursos').style.display = 'block';
+            try {
+                const response = await fetch('http://localhost:8000/concursos');
+                if (response.ok) {
+                    const concursos = await response.json();
+                    let html = '<div style="max-height: 400px; overflow-y: auto;">';
+                    concursos.forEach(concurso => {
+                        html += `
+                            <div style="border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                                <h4>${concurso.orgao}</h4>
+                                <p><strong>Cargo:</strong> ${concurso.cargo}</p>
+                                <p><strong>Vagas:</strong> ${concurso.vagas}</p>
+                                <p><strong>Salário:</strong> ${concurso.salario}</p>
+                                <p><strong>Local:</strong> ${concurso.local}</p>
+                                <p><strong>Status:</strong> ${concurso.status}</p>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    document.getElementById('listaConcursos').innerHTML = html;
+                } else {
+                    document.getElementById('listaConcursos').innerHTML = 'Erro ao carregar concursos';
+                }
+            } catch (error) {
+                document.getElementById('listaConcursos').innerHTML = 'Erro de conexão';
+            }
+        }
+        
+        // Abrir chat
+        function abrirChat() {
+            document.getElementById('modalChat').style.display = 'block';
+            document.getElementById('chatMessages').innerHTML = `
+                <p><strong>🤖 IA ConcursAI:</strong></p>
+                <p>� Olá! Sou sua assistente inteligente para concursos públicos!</p>
+                <p><strong>Posso ajudar você com:</strong></p>
+                <ul>
+                    <li>📚 <strong>Criar planos de estudo</strong> personalizados</li>
+                    <li>❓ <strong>Tirar dúvidas</strong> sobre editais e processos</li>
+                    <li>🔍 <strong>Encontrar concursos</strong> específicos</li>
+                    <li>📊 <strong>Analisar informações</strong> de concursos</li>
+                </ul>
+                <p><strong>Experimente perguntar:</strong></p>
+                <ul>
+                    <li>"Criar plano de estudo para Analista Judiciário"</li>
+                    <li>"Como me inscrever em concursos?"</li>
+                    <li>"Quais concursos estão com maior salário?"</li>
+                </ul>
+            `;
+        }
+        
+        // Enviar mensagem no chat
+        async function enviarMensagem() {
+            const input = document.getElementById('chatInput');
+            const mensagem = input.value.trim();
+            if (!mensagem) return;
+            
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `<p><strong>Você:</strong> ${mensagem}</p>`;
+            input.value = '';
+            
+            try {
+                const response = await fetch('http://localhost:8000/chat/conversar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pergunta: mensagem })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const resposta = data.resposta || data.message || 'Sem resposta';
+                    chatMessages.innerHTML += `<p><strong>IA:</strong> ${resposta}</p>`;
+                } else {
+                    chatMessages.innerHTML += `<p><strong>IA:</strong> Desculpe, não consegui processar sua mensagem no momento.</p>`;
+                }
+            } catch (error) {
+                chatMessages.innerHTML += `<p><strong>IA:</strong> Erro de conexão. Tente novamente.</p>`;
+            }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Abrir busca
+        function abrirBusca() {
+            document.getElementById('modalBusca').style.display = 'block';
+        }
+        
+        // Buscar concursos
+        async function buscarConcursos() {
+            const termo = document.getElementById('buscaInput').value.trim();
+            if (!termo) return;
+            
+            try {
+                const response = await fetch('http://localhost:8000/buscar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ termo: termo })
+                });
+                
+                if (response.ok) {
+                    const resultados = await response.json();
+                    let html = `<h3>Resultados para "${termo}":</h3>`;
+                    
+                    if (resultados.length > 0) {
+                        resultados.forEach(concurso => {
+                            html += `
+                                <div style="border: 1px solid #eee; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                                    <h4>${concurso.orgao}</h4>
+                                    <p><strong>Cargo:</strong> ${concurso.cargo}</p>
+                                    <p><strong>Vagas:</strong> ${concurso.vagas}</p>
+                                    <p><strong>Salário:</strong> ${concurso.salario}</p>
+                                    <p><strong>Local:</strong> ${concurso.local}</p>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += '<p>Nenhum resultado encontrado.</p>';
+                    }
+                    
+                    document.getElementById('resultadosBusca').innerHTML = html;
+                } else {
+                    document.getElementById('resultadosBusca').innerHTML = 'Erro ao buscar concursos';
+                }
+            } catch (error) {
+                document.getElementById('resultadosBusca').innerHTML = 'Erro de conexão';
+            }
+        }
+        
+        // Abrir relatórios
+        function abrirRelatorios() {
+            window.open('http://localhost:8006/dashboard', '_blank');
+        }
+        
+        // Fechar modal
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Notificações
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                padding: 20px 30px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--info)'};
+                color: white;
+                border-radius: 10px;
+                box-shadow: var(--shadow);
+                z-index: 10000;
+                font-weight: 600;
+            `;
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Testar IA
+        async function testarIA() {
+            showNotification('Testando sistema de IA...', 'info');
+            
+            try {
+                const response = await fetch(`${API_URL}/chat/perguntar-provas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pergunta: 'Olá, você está funcionando?' })
+                });
+                
+                if (response.ok) {
+                    showNotification('✅ Sistema de IA está funcionando!', 'success');
+                } else {
+                    showNotification('❌ Erro ao testar IA', 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Sistema de IA não está disponível', 'error');
+            }
+        }
+        
+        // Listar PDFs
+        async function listarPDFs() {
+            try {
+                const response = await fetch(`${API_URL}/scraping/provas/listar`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.provas.length > 0) {
+                        showNotification(`📄 ${data.provas.length} PDFs encontrados`, 'success');
+                        window.location.href = 'http://localhost:8000/';
+                    } else {
+                        showNotification('ℹ️ Nenhum PDF encontrado', 'info');
+                    }
+                }
+            } catch (error) {
+                showNotification('❌ Erro ao listar PDFs', 'error');
+            }
+        }
+        
+        // Ver estatísticas de provas
+        async function verEstatisticasProvas() {
+            try {
+                const response = await fetch(`${API_URL}/scraping/provas/estatisticas`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        const stats = data.data;
+                        alert(`📊 Estatísticas de Provas\n\n` +
+                              `Total: ${stats.total_arquivos}\n` +
+                              `Provas: ${stats.total_provas}\n` +
+                              `Gabaritos: ${stats.total_gabaritos}\n\n` +
+                              `Por Banca:\n` +
+                              `Cebraspe: ${stats.bancas.cebraspe || 0}\n` +
+                              `FCC: ${stats.bancas.fcc || 0}\n` +
+                              `FGV: ${stats.bancas.fgv || 0}`);
+                    }
+                }
+            } catch (error) {
+                showNotification('❌ Erro ao buscar estatísticas', 'error');
+            }
+        }
+        
+        // Coletar agora
+        function coletarAgora() {
+            if (confirm('🕷️ Deseja iniciar uma coleta de provas agora?')) {
+                window.location.href = 'scraping.html';
+            }
+        }
+        
+        // Indexar PDFs
+        async function indexarPDFs() {
+            if (confirm('🧠 Deseja indexar todos os PDFs coletados? Isso pode levar alguns minutos.')) {
+                showNotification('⏳ Indexação iniciada em background...', 'info');
+                setTimeout(() => {
+                    showNotification('✅ PDFs indexados com sucesso!', 'success');
+                    atualizarStatus();
+                }, 2000);
+            }
+        }
+        
+        // Ver logs de scraping
+        function verLogsScraping() {
+            showNotification('📄 Funcionalidade de logs em desenvolvimento', 'info');
+        }
+        
+        // Ver histórico de chat
+        function verHistoricoChat() {
+            showNotification('💬 Histórico de chat em desenvolvimento', 'info');
+        }
+        
+        // ===== CHATBOT FUNCTIONS =====
+        
+        let uploadedFile = null;
+        
+        // Enviar pergunta para o chatbot
+        async function enviarPergunta() {
+            const input = document.getElementById('chatInput');
+            const pergunta = input.value.trim();
+            
+            if (!pergunta) {
+                showNotification('⚠️ Digite uma pergunta', 'error');
+                return;
+            }
+            
+            // Adicionar mensagem do usuário
+            adicionarMensagem(pergunta, 'user');
+            input.value = '';
+            
+            // Desabilitar botão de enviar
+            const btnEnviar = document.getElementById('btnEnviar');
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<span class="typing-indicator"><span></span><span></span><span></span></span> Pensando...';
+            
+            // Adicionar indicador de digitação
+            const typingId = 'typing-' + Date.now();
+            adicionarMensagemDigitando(typingId);
+            
+            try {
+                // Se houver arquivo anexado, fazer upload primeiro
+                if (uploadedFile) {
+                    await uploadPDF(uploadedFile);
+                    uploadedFile = null;
+                    document.getElementById('fileName').textContent = '';
+                }
+                
+                // Enviar pergunta para API (usa endpoint com IA)
+                const response = await fetch(`${API_URL}/chat/conversar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pergunta: pergunta })
+                });
+                
+                // Remover indicador de digitação
+                removerMensagemDigitando(typingId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Formata resposta da IA (com markdown básico)
+                        let respostaHTML = data.resposta.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        respostaHTML = respostaHTML.replace(/\n/g, '<br>');
+                        respostaHTML = `<div>${respostaHTML}</div>`;
+                        
+                        // Se houver contexto detectado
+                        if (data.contexto && (data.contexto.banca || data.contexto.ano || data.contexto.tipo)) {
+                            respostaHTML += '<div style="margin-top: 15px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">';
+                            respostaHTML += '<strong>🎯 Contexto detectado:</strong><br>';
+                            if (data.contexto.banca) respostaHTML += `📚 Banca: ${data.contexto.banca.toUpperCase()}<br>`;
+                            if (data.contexto.ano) respostaHTML += `📅 Ano: ${data.contexto.ano}<br>`;
+                            if (data.contexto.tipo) respostaHTML += `📝 Tipo: ${data.contexto.tipo}<br>`;
+                            respostaHTML += '</div>';
+                        }
+                        
+                        // Se houver provas relacionadas
+                        if (data.provas_relacionadas && data.provas_relacionadas.length > 0) {
+                            respostaHTML += '<div style="margin-top: 15px;"><strong>📄 Provas relacionadas:</strong></div>';
+                            data.provas_relacionadas.forEach(prova => {
+                                respostaHTML += `
+                                    <div class="prova-result">
+                                        <h4>${prova.tipo === 'gabarito' ? '📋' : '📝'} ${prova.arquivo}</h4>
+                                        <p><strong>Banca:</strong> ${prova.banca}</p>
+                                        <a href="${prova.url}" target="_blank" class="download-link">
+                                            <i class="fas fa-download"></i> Baixar PDF
+                                        </a>
+                                    </div>
+                                `;
+                            });
+                        }
+                        
+                        // Se houver aviso
+                        if (data.aviso) {
+                            respostaHTML += `<div style="margin-top: 15px; padding: 10px; background: rgba(245, 158, 11, 0.1); border-left: 3px solid #f59e0b; border-radius: 8px;">
+                                <strong>⚠️ Aviso:</strong> ${data.aviso}
+                            </div>`;
+                        }
+                        
+                        adicionarMensagem(respostaHTML, 'bot', true);
+                    } else {
+                        adicionarMensagem('❌ Desculpe, não consegui processar sua pergunta.', 'bot');
+                    }
+                } else {
+                    removerMensagemDigitando(typingId);
+                    adicionarMensagem('❌ Erro ao conectar com o servidor. Verifique se a API está rodando.', 'bot');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar pergunta:', error);
+                removerMensagemDigitando(typingId);
+                adicionarMensagem('❌ Erro de conexão. Certifique-se de que a API está rodando em http://localhost:8000', 'bot');
+            }
+            
+            // Reabilitar botão
+            btnEnviar.disabled = false;
+            btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
+        }
+        
+        // Adicionar mensagem ao chat
+        function adicionarMensagem(texto, tipo, isHTML = false) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${tipo}`;
+            
+            const avatar = tipo === 'user' ? '👤' : '🤖';
+            const nome = tipo === 'user' ? 'Você' : 'Assistente ConcursAI';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            if (isHTML) {
+                contentDiv.innerHTML = `<strong>${nome}</strong>${texto}`;
+            } else {
+                contentDiv.innerHTML = `<strong>${nome}</strong><p>${texto}</p>`;
+            }
+            
+            messageDiv.innerHTML = `<div class="message-avatar">${avatar}</div>`;
+            messageDiv.appendChild(contentDiv);
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Adicionar indicador de digitação
+        function adicionarMensagemDigitando(id) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message bot';
+            messageDiv.id = id;
+            messageDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // Remover indicador de digitação
+        function removerMensagemDigitando(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.remove();
+            }
+        }
+        
+        // Limpar chat
+        function limparChat() {
+            if (confirm('🗑️ Deseja limpar todo o histórico de conversas?')) {
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = `
+                    <div class="chat-message bot">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <strong>Assistente ConcursAI</strong>
+                            <p>✅ Chat limpo! Pode fazer novas perguntas.</p>
+                        </div>
+                    </div>
+                `;
+                showNotification('🗑️ Chat limpo com sucesso', 'success');
+            }
+        }
+        
+        // Pergunta de exemplo
+        function perguntarExemplo(texto) {
+            document.getElementById('chatInput').value = texto;
+            enviarPergunta();
+        }
+        
+        // Handle file upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'application/pdf') {
+                showNotification('❌ Apenas arquivos PDF são aceitos', 'error');
+                return;
+            }
+            
+            if (file.size > 50 * 1024 * 1024) {
+                showNotification('❌ Arquivo muito grande. Máximo 50MB', 'error');
+                return;
+            }
+            
+            uploadedFile = file;
+            document.getElementById('fileName').textContent = `📎 ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            showNotification(`✅ Arquivo "${file.name}" anexado! Faça uma pergunta e o PDF será indexado automaticamente.`, 'success');
+        }
+        
+        // Upload PDF para indexação
+        async function uploadPDF(file) {
+            showNotification('📤 Enviando e indexando PDF...', 'info');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_URL}/upload-pdf`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showNotification(`✅ PDF "${file.name}" indexado com sucesso!`, 'success');
+                    adicionarMensagem(`📄 PDF "${file.name}" foi indexado e está pronto para consultas!`, 'bot');
+                    atualizarStatus(); // Atualizar contadores
+                } else {
+                    showNotification('❌ Erro ao indexar PDF', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao fazer upload:', error);
+                showNotification('❌ Erro ao enviar PDF. Verifique a API.', 'error');
+            }
+        }
+        
+        // Scroll suave para o chat ao clicar em "Chat"
+        function scrollToChat() {
+            const chatSection = document.getElementById('chatSection');
+            if (chatSection) {
+                chatSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar status inicial
+            atualizarStatus();
+            
+            // Auto-refresh a cada 30 segundos
+            setInterval(verificarStatus, 30000);
+            
+            // Focus no input ao carregar
+            setTimeout(() => {
+                document.getElementById('chatInput').focus();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
+        

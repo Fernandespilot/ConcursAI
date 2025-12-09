@@ -1,0 +1,47 @@
+# LangChain dependencies - versões atualizadas
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-ollama>=0.1.0
+
+# Groq API - Inferência ultra-rápida na nuvem ⚡
+groq>=0.4.0
+
+gradio>=4.0.0
+pandas>=1.5.0
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+lxml>=4.9.0
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+gpt4all>=2.0.0
+PyPDF2>=3.0.0
+pdfplumber>=0.9.0
+python-magic-bin>=0.4.14
+openpyxl>=3.1.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+selenium>=4.0.0
+webdriver-manager>=3.8.0
+plotly>=5.0.0
+schedule>=1.2.0
+win10toast>=0.9
+
+
+# Depend�ncias v2.0
+# Adicionando aioredis para cache Redis (opcional)
+aioredis==2.0.1
+
+# Adicionando bcrypt para hashing de senhas
+bcrypt==4.1.2
+
+# Adicionando PyJWT para tokens JWT
+PyJWT==2.8.0
+
+# Dependências existentes mantidas
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.1
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+httpx==0.25.2

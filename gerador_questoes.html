@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Questões - ConcursAI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .questao-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .questao-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .questao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .questao-numero {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .questao-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-banca {
+            background: #667eea;
+            color: white;
+        }
+
+        .badge-area {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-dificuldade-facil {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-dificuldade-medio {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-dificuldade-dificil {
+            background: #dc3545;
+            color: white;
+        }
+
+        .questao-texto {
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 1.05em;
+            color: #333;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .alternativas {
+            margin: 20px 0;
+        }
+
+        .alternativa {
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 2px solid #dee2e6;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alternativa:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .alternativa-letra {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #667eea;
+            min-width: 30px;
+        }
+
+        .alternativa.selecionada {
+            background: #e7f3ff;
+            border-color: #667eea;
+        }
+
+        .alternativa.correta {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: pulse 0.5s;
+        }
+
+        .alternativa.incorreta {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .questao-explicacao {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .questao-explicacao.show {
+            display: block;
+            animation: slideDown 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .explicacao-titulo {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .questao-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-verificar {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-proxima {
+            flex: 1;
+            min-width: 150px;
+            background: #28a745;
+        }
+
+        .btn-proxima:hover {
+            background: #218838;
+        }
+
+        .progresso {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .progresso-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .progresso-barra {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progresso-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s;
+        }
+
+        .estatisticas {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .dica-banca {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .dica-titulo {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .dica-texto {
+            color: #856404;
+        }
+
+        @media (max-width: 768px) {
+            .estatisticas {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .questao-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Gerador de Questões Personalizadas</h1>
+            <p>Treine com questões no estilo da banca selecionada</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="bancaSelect">📋 Banca:</label>
+                <select id="bancaSelect">
+                    <option value="CEBRASPE">CEBRASPE</option>
+                    <option value="FGV">FGV</option>
+                    <option value="FCC">FCC</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="areaSelect">📚 Área:</label>
+                <select id="areaSelect">
+                    <option value="TODAS">Todas</option>
+                    <option value="Língua Portuguesa">Língua Portuguesa</option>
+                    <option value="Raciocínio Lógico">Raciocínio Lógico</option>
+                    <option value="Informática">Informática</option>
+                    <option value="Jurídica">Jurídica</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="qtdSelect">🔢 Quantidade:</label>
+                <input type="number" id="qtdSelect" value="10" min="5" max="50">
+            </div>
+
+            <button onclick="gerarQuestoes()" style="align-self: flex-end;">🚀 Gerar Questões</button>
+        </div>
+
+        <div id="dicaBanca" class="dica-banca" style="display: none;">
+            <div class="dica-titulo">💡 Dica da Banca</div>
+            <div class="dica-texto" id="dicaTexto"></div>
+        </div>
+
+        <div class="estatisticas" style="display: none;" id="estatisticas">
+            <div class="stat-box">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statRespondidas">0</div>
+                <div class="stat-label">Respondidas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statCorretas">0</div>
+                <div class="stat-label">Corretas</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="statTaxa">0%</div>
+                <div class="stat-label">Acertos</div>
+            </div>
+        </div>
+
+        <div class="progresso" style="display: none;" id="progresso">
+            <div class="progresso-info">
+                <span>Progresso</span>
+                <span id="progressoTexto">0 de 0</span>
+            </div>
+            <div class="progresso-barra">
+                <div class="progresso-fill" id="progressoFill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="questoesContainer"></div>
+    </div>
+
+    <script>
+        let questoesAtivas = [];
+        let respostas = {};
+        let estatisticas = {
+            total: 0,
+            respondidas: 0,
+            corretas: 0
+        };
+
+        const questoesSimuladas = {
+            CEBRASPE: [
+                {
+                    id: 1,
+                    texto: "Acerca da administração pública, julgue o item a seguir. O princípio da impessoalidade está diretamente relacionado à finalidade pública e à isonomia.",
+                    alternativas: ["Certo", "Errado"],
+                    correta: 0,
+                    area: "Jurídica",
+                    dificuldade: "Médio",
+                    explicacao: "CORRETO. O princípio da impessoalidade está relacionado à finalidade pública (a administração deve servir ao interesse público, não a interesses particulares) e à isonomia (tratamento igual a todos os administrados)."
+                },
+                {
+                    id: 2,
+                    texto: "Considerando os aspectos relacionados à morfologia da língua portuguesa, julgue o item subsequente. Na frase 'Ele não vem mais aqui', a palavra 'mais' é um advérbio de intensidade.",
+                    alternativas: ["Certo", "Errado"],
+                    correta: 1,
+                    area: "Língua Portuguesa",
+                    dificuldade: "Fácil",
+                    explicacao: "ERRADO. Neste contexto, 'mais' é um advérbio de tempo, não de intensidade. Indica 'já não', 'a partir de agora não'."
+                }
+            ],
+            FGV: [
+                {
+                    id: 3,
+                    texto: "Sobre os direitos fundamentais previstos na Constituição Federal de 1988, é correto afirmar que:",
+                    alternativas: [
+                        "São absolutos e não admitem qualquer tipo de restrição.",
+                        "Podem ser restringidos mediante lei, respeitando-se o núcleo essencial.",
+                        "Aplicam-se exclusivamente às relações entre Estado e indivíduo.",
+                        "Dependem de regulamentação infraconstitucional para produzir efeitos.",
+                        "Não podem ser objeto de emenda constitucional."
+                    ],
+                    correta: 1,
+                    area: "Jurídica",
+                    dificuldade: "Difícil",
+                    explicacao: "Alternativa B. Os direitos fundamentais não são absolutos e podem sofrer restrições mediante lei, desde que preservado o núcleo essencial do direito (teoria dos limites dos limites)."
+                },
+                {
+                    id: 4,
+                    texto: "Analise as afirmativas sobre concordância nominal: I. Em 'É proibido entrada', a concordância está correta. II. Em 'Ela mesmo fez o trabalho', a concordância está correta. III. Em 'Anexo seguem os documentos', a concordância está correta. Está correto o que se afirma em:",
+                    alternativas: [
+                        "I, apenas.",
+                        "II, apenas.",
+                        "III, apenas.",
+                        "I e III, apenas.",
+                        "I, II e III."
+                    ],
+                    correta: 0,
+                    area: "Língua Portuguesa",
+                    dificuldade: "Médio",
+                    explicacao: "Alternativa A. Apenas I está correta. 'É proibido entrada' está correto quando o substantivo não tem artigo. II está errada ('Ela mesma'). III está errada ('Anexos seguem')."
+                }
+            ],
+            FCC: [
+                {
+                    id: 5,
+                    texto: "Considere: I. O verbo 'haver' é impessoal quando usado no sentido de 'existir'. II. O verbo 'fazer' é impessoal quando indica tempo decorrido. III. Verbos impessoais não possuem sujeito e ficam na 3ª pessoa do singular. Está correto o que consta de:",
+                    alternativas: [
+                        "I, II e III.",
+                        "I e II, apenas.",
+                        "II e III, apenas.",
+                        "I, apenas.",
+                        "III, apenas."
+                    ],
+                    correta: 0,
+                    area: "Língua Portuguesa",
+                    dificuldade: "Médio",
+                    explicacao: "Alternativa A. Todas as afirmativas estão corretas. 'Haver' no sentido de existir é impessoal (Há pessoas). 'Fazer' indicando tempo também é impessoal (Faz dois anos). Verbos impessoais não têm sujeito e ficam sempre na 3ª pessoa do singular."
+                },
+                {
+                    id: 6,
+                    texto: "Em relação aos dispositivos da Lei nº 8.112/1990, que dispõe sobre o regime jurídico dos servidores públicos civis da União, é correto afirmar:",
+                    alternativas: [
+                        "A licença para capacitação pode ser concedida após cada quinquênio de efetivo exercício.",
+                        "O servidor não pode ausentar-se do serviço durante o expediente sem prévia autorização do chefe imediato, salvo em caso de doença.",
+                        "A remoção a pedido pode ocorrer para outra localidade independentemente do interesse da Administração.",
+                        "O servidor estável só pode perder o cargo em virtude de sentença judicial transitada em julgado.",
+                        "A progressão funcional é automática após três anos de efetivo exercício."
+                    ],
+                    correta: 0,
+                    area: "Jurídica",
+                    dificuldade: "Difícil",
+                    explicacao: "Alternativa A. A licença para capacitação pode ser concedida após cada quinquênio de efetivo exercício (art. 87 da Lei 8.112/90), pelo prazo de até três meses."
+                }
+            ]
+        };
+
+        const dicasBancas = {
+            CEBRASPE: "A CEBRASPE usa formato CERTO/ERRADO. Atenção com negações duplas e termos absolutos como 'sempre', 'nunca', 'todo'!",
+            FGV: "A FGV costuma ter questões mais longas e exigir interpretação cuidadosa. Leia todas as alternativas antes de responder!",
+            FCC: "A FCC cobra muito gramática e lei seca. Foque em detalhes específicos da legislação e regras gramaticais!"
+        };
+
+        function gerarQuestoes() {
+            const banca = document.getElementById('bancaSelect').value;
+            const area = document.getElementById('areaSelect').value;
+            const qtd = parseInt(document.getElementById('qtdSelect').value);
+
+            // Mostrar dica da banca
+            document.getElementById('dicaBanca').style.display = 'block';
+            document.getElementById('dicaTexto').textContent = dicasBancas[banca];
+
+            // Filtrar questões
+            let questoes = questoesSimuladas[banca] || [];
+            
+            if (area !== 'TODAS') {
+                questoes = questoes.filter(q => q.area === area);
+            }
+
+            // Duplicar questões se necessário (simulação)
+            while (questoes.length < qtd) {
+                questoes = [...questoes, ...questoes];
+            }
+
+            questoesAtivas = questoes.slice(0, qtd).map((q, i) => ({...q, numero: i + 1}));
+            respostas = {};
+            estatisticas = {
+                total: questoesAtivas.length,
+                respondidas: 0,
+                corretas: 0
+            };
+
+            renderizarQuestoes();
+            atualizarEstatisticas();
+            atualizarProgresso();
+
+            document.getElementById('estatisticas').style.display = 'grid';
+            document.getElementById('progresso').style.display = 'block';
+        }
+
+        function renderizarQuestoes() {
+            const container = document.getElementById('questoesContainer');
+            
+            container.innerHTML = questoesAtivas.map(questao => `
+                <div class="questao-card" id="questao-${questao.numero}">
+                    <div class="questao-header">
+                        <div class="questao-numero">Questão ${questao.numero}</div>
+                        <div class="questao-badges">
+                            <span class="badge badge-banca">${document.getElementById('bancaSelect').value}</span>
+                            <span class="badge badge-area">${questao.area}</span>
+                            <span class="badge badge-dificuldade-${questao.dificuldade.toLowerCase()}">${questao.dificuldade}</span>
+                        </div>
+                    </div>
+
+                    <div class="questao-texto">${questao.texto}</div>
+
+                    <div class="alternativas">
+                        ${questao.alternativas.map((alt, i) => `
+                            <div class="alternativa" onclick="selecionarAlternativa(${questao.numero}, ${i})">
+                                <div class="alternativa-letra">${questao.alternativas.length === 2 ? alt : String.fromCharCode(65 + i)}</div>
+                                <div class="alternativa-texto">${alt}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="questao-actions">
+                        <button class="btn-verificar" onclick="verificarResposta(${questao.numero})">
+                            ✓ Verificar Resposta
+                        </button>
+                        <button class="btn-proxima" onclick="proximaQuestao(${questao.numero})" style="display: none;">
+                            → Próxima Questão
+                        </button>
+                    </div>
+
+                    <div class="questao-explicacao" id="explicacao-${questao.numero}">
+                        <div class="explicacao-titulo">💡 Explicação</div>
+                        <div>${questao.explicacao}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selecionarAlternativa(numero, indice) {
+            const questaoCard = document.getElementById(`questao-${numero}`);
+            const alternativas = questaoCard.querySelectorAll('.alternativa');
+            
+            // Remover seleção anterior
+            alternativas.forEach(alt => alt.classList.remove('selecionada'));
+            
+            // Adicionar nova seleção
+            alternativas[indice].classList.add('selecionada');
+            
+            // Guardar resposta
+            respostas[numero] = indice;
+        }
+
+        function verificarResposta(numero) {
+            if (respostas[numero] === undefined) {
+                alert('Selecione uma alternativa primeiro!');
+                return;
+            }
+
+            const questao = questoesAtivas.find(q => q.numero === numero);
+            const questaoCard = document.getElementById(`questao-${numero}`);
+            const alternativas = questaoCard.querySelectorAll('.alternativa');
+            const explicacao = document.getElementById(`explicacao-${numero}`);
+            
+            // Marcar corretas e incorretas
+            alternativas.forEach((alt, i) => {
+                if (i === questao.correta) {
+                    alt.classList.add('correta');
+                } else if (i === respostas[numero]) {
+                    alt.classList.add('incorreta');
+                }
+                alt.style.pointerEvents = 'none';
+            });
+
+            // Mostrar explicação
+            explicacao.classList.add('show');
+
+            // Atualizar estatísticas
+            if (respostas[numero] === questao.correta) {
+                estatisticas.corretas++;
+            }
+            estatisticas.respondidas++;
+
+            // Ocultar botão verificar, mostrar próxima
+            questaoCard.querySelector('.btn-verificar').style.display = 'none';
+            questaoCard.querySelector('.btn-proxima').style.display = 'block';
+
+            atualizarEstatisticas();
+            atualizarProgresso();
+        }
+
+        function proximaQuestao(numero) {
+            if (numero < questoesAtivas.length) {
+                document.getElementById(`questao-${numero + 1}`).scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert(`Você completou todas as questões!\nAcertos: ${estatisticas.corretas}/${estatisticas.total} (${Math.round(estatisticas.corretas / estatisticas.total * 100)}%)`);
+            }
+        }
+
+        function atualizarEstatisticas() {
+            document.getElementById('statTotal').textContent = estatisticas.total;
+            document.getElementById('statRespondidas').textContent = estatisticas.respondidas;
+            document.getElementById('statCorretas').textContent = estatisticas.corretas;
+            
+            const taxa = estatisticas.respondidas > 0 
+                ? Math.round((estatisticas.corretas / estatisticas.respondidas) * 100)
+                : 0;
+            document.getElementById('statTaxa').textContent = taxa + '%';
+        }
+
+        function atualizarProgresso() {
+            const percentual = (estatisticas.respondidas / estatisticas.total) * 100;
+            document.getElementById('progressoFill').style.width = percentual + '%';
+            document.getElementById('progressoTexto').textContent = 
+                `${estatisticas.respondidas} de ${estatisticas.total}`;
+        }
+
+        // Carregar parâmetros da URL
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const banca = params.get('banca');
+            const area = params.get('area');
+
+            if (banca) {
+                document.getElementById('bancaSelect').value = banca;
+            }
+            if (area) {
+                document.getElementById('areaSelect').value = area;
+            }
+
+            if (banca || area) {
+                gerarQuestoes();
+            }
+        };
+    </script>
+</body>
+</html>

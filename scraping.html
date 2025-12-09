@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Automático - ConcursAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-box {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success);
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pdfs-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .pdf-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pdf-info {
+            flex: 1;
+        }
+        
+        .pdf-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .pdf-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .nav-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nav-link">
+        <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+    </a>
+    
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-spider"></i> Scraping Automático</h1>
+            <p>Coleta automática de editais de concursos públicos</p>
+        </div>
+        
+        <!-- Alertas -->
+        <div id="alerts"></div>
+        
+        <!-- Status do Sistema -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                <h2 class="card-title">Status do Sistema</h2>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-coletados">-</div>
+                    <div class="stat-label">PDFs Coletados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-indexados">-</div>
+                    <div class="stat-label">PDFs Indexados</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-jobs">-</div>
+                    <div class="stat-label">Jobs Ativos</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="stat-status">-</div>
+                    <div class="stat-label">Status</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-success" onclick="atualizarStatus()" style="width: auto;">
+                    <i class="fas fa-sync"></i> Atualizar Status
+                </button>
+                <button class="btn btn-danger" onclick="pararScheduler()" style="width: auto;">
+                    <i class="fas fa-stop"></i> Parar Scheduler
+                </button>
+            </div>
+        </div>
+        
+        <div class="grid">
+            <!-- Coleta PCI (RECOMENDADO) -->
+            <div class="card" style="border: 2px solid var(--success);">
+                <div class="card-header" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <div class="card-icon"><i class="fas fa-star"></i></div>
+                    <h2 class="card-title" style="color: white;">🌐 Coleta PCI (Recomendado)</h2>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>PCI Concursos:</strong> Scraper mais confiável! Coleta provas e editais do site agregador PCI Concursos.
+                        <strong>Inclui FCC!</strong>
+                    </div>
+                </div>
+                
+                <form id="form-coleta-pci" onsubmit="coletarPCI(event)">
+                    <div class="form-group">
+                        <label>Banca</label>
+                        <select id="banca-pci" required>
+                            <option value="cebraspe">Cebraspe (CESPE)</option>
+                            <option value="fcc">FCC - Fundação Carlos Chagas</option>
+                            <option value="fgv">FGV - Fundação Getúlio Vargas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Máximo de Concursos</label>
+                        <input type="number" id="max-concursos-pci" min="1" max="15" value="5" required>
+                        <small style="color: #6b7280;">PCI é mais rápido (~30s por concurso)</small>
+                    </div>
+                    
+                    <button type="submit" class="btn" style="background: var(--success);">
+                        <i class="fas fa-rocket"></i> Iniciar Coleta PCI
+                    </button>
+                    
+                    <button type="button" class="btn" style="background: #8b5cf6; margin-top: 10px;" onclick="coletarIndexarAutomatico()">
+                        <i class="fas fa-brain"></i> Coletar + Indexar (RAG Automático)
+                    </button>
+                    
+                    <button type="button" class="btn btn-warning" onclick="coletarTodasPCI()" style="margin-top: 10px;">
+                        <i class="fas fa-globe"></i> Coletar TODAS (Cebraspe + FCC + FGV)
+                    </button>
+                    
+                    <button type="button" class="btn" style="background: #ec4899; margin-top: 10px;" onclick="coletarIndexarTodas()">
+                        <i class="fas fa-magic"></i> Coletar + Indexar TODAS (Completo)
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading-coleta-pci">
+                    <div class="spinner"></div>
+                    <p>Coletando via PCI Concursos... Aguarde.</p>
+                </div>
+            </div>
+            
+            <!-- Coleta Direta (Site das Bancas) -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-download"></i></div>
+                    <h2 class="card-title">Coleta Direta</h2>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div><strong>Coleta Direta:</strong> Scraping dos sites oficiais. Mais lento e pode ter bloqueios. Use PCI se disponível.</div>
+                </div>
+                
+                <form id="form-coleta-imediata" onsubmit="coletarAgora(event)">
+                    <div class="form-group">
+                        <label>Banca</label>
+                        <select id="banca" required>
+                            <option value="cebraspe">Cebraspe (CESPE)</option>
+                            <option value="fgv">FGV Conhecimento</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Máximo de Concursos</label>
+                        <input type="number" id="max-concursos" min="1" max="20" value="3" required>
+                        <small style="color: #6b7280;">Quanto mais, mais tempo leva (~1 min por concurso)</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" id="btn-coletar">
+                        <i class="fas fa-spider"></i> Iniciar Coleta
+                    </button>
+                    
+                    <button type="button" class="btn btn-warning" onclick="coletarTodas()" style="margin-top: 10px;">
+                        <i class="fas fa-globe"></i> Coletar TODAS as Bancas
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading-coleta">
+                    <div class="spinner"></div>
+                    <p>Coletando editais... Isso pode levar alguns minutos.</p>
+                </div>
+            </div>
+            
+            <!-- Agendamento -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon"><i class="fas fa-clock"></i></div>
+                    <h2 class="card-title">Agendamento</h2>
+                </div>
+                
+                <form id="form-agendamento" onsubmit="agendarColeta(event)">
+                    <div class="form-group">
+                        <label>Tipo de Agendamento</label>
+                        <select id="tipo-agendamento" onchange="toggleDiaSemana()" required>
+                            <option value="diario">Diário</option>
+                            <option value="semanal">Semanal</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="group-dia-semana" style="display: none;">
+                        <label>Dia da Semana</label>
+                        <select id="dia-semana">
+                            <option value="monday">Segunda-feira</option>
+                            <option value="tuesday">Terça-feira</option>
+                            <option value="wednesday">Quarta-feira</option>
+                            <option value="thursday">Quinta-feira</option>
+                            <option value="friday">Sexta-feira</option>
+                            <option value="saturday">Sábado</option>
+                            <option value="sunday">Domingo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Horário</label>
+                        <input type="time" id="horario" value="06:00" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i> Agendar Coleta
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- PDFs Coletados -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-file-pdf"></i></div>
+                <h2 class="card-title">PDFs Coletados</h2>
+            </div>
+            
+            <button class="btn btn-primary" onclick="listarPDFs()" style="margin-bottom: 20px; width: auto;">
+                <i class="fas fa-sync"></i> Atualizar Lista
+            </button>
+            
+            <div class="pdfs-list" id="pdfs-list">
+                <p style="text-align: center; color: #6b7280;">Clique em "Atualizar Lista" para ver os PDFs</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8000';
+        
+        // Atualizar status ao carregar
+        window.addEventListener('load', () => {
+            atualizarStatus();
+        });
+        
+        function toggleDiaSemana() {
+            const tipo = document.getElementById('tipo-agendamento').value;
+            const groupDia = document.getElementById('group-dia-semana');
+            groupDia.style.display = tipo === 'semanal' ? 'block' : 'none';
+        }
+        
+        function showAlert(message, type = 'success') {
+            const alertsDiv = document.getElementById('alerts');
+            const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-error' : 'alert-info';
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            
+            const alert = document.createElement('div');
+            alert.className = `alert ${alertClass}`;
+            alert.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            alertsDiv.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        async function atualizarStatus() {
+            try {
+                const response = await fetch(`${API_URL}/scraping/status`);
+                const data = await response.json();
+                
+                if (data.disponivel) {
+                    document.getElementById('stat-coletados').textContent = data.estatisticas.total_coletados;
+                    document.getElementById('stat-indexados').textContent = data.estatisticas.total_indexados;
+                    document.getElementById('stat-jobs').textContent = data.scheduler.jobs_ativos;
+                    
+                    const statusEl = document.getElementById('stat-status');
+                    if (data.scheduler.rodando) {
+                        statusEl.innerHTML = '<span class="status-badge status-active"><i class="fas fa-circle"></i> Ativo</span>';
+                    } else {
+                        statusEl.innerHTML = '<span class="status-badge status-inactive"><i class="fas fa-circle"></i> Parado</span>';
+                    }
+                } else {
+                    showAlert('Sistema de scraping não disponível. Instale as dependências.', 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+                showAlert('Erro ao conectar com a API', 'error');
+            }
+        }
+        
+        async function coletarAgora(event) {
+            event.preventDefault();
+            
+            const banca = document.getElementById('banca').value;
+            const maxConcursos = parseInt(document.getElementById('max-concursos').value);
+            const btnColetar = document.getElementById('btn-coletar');
+            const loading = document.getElementById('loading-coleta');
+            
+            btnColetar.disabled = true;
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/coletar`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({banca, max_concursos: maxConcursos})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Coleta da ${banca.toUpperCase()} iniciada! Tempo estimado: ${Math.round(data.estimativa_tempo / 60)} minutos`, 'success');
+                    
+                    // Atualiza status após alguns segundos
+                    setTimeout(atualizarStatus, 5000);
+                } else {
+                    showAlert('Erro ao iniciar coleta', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao iniciar coleta', 'error');
+            } finally {
+                btnColetar.disabled = false;
+                loading.classList.remove('active');
+            }
+        }
+        
+        async function coletarTodas() {
+            if (!confirm('Isso vai coletar de TODAS as bancas. Pode levar vários minutos. Continuar?')) {
+                return;
+            }
+            
+            const maxConcursos = parseInt(document.getElementById('max-concursos').value);
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/coletar-todas?max_concursos=${maxConcursos}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Coleta de todas as bancas iniciada! Tempo estimado: ${Math.round(data.estimativa_tempo / 60)} minutos`, 'success');
+                    setTimeout(atualizarStatus, 5000);
+                } else {
+                    showAlert('Erro ao iniciar coleta geral', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao iniciar coleta geral', 'error');
+            }
+        }
+        
+        // === FUNÇÕES PCI SCRAPER ===
+        
+        async function coletarPCI(event) {
+            event.preventDefault();
+            
+            const banca = document.getElementById('banca-pci').value;
+            const maxConcursos = parseInt(document.getElementById('max-concursos-pci').value);
+            const loading = document.getElementById('loading-coleta-pci');
+            
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/pci/coletar`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({banca, max_concursos: maxConcursos})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`🌐 Coleta PCI da ${banca.toUpperCase()} iniciada! Tempo estimado: ${Math.round(data.estimativa_tempo / 60)} minutos`, 'success');
+                    setTimeout(atualizarStatus, 5000);
+                } else {
+                    showAlert('Erro ao iniciar coleta PCI', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Sistema de scraping não disponível. Execute: instalar_scraping.bat', 'error');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        async function coletarTodasPCI() {
+            if (!confirm('🌐 Coleta PCI de TODAS as bancas (Cebraspe, FCC e FGV). Continuar?')) {
+                return;
+            }
+            
+            const maxConcursos = parseInt(document.getElementById('max-concursos-pci').value);
+            const loading = document.getElementById('loading-coleta-pci');
+            
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/pci/coletar-todas?max_concursos=${maxConcursos}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`🚀 Coleta PCI iniciada! 3 bancas, ~${Math.round(data.estimativa_tempo / 60)} minutos`, 'success');
+                    setTimeout(atualizarStatus, 5000);
+                } else {
+                    showAlert('Erro ao iniciar coleta PCI', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Sistema de scraping não disponível', 'error');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        // === COLETA + INDEXAÇÃO AUTOMÁTICA ===
+        
+        async function coletarIndexarAutomatico() {
+            if (!confirm('🧠 Coletar E indexar automaticamente no RAG? Os PDFs ficarão prontos para consultas.')) {
+                return;
+            }
+            
+            const banca = document.getElementById('banca-pci').value;
+            const maxConcursos = parseInt(document.getElementById('max-concursos-pci').value);
+            const loading = document.getElementById('loading-coleta-pci');
+            
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/coletar-indexar`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({banca, max_concursos: maxConcursos})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`🧠 Coleta+Indexação iniciada! ${banca.upper()} será automaticamente indexado no RAG (~${Math.round(data.estimativa_tempo / 60)} min)`, 'success');
+                    setTimeout(atualizarStatus, 5000);
+                } else {
+                    showAlert('Erro ao iniciar coleta+indexação', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Sistema não disponível. Verifique se a API está rodando.', 'error');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        async function coletarIndexarTodas() {
+            if (!confirm('🔥 Coletar E indexar TODAS as bancas (Cebraspe+FCC+FGV)? Isso vai demorar ~15-20 minutos mas deixará TUDO pronto no RAG!')) {
+                return;
+            }
+            
+            const maxConcursos = parseInt(document.getElementById('max-concursos-pci').value);
+            const loading = document.getElementById('loading-coleta-pci');
+            
+            loading.classList.add('active');
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/coletar-indexar-todas?max_concursos=${maxConcursos}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`🔥 Coleta+Indexação COMPLETA iniciada! ${data.total_concursos} concursos serão processados (~${Math.round(data.estimativa_tempo / 60)} min)`, 'success');
+                    setTimeout(atualizarStatus, 5000);
+                } else {
+                    showAlert('Erro ao iniciar processo completo', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Sistema não disponível', 'error');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+        
+        async function agendarColeta(event) {
+            event.preventDefault();
+            
+            const tipo = document.getElementById('tipo-agendamento').value;
+            const horario = document.getElementById('horario').value;
+            const [hora, minuto] = horario.split(':').map(Number);
+            
+            const payload = {
+                tipo,
+                hora,
+                minuto
+            };
+            
+            if (tipo === 'semanal') {
+                payload.dia_semana = document.getElementById('dia-semana').value;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/agendar`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Agendamento configurado: ${data.proxima_execucao}`, 'success');
+                    setTimeout(atualizarStatus, 1000);
+                } else {
+                    showAlert('Erro ao agendar coleta', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao agendar coleta', 'error');
+            }
+        }
+        
+        async function pararScheduler() {
+            if (!confirm('Tem certeza que deseja parar o scheduler?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/parar`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Scheduler parado com sucesso', 'success');
+                    setTimeout(atualizarStatus, 1000);
+                } else {
+                    showAlert('Erro ao parar scheduler', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('Erro ao parar scheduler', 'error');
+            }
+        }
+        
+        async function listarPDFs() {
+            const listDiv = document.getElementById('pdfs-list');
+            listDiv.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Carregando...</p></div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/scraping/pdfs`);
+                const data = await response.json();
+                
+                if (data.success && data.pdfs.length > 0) {
+                    listDiv.innerHTML = data.pdfs.map(pdf => `
+                        <div class="pdf-item">
+                            <div class="pdf-info">
+                                <div class="pdf-name">
+                                    <i class="fas fa-file-pdf" style="color: #ef4444;"></i>
+                                    ${pdf.filename}
+                                </div>
+                                <div class="pdf-meta">
+                                    <span><strong>Banca:</strong> ${pdf.banca.toUpperCase()}</span> |
+                                    <span><strong>Tipo:</strong> ${pdf.tipo}</span> |
+                                    <span><strong>Tamanho:</strong> ${pdf.size_mb} MB</span> |
+                                    <span><strong>Data:</strong> ${pdf.data_modificacao}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listDiv.innerHTML = '<p style="text-align: center; color: #6b7280;">Nenhum PDF coletado ainda</p>';
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                listDiv.innerHTML = '<p style="text-align: center; color: #ef4444;">Erro ao carregar PDFs</p>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI API - Documentação Interativa</title>
+    <meta name="description" content="API ConcursAI - Sistema de análise inteligente de concursos públicos com IA avançada.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --bg: #f8f9ff;
+            --text: #333;
+            --light: #666;
+            --white: #fff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --radius: 20px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            color: var(--white);
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .api-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .endpoints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .endpoint-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .endpoint-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .method {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        
+        .method.get {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .method.post {
+            background: #e8f5e8;
+            color: #388e3c;
+        }
+        
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .endpoint-desc {
+            color: var(--light);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .try-button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .try-button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .status-item {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: var(--transition);
+        }
+        
+        .status-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+        
+        .status-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-label {
+            font-size: 0.9rem;
+            color: var(--light);
+            font-weight: 500;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .example-section {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .example-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .response-mock {
+            background: var(--white);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .endpoints-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ConcursAI API</h1>
+            <p>Sistema Inteligente de Análise de Concursos Públicos</p>
+            <p>Base URL: <code style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.5rem; border-radius: 4px;">http://localhost:8000</code></p>
+        </div>
+        
+        <div class="api-card">
+            <h2>📊 Status do Sistema</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-value" id="statusValue">🟢 Online</div>
+                    <div class="status-label">Status da API</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="concursosCount">Loading...</div>
+                    <div class="status-label">Concursos Ativos</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="requestsCount">Loading...</div>
+                    <div class="status-label">Requisições/Dia</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">v2.1.0</div>
+                    <div class="status-label">Versão</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <a href="/docs" class="action-btn" target="_blank">
+                <i class="fas fa-book"></i>
+                Swagger Docs
+            </a>
+            <a href="/api-brasil/concursos" class="action-btn" target="_blank">
+                <i class="fas fa-search"></i>
+                Testar API
+            </a>
+            <a href="dashboard.html" class="action-btn">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="index.html" class="action-btn">
+                <i class="fas fa-home"></i>
+                Página Principal
+            </a>
+        </div>
+        
+        <div class="api-card">
+            <h2>🎯 Endpoints Principais</h2>
+            <div class="endpoints-grid">
+                
+                <div class="endpoint-card">
+                    <div class="method get">GET</div>
+                    <div class="endpoint-path">/api-brasil/concursos</div>
+                    <div class="endpoint-desc">Lista todos os concursos públicos do Brasil</div>
+                    <button class="try-button" onclick="testEndpoint('/api-brasil/concursos')">Testar Agora</button>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="method get">GET</div>
+                    <div class="endpoint-path">/api-brasil/concursos/{estado}</div>
+                    <div class="endpoint-desc">Concursos filtrados por estado específico</div>
+                    <button class="try-button" onclick="testEndpoint('/api-brasil/concursos/sp')">Testar com SP</button>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="method post">POST</div>
+                    <div class="endpoint-path">/buscar</div>
+                    <div class="endpoint-desc">Busca semântica inteligente com IA</div>
+                    <button class="try-button" onclick="showSearchDemo()">Demo Interativa</button>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="method get">GET</div>
+                    <div class="endpoint-path">/concursos</div>
+                    <div class="endpoint-desc">Lista concursos com filtros avançados</div>
+                    <button class="try-button" onclick="testEndpoint('/concursos?limit=5')">Testar com Filtros</button>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="method get">GET</div>
+                    <div class="endpoint-path">/status</div>
+                    <div class="endpoint-desc">Status geral e métricas do sistema</div>
+                    <button class="try-button" onclick="testEndpoint('/status')">Ver Status</button>
+                </div>
+                
+                <div class="endpoint-card">
+                    <div class="method post">POST</div>
+                    <div class="endpoint-path">/ia/analisar-edital</div>
+                    <div class="endpoint-desc">Análise completa de edital com IA</div>
+                    <button class="try-button" onclick="showAIDemo()">Demo IA</button>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="api-card">
+            <h2>📋 Exemplos de Uso</h2>
+            
+            <div class="example-section">
+                <div class="example-title">🔍 Busca Simples de Concursos</div>
+                <div class="code-block">
+# Python
+import requests
+
+response = requests.get('http://localhost:8000/api-brasil/concursos')
+concursos = response.json()
+print(f"Total de concursos: {len(concursos)}")
+                </div>
+                
+                <div class="code-block">
+// JavaScript
+fetch('/api-brasil/concursos')
+  .then(response => response.json())
+  .then(data => console.log('Concursos:', data));
+                </div>
+            </div>
+            
+            <div class="example-section">
+                <div class="example-title">🧠 Busca Semântica com IA</div>
+                <div class="code-block">
+# Python
+payload = {
+    "pergunta": "Quais concursos estão abertos para área de TI?",
+    "filtros": {"area": "tecnologia"}
+}
+
+response = requests.post('http://localhost:8000/buscar', json=payload)
+resultado = response.json()
+                </div>
+                
+                <div class="response-mock" id="searchResponse">
+{
+  "resposta": "Encontrei 15 concursos na área de Tecnologia...",
+  "concursos_relevantes": [
+    {
+      "titulo": "TRT - Analista de Sistemas",
+      "relevancia": 0.95,
+      "link": "..."
+    }
+  ]
+}
+                </div>
+            </div>
+        </div>
+        
+        <div class="api-card">
+            <h2>💬 Recursos de IA Disponíveis</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 1.5rem 0;">
+                
+                <div style="background: var(--bg); padding: 1.5rem; border-radius: 15px; border-left: 4px solid var(--primary);">
+                    <h4>🔍 Análise Semântica</h4>
+                    <p>Compreensão profunda do conteúdo de editais usando processamento de linguagem natural.</p>
+                </div>
+                
+                <div style="background: var(--bg); padding: 1.5rem; border-radius: 15px; border-left: 4px solid var(--secondary);">
+                    <h4>💬 Chat Conversacional</h4>
+                    <p>Interação natural com documentos através de perguntas e respostas contextuais.</p>
+                </div>
+                
+                <div style="background: var(--bg); padding: 1.5rem; border-radius: 15px; border-left: 4px solid var(--accent);">
+                    <h4>📊 Extração de Dados</h4>
+                    <p>Extração automática de informações estruturadas de documentos complexos.</p>
+                </div>
+                
+                <div style="background: var(--bg); padding: 1.5rem; border-radius: 15px; border-left: 4px solid #10b981;">
+                    <h4>🎯 Busca Inteligente</h4>
+                    <p>Encontre resultados relevantes sem necessidade de palavras-chave exatas.</p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data for demonstration
+        const mockData = {
+            concursos: [
+                { id: 1, titulo: "TRT - Tribunal Regional do Trabalho", vagas: 25, area: "Jurídica" },
+                { id: 2, titulo: "INSS - Instituto Nacional do Seguro Social", vagas: 150, area: "Administração" },
+                { id: 3, titulo: "IBAMA - Instituto Brasileiro do Meio Ambiente", vagas: 50, area: "Ambiental" }
+            ],
+            status: { 
+                online: true, 
+                total_concursos: 1247, 
+                requests_today: 2840,
+                last_update: "2024-11-15T10:30:00Z"
+            }
+        };
+        
+        // Load initial status
+        function loadStatus() {
+            try {
+                // In a real scenario, this would be an actual API call
+                // For demo purposes, we're using mock data
+                document.getElementById('concursosCount').textContent = mockData.status.total_concursos.toLocaleString();
+                document.getElementById('requestsCount').textContent = mockData.status.requests_today.toLocaleString();
+                document.getElementById('statusValue').textContent = mockData.status.online ? '🟢 Online' : '🔴 Offline';
+            } catch (error) {
+                console.error('Erro ao carregar status:', error);
+                document.getElementById('concursosCount').textContent = 'N/A';
+                document.getElementById('statusValue').textContent = '🔴 Offline';
+            }
+        }
+        
+        // Test endpoint with mock response
+        async function testEndpoint(endpoint) {
+            let mockResponse;
+            
+            // Generate appropriate mock response based on endpoint
+            if (endpoint.includes('/api-brasil/concursos')) {
+                if (endpoint.includes('/sp')) {
+                    mockResponse = mockData.concursos.filter((c, i) => i < 2);
+                } else {
+                    mockResponse = mockData.concursos;
+                }
+            } else if (endpoint.includes('/status')) {
+                mockResponse = mockData.status;
+            } else {
+                mockResponse = { message: "Endpoint testado com sucesso!", data: mockData.concursos.slice(0, 5) };
+            }
+            
+            // Show result in a styled modal
+            showResultModal(endpoint, mockResponse);
+        }
+        
+        function showResultModal(endpoint, data) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; display: flex; 
+                justify-content: center; align-items: center; padding: 2rem;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 15px; padding: 2rem; max-width: 800px; width: 100%; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2 style="color: #667eea;">📊 Resultado: ${endpoint}</h2>
+                        <button onclick="this.closest('.modal').remove()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666;">✕</button>
+                    </div>
+                    <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <strong>Status:</strong> <span style="color: #10b981;">✅ Sucesso</span><br>
+                        <strong>Endpoint:</strong> <code>${endpoint}</code><br>
+                        <strong>Método:</strong> <span style="color: #667eea;">GET</span>
+                    </div>
+                    <pre style="background: #1e1e1e; color: #d4d4d4; padding: 1.5rem; border-radius: 8px; overflow: auto; font-size: 0.9rem;">${JSON.stringify(data, null, 2)}</pre>
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button onclick="this.closest('.modal').remove()" style="background: #667eea; color: white; border: none; padding: 0.75rem 2rem; border-radius: 50px; cursor: pointer; font-weight: 600;">Fechar</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+        
+        // Show search demo with interactive elements
+        function showSearchDemo() {
+            const demoQuestions = [
+                "Quais concursos estão abertos para área de TI?",
+                "Concursos com salário acima de R$ 5.000",
+                "Editais para nível superior em São Paulo",
+                "Vagas para área da saúde"
+            ];
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; display: flex; 
+                justify-content: center; align-items: center; padding: 2rem;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 15px; padding: 2rem; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto;">
+                    <h2 style="color: #667eea; margin-bottom: 1.5rem;">🔍 Demo: Busca Semântica</h2>
+                    <p style="margin-bottom: 1rem; color: #666;">Teste nossa busca inteligente com perguntas em linguagem natural:</p>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <input type="text" id="demoQuery" placeholder="Digite sua pergunta..." 
+                               style="width: 100%; padding: 1rem; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem;"
+                               value="${demoQuestions[0]}">
+                    </div>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;">
+                        ${demoQuestions.map(q => `
+                            <button onclick="document.getElementById('demoQuery').value='${q}'" 
+                                    style="background: #f0f0f0; border: none; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">
+                                ${q}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <button onclick="runSearchDemo()" style="background: #667eea; color: white; border: none; padding: 1rem 2rem; border-radius: 50px; cursor: pointer; font-weight: 600; width: 100%; margin-bottom: 1rem;">
+                        🚀 Executar Busca
+                    </button>
+                    
+                    <div id="demoResult" style="background: #f8f9ff; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; display: none;">
+                        <!-- Results will appear here -->
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button onclick="this.closest('.modal').remove()" style="background: #f0f0f0; color: #333; border: none; padding: 0.75rem 2rem; border-radius: 50px; cursor: pointer; font-weight: 600;">Fechar</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+        
+        function runSearchDemo() {
+            const query = document.getElementById('demoQuery').value;
+            const resultDiv = document.getElementById('demoResult');
+            
+            // Simulate API call
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="text-align: center; color: #667eea;">🔄 Processando busca...</div>';
+            
+            setTimeout(() => {
+                const mockResult = {
+                    pergunta: query,
+                    resposta: "Encontrei 12 concursos relevantes para sua busca. Os principais são para cargos em Tecnologia da Informação com salários competitivos.",
+                    concursos_encontrados: 12,
+                    documentos_relevantes: [
+                        { titulo: "TRT - Analista de Sistemas", relevancia: 0.95, vagas: 15 },
+                        { titulo: "INSS - Técnico em TI", relevancia: 0.87, vagas: 25 },
+                        { titulo: "IBAMA - Analista Ambiental", relevancia: 0.82, vagas: 8 }
+                    ]
+                };
+                
+                resultDiv.innerHTML = `
+                    <h4 style="color: #667eea; margin-bottom: 1rem;">📊 Resultado da Busca</h4>
+                    <div style="background: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <strong>Pergunta:</strong> ${mockResult.pergunta}<br>
+                        <strong>Concursos encontrados:</strong> ${mockResult.concursos_encontrados}
+                    </div>
+                    <div style="background: white; padding: 1rem; border-radius: 8px;">
+                        <strong>Resposta:</strong><br>
+                        ${mockResult.resposta}
+                        <div style="margin-top: 1rem;">
+                            ${mockResult.documentos_relevantes.map(doc => `
+                                <div style="background: #f0f0f0; padding: 0.5rem; margin: 0.5rem 0; border-radius: 4px; border-left: 3px solid #667eea;">
+                                    <strong>${doc.titulo}</strong> - ${doc.vagas} vagas (${Math.round(doc.relevancia * 100)}% relevância)
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }, 1500);
+        }
+        
+        // Show AI analysis demo
+        function showAIDemo() {
+            const demoData = {
+                analise: {
+                    cargo_principal: "Analista de Sistemas",
+                    vagas_total: 25,
+                    salario: "R$ 8.500,00",
+                    escolaridade: "Superior Completo em Ciência da Computação ou área afim",
+                    inscricoes: "15/11/2024 a 30/11/2024",
+                    prova: "20/01/2025",
+                    resumo: "Concurso público para área de tecnologia com excelente remuneração e benefícios. Oportunidade para atuar no desenvolvimento de sistemas para o setor público.",
+                    principais_requisitos: [
+                        "Graduação em área específica",
+                        "Conhecimento em desenvolvimento web",
+                        "Experiência com bancos de dados"
+                    ]
+                }
+            };
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.8); z-index: 1000; display: flex; 
+                justify-content: center; align-items: center; padding: 2rem;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 15px; padding: 2rem; max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto;">
+                    <h2 style="color: #667eea; margin-bottom: 1.5rem;">🧠 Demo: Análise de Edital com IA</h2>
+                    <div style="background: #f8f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <h4>POST /ia/analisar-edital</h4>
+                        <p style="color: #666; margin-top: 0.5rem;">Nossa IA analisa automaticamente editais e extrai informações estruturadas</p>
+                    </div>
+                    <pre style="background: #1e1e1e; color: #d4d4d4; padding: 1.5rem; border-radius: 8px; overflow: auto; font-size: 0.9rem; margin-bottom: 1rem;">${JSON.stringify(demoData, null, 2)}</pre>
+                    <div style="text-align: center;">
+                        <button onclick="this.closest('.modal').remove()" style="background: #667eea; color: white; border: none; padding: 0.75rem 2rem; border-radius: 50px; cursor: pointer; font-weight: 600;">Fechar</button>
+                    </div>
+                </div>
+            `;
+            
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+        
+        // Load status on page load
+        loadStatus();
+        
+        // Update stats periodically for demo
+        let requestCount = 2840;
+        setInterval(() => {
+            requestCount += Math.floor(Math.random() * 5) + 1;
+            document.getElementById('requestsCount').textContent = requestCount.toLocaleString();
+        }, 3000);
+    </script>
+</body>
+</html>

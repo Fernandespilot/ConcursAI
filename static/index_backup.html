@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Inteligência Artificial para Concursos Públicos</title>
+    <meta name="description" content="Plataforma inteligente para busca e análise de concursos públicos em todo o Brasil usando IA">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background);
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.1)" points="0,1000 1000,0 1000,1000"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Search Section */
+        .search-section {
+            padding: 4rem 2rem;
+            background: var(--surface);
+        }
+
+        .search-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .search-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .search-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+        }
+
+        .search-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 3rem;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Results Section */
+        .results-section {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .results-count {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .filter-btn.active:hover {
+            color: white;
+        }
+
+        .concursos-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .concurso-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concurso-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .concurso-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        .concurso-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .concurso-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .concurso-orgao {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .status-open {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-expected {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-closed {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        .concurso-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: 0.5rem;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .concurso-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .concurso-actions {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            border-radius: 0.375rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 4rem 2rem;
+            background: var(--text-primary);
+            color: white;
+        }
+
+        .stats-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 4rem 2rem;
+            background: white;
+        }
+
+        .features-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Seção IA */
+        .ia-section {
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .ia-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .ia-tool-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .ia-tool-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .ia-tool-card h3 {
+            margin-bottom: 1rem;
+            color: #fff;
+            font-size: 1.3rem;
+        }
+
+        .ia-tool-card p {
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .btn-ia {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-ia:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(238, 90, 36, 0.4);
+        }
+
+        .ia-status {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-online {
+            color: #2ecc71;
+        }
+
+        .status-offline {
+            color: #e74c3c;
+        }
+
+        .status-checking {
+            color: #f39c12;
+        }
+
+        /* Modais */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .resultado-container {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .resultado-container h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Chat Conversacional */
+        .chat-modal {
+            max-width: 1000px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-setup {
+            margin-bottom: 2rem;
+        }
+
+        .setup-tabs {
+            display: flex;
+            border-bottom: 2px solid #e1e8ed;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .chat-interface {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .edital-info h4 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .edital-info span {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            max-height: 400px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-message i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .quick-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .quick-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-sources {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            border: 2px solid #e1e8ed;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #chat-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        #chat-send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #chat-send-btn:hover {
+            background: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        #chat-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .chat-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .loading-message {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: loading-dots 1.5s infinite;
+        }
+
+        @keyframes loading-dots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+            100% { content: '.'; }
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .chat-modal {
+                height: 90vh;
+                margin: 1rem;
+                width: calc(100% - 2rem);
+            }
+            
+            .chat-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .quick-questions {
+                flex-direction: column;
+            }
+            
+            .message-content {
+                max-width: 90%;
+            }
+        }
+
+        .features-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: 1rem;
+            text-align: left;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-primary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary-color);
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .footer-section a:hover {
+            color: var(--secondary-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="#" class="logo">
+                <i class="fas fa-brain"></i>
+                ConcursAI
+            </a>
+            <ul class="nav-links">
+                <li><a href="#search">Buscar</a></li>
+                <li><a href="#features">Recursos</a></li>
+                <li><a href="#api">API</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Inteligência Artificial para Concursos Públicos</h1>
+            <p>Descubra milhares de oportunidades em concursos públicos de todo o Brasil com nossa plataforma inteligente. Busca avançada, análise de editais e notificações personalizadas.</p>
+            <div class="cta-buttons">
+                <a href="#search" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    Buscar Concursos
+                </a>
+                <a href="#api" class="btn btn-secondary">
+                    <i class="fas fa-code"></i>
+                    Acessar API
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section id="search" class="search-section">
+        <div class="search-container">
+            <h2 class="search-title">Encontre Sua Oportunidade</h2>
+            <p class="search-subtitle">Busque entre milhares de concursos públicos em todo o Brasil</p>
+            
+            <div class="search-form">
+                <div class="search-grid">
+                    <div class="form-group">
+                        <label class="form-label">Buscar por palavra-chave</label>
+                        <input type="text" id="searchQuery" class="form-input" placeholder="Ex: professor, enfermeiro, analista...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <select id="estadoSelect" class="form-select">
+                            <option value="">Todos os estados</option>
+                            <option value="ac">Acre</option>
+                            <option value="al">Alagoas</option>
+                            <option value="ap">Amapá</option>
+                            <option value="am">Amazonas</option>
+                            <option value="ba">Bahia</option>
+                            <option value="ce">Ceará</option>
+                            <option value="df">Distrito Federal</option>
+                            <option value="es">Espírito Santo</option>
+                            <option value="go">Goiás</option>
+                            <option value="ma">Maranhão</option>
+                            <option value="mt">Mato Grosso</option>
+                            <option value="ms">Mato Grosso do Sul</option>
+                            <option value="mg">Minas Gerais</option>
+                            <option value="pa">Pará</option>
+                            <option value="pb">Paraíba</option>
+                            <option value="pr">Paraná</option>
+                            <option value="pe">Pernambuco</option>
+                            <option value="pi">Piauí</option>
+                            <option value="rj">Rio de Janeiro</option>
+                            <option value="rn">Rio Grande do Norte</option>
+                            <option value="rs">Rio Grande do Sul</option>
+                            <option value="ro">Rondônia</option>
+                            <option value="rr">Roraima</option>
+                            <option value="sc">Santa Catarina</option>
+                            <option value="sp">São Paulo</option>
+                            <option value="se">Sergipe</option>
+                            <option value="to">Tocantins</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="buscarConcursos()">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção IA - Análise de Editais -->
+    <section class="ia-section">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-brain"></i> Análise Inteligente de Editais</h2>
+                <p>Use IA para entender melhor os editais e obter dicas personalizadas</p>
+            </div>
+
+            <div class="ia-tools-grid">
+                <div class="ia-tool-card">
+                    <h3><i class="fas fa-file-alt"></i> Analisar Edital</h3>
+                    <p>Cole o texto do edital e receba uma análise completa com informações estruturadas</p>
+                    <button class="btn-ia" onclick="mostrarAnaliseEdital()">Analisar Edital</button>
+                </div>
+
+                <div class="ia-tool-card">
+                    <h3><i class="fas fa-graduation-cap"></i> Dicas de Estudo</h3>
+                    <p>Receba um plano de estudos personalizado baseado no cargo e conteúdo programático</p>
+                    <button class="btn-ia" onclick="mostrarDicasEstudo()">Gerar Dicas</button>
+                </div>
+
+                <div class="ia-tool-card">
+                    <h3><i class="fas fa-balance-scale"></i> Comparar Editais</h3>
+                    <p>Compare dois editais e veja as principais diferenças e vantagens de cada um</p>
+                    <button class="btn-ia" onclick="mostrarComparacaoEditais()">Comparar</button>
+                </div>
+
+                    <div class="ia-tool-card">
+                        <h3><i class="fas fa-question-circle"></i> Explicar Seção</h3>
+                        <p>Não entendeu uma parte do edital? Cole o texto e receba uma explicação simples</p>
+                        <button class="btn-ia" onclick="mostrarExplicacaoSecao()">Explicar</button>
+                    </div>
+
+                    <div class="ia-tool-card">
+                        <h3><i class="fas fa-comments"></i> Chat com Edital</h3>
+                        <p>Converse com a IA sobre qualquer edital. Faça perguntas específicas e obtenha respostas precisas</p>
+                        <button class="btn-ia" onclick="mostrarChatEdital()">Iniciar Chat</button>
+                    </div>
+                </div>            <!-- Status da IA -->
+            <div class="ia-status">
+                <span id="ia-status-indicator" class="status-offline">
+                    <i class="fas fa-circle"></i> Verificando IA...
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <div id="resultsContainer" style="display: none;">
+            <div class="results-header">
+                <div class="results-count" id="resultsCount">0 concursos encontrados</div>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filtrarPorStatus('all')">Todos</button>
+                    <button class="filter-btn" onclick="filtrarPorStatus('open')">Abertos</button>
+                    <button class="filter-btn" onclick="filtrarPorStatus('expected')">Previstos</button>
+                    <button class="filter-btn" onclick="filtrarPorStatus('closed')">Encerrados</button>
+                </div>
+            </div>
+            <div class="concursos-grid" id="concursosGrid"></div>
+        </div>
+        
+        <div id="loadingContainer" style="display: none;">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Buscando concursos em todo o Brasil...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number" id="totalConcursos">5.000+</div>
+                <div class="stat-label">Concursos Ativos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">27</div>
+                <div class="stat-label">Estados Cobertos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50.000+</div>
+                <div class="stat-label">Vagas Disponíveis</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Monitoramento</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="features-container">
+            <h2 class="features-title">Recursos Avançados</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Inteligência Artificial</h3>
+                    <p class="feature-description">Nossa IA analisa milhares de editais automaticamente, extraindo informações relevantes e facilitando sua busca.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="feature-title">Busca Inteligente</h3>
+                    <p class="feature-description">Encontre oportunidades específicas com nossa busca semântica avançada que compreende o contexto da sua consulta.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="feature-title">Alertas Personalizados</h3>
+                    <p class="feature-description">Receba notificações instantâneas sobre novos concursos que atendem ao seu perfil e áreas de interesse.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Análise de Dados</h3>
+                    <p class="feature-description">Estatísticas detalhadas sobre concorrência, salários, e tendências do mercado de concursos públicos.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Acesso Mobile</h3>
+                    <p class="feature-description">Interface responsiva e otimizada para todos os dispositivos. Busque oportunidades onde quer que esteja.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="feature-title">API Aberta</h3>
+                    <p class="feature-description">Integre nossos dados em seus próprios sistemas com nossa API RESTful documentada e fácil de usar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals da IA -->
+    <!-- Modal para Análise de Edital -->
+    <div id="modal-analise-edital" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal('modal-analise-edital')">&times;</span>
+            <h2><i class="fas fa-brain"></i> Análise Inteligente de Edital</h2>
+            
+            <form id="form-analise-edital">
+                <div class="form-group">
+                    <label for="titulo-concurso">Título do Concurso:</label>
+                    <input type="text" id="titulo-concurso" placeholder="Ex: Concurso Público para Analista" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="orgao-concurso">Órgão:</label>
+                    <input type="text" id="orgao-concurso" placeholder="Ex: Prefeitura de São Paulo" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado-concurso">Estado:</label>
+                    <select id="estado-concurso" required>
+                        <option value="">Selecione o estado</option>
+                        <option value="SP">São Paulo</option>
+                        <option value="RJ">Rio de Janeiro</option>
+                        <option value="MG">Minas Gerais</option>
+                        <option value="RS">Rio Grande do Sul</option>
+                        <option value="PR">Paraná</option>
+                        <option value="SC">Santa Catarina</option>
+                        <option value="BA">Bahia</option>
+                        <option value="GO">Goiás</option>
+                        <option value="PE">Pernambuco</option>
+                        <option value="CE">Ceará</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="conteudo-edital">Conteúdo do Edital:</label>
+                    <textarea id="conteudo-edital" placeholder="Cole aqui o texto completo do edital..." rows="10" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-cogs"></i> Analisar com IA
+                </button>
+            </form>
+            
+            <div id="resultado-analise" class="resultado-container" style="display: none;">
+                <h3>Resultado da Análise</h3>
+                <div id="conteudo-resultado-analise"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Dicas de Estudo -->
+    <div id="modal-dicas-estudo" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal('modal-dicas-estudo')">&times;</span>
+            <h2><i class="fas fa-graduation-cap"></i> Dicas Personalizadas de Estudo</h2>
+            
+            <form id="form-dicas-estudo">
+                <div class="form-group">
+                    <label for="cargo-estudo">Cargo:</label>
+                    <input type="text" id="cargo-estudo" placeholder="Ex: Analista Administrativo" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="materias-estudo">Matérias do Conteúdo Programático:</label>
+                    <textarea id="materias-estudo" placeholder="Digite uma matéria por linha&#10;Ex:&#10;Português&#10;Matemática&#10;Direito Administrativo&#10;Informática" rows="8" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-lightbulb"></i> Gerar Dicas
+                </button>
+            </form>
+            
+            <div id="resultado-dicas" class="resultado-container" style="display: none;">
+                <h3>Plano de Estudos Personalizado</h3>
+                <div id="conteudo-resultado-dicas"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Explicação de Seção -->
+    <div id="modal-explicacao-secao" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="fecharModal('modal-explicacao-secao')">&times;</span>
+            <h2><i class="fas fa-question-circle"></i> Explicar Seção do Edital</h2>
+            
+            <form id="form-explicacao-secao">
+                <div class="form-group">
+                    <label for="nome-secao">Nome da Seção:</label>
+                    <input type="text" id="nome-secao" placeholder="Ex: Dos Requisitos para Investidura no Cargo" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="texto-secao">Texto da Seção:</label>
+                    <textarea id="texto-secao" placeholder="Cole aqui o texto da seção que você não entendeu..." rows="8" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-comments"></i> Explicar
+                </button>
+            </form>
+            
+            <div id="resultado-explicacao" class="resultado-container" style="display: none;">
+                <h3>Explicação Simplificada</h3>
+                <div id="conteudo-resultado-explicacao"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Chat Conversacional -->
+    <div id="modal-chat-edital" class="modal">
+        <div class="modal-content chat-modal">
+            <span class="close" onclick="fecharModal('modal-chat-edital')">&times;</span>
+            <h2><i class="fas fa-comments"></i> Chat Inteligente com Edital</h2>
+            
+            <!-- Seleção/Upload de Edital -->
+            <div id="chat-setup" class="chat-setup">
+                <div class="setup-tabs">
+                    <button class="tab-btn active" onclick="mostrarTabChat('upload')">Novo Edital</button>
+                    <button class="tab-btn" onclick="mostrarTabChat('existing')">Edital Existente</button>
+                </div>
+                
+                <!-- Tab Upload Novo Edital -->
+                <div id="tab-upload" class="tab-content active">
+                    <form id="form-upload-edital">
+                        <div class="form-group">
+                            <label for="chat-titulo">Título do Concurso:</label>
+                            <input type="text" id="chat-titulo" placeholder="Ex: Concurso Público para Analista" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="chat-orgao">Órgão:</label>
+                            <input type="text" id="chat-orgao" placeholder="Ex: Prefeitura de São Paulo" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="chat-estado">Estado:</label>
+                            <select id="chat-estado" required>
+                                <option value="">Selecione o estado</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="PR">Paraná</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="BA">Bahia</option>
+                                <option value="GO">Goiás</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="CE">Ceará</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="chat-conteudo">Texto Completo do Edital:</label>
+                            <textarea id="chat-conteudo" placeholder="Cole aqui o texto completo do edital..." rows="8" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-upload"></i> Carregar e Iniciar Chat
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Tab Edital Existente -->
+                <div id="tab-existing" class="tab-content">
+                    <div class="form-group">
+                        <label for="select-edital-existente">Selecione um edital carregado:</label>
+                        <select id="select-edital-existente">
+                            <option value="">Carregando editais...</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-primary" onclick="iniciarChatExistente()">
+                        <i class="fas fa-play"></i> Iniciar Chat
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Interface de Chat -->
+            <div id="chat-interface" class="chat-interface" style="display: none;">
+                <div class="chat-header">
+                    <div class="edital-info">
+                        <h4 id="chat-edital-titulo">Edital Carregado</h4>
+                        <span id="chat-edital-detalhes">Pronto para conversar</span>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="btn-small" onclick="limparHistorico()">
+                            <i class="fas fa-trash"></i> Limpar Histórico
+                        </button>
+                        <button class="btn-small" onclick="voltarSetupChat()">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="welcome-message">
+                        <i class="fas fa-robot"></i>
+                        <p>Olá! Estou pronto para responder suas perguntas sobre este edital. O que gostaria de saber?</p>
+                        <div class="quick-questions">
+                            <button class="quick-btn" onclick="enviarPerguntaRapida('Quais são os cargos disponíveis?')">Cargos disponíveis</button>
+                            <button class="quick-btn" onclick="enviarPerguntaRapida('Quais são os requisitos?')">Requisitos</button>
+                            <button class="quick-btn" onclick="enviarPerguntaRapida('Qual é o cronograma?')">Cronograma</button>
+                            <button class="quick-btn" onclick="enviarPerguntaRapida('Qual é o salário?')">Salários</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <input type="text" id="chat-input" placeholder="Digite sua pergunta sobre o edital..." maxlength="500">
+                        <button id="chat-send-btn" onclick="enviarMensagem()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="chat-info">
+                        <span id="chat-status">Conectado</span>
+                        <span id="chunks-info">Chunks: 0/0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>ConcursAI</h3>
+                <p>Plataforma inteligente para busca e análise de concursos públicos em todo o Brasil.</p>
+                <p>Desenvolvido com ❤️ usando tecnologias modernas e IA.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Recursos</h3>
+                <a href="#search">Busca de Concursos</a>
+                <a href="#features">Recursos da Plataforma</a>
+                <a href="/docs">Documentação da API</a>
+                <a href="/rag">Chat Inteligente</a>
+            </div>
+            <div class="footer-section">
+                <h3>API Endpoints</h3>
+                <a href="/api-brasil/concursos">Todos os Concursos</a>
+                <a href="/api-brasil/estados">Estados Disponíveis</a>
+                <a href="/docs">Documentação Swagger</a>
+                <a href="/redoc">Documentação ReDoc</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 ConcursAI. Todos os direitos reservados. | Dados atualizados em tempo real.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Variáveis globais
+        let todosOsConcursos = [];
+        let concursosFiltrados = [];
+
+        // Função principal de busca
+        async function buscarConcursos() {
+            const query = document.getElementById('searchQuery').value;
+            const estado = document.getElementById('estadoSelect').value;
+            
+            mostrarLoading(true);
+            
+            try {
+                // Construir URL da API
+                let url = '/api-brasil/concursos';
+                const params = new URLSearchParams();
+                
+                if (estado) {
+                    params.append('estados', estado);
+                }
+                params.append('limite', '100');
+                
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+                
+                console.log('Buscando em:', url);
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status}`);
+                }
+                
+                const concursos = await response.json();
+                console.log('Concursos recebidos:', concursos.length);
+                
+                // Filtrar por query se fornecida
+                if (query && query.trim()) {
+                    const queryLower = query.toLowerCase();
+                    todosOsConcursos = concursos.filter(concurso => 
+                        concurso.titulo.toLowerCase().includes(queryLower) ||
+                        concurso.orgao.toLowerCase().includes(queryLower) ||
+                        concurso.cargo.toLowerCase().includes(queryLower) ||
+                        concurso.conteudo.toLowerCase().includes(queryLower)
+                    );
+                } else {
+                    todosOsConcursos = concursos;
+                }
+                
+                concursosFiltrados = [...todosOsConcursos];
+                exibirResultados();
+                
+                // Atualizar estatísticas
+                document.getElementById('totalConcursos').textContent = `${concursos.length.toLocaleString()}+`;
+                
+            } catch (error) {
+                console.error('Erro na busca:', error);
+                exibirErro(error.message);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Exibir resultados
+        function exibirResultados() {
+            const container = document.getElementById('concursosGrid');
+            const countElement = document.getElementById('resultsCount');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            countElement.textContent = `${concursosFiltrados.length} concursos encontrados`;
+            
+            if (concursosFiltrados.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3>Nenhum concurso encontrado</h3>
+                        <p>Tente ajustar os filtros ou termos de busca.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = concursosFiltrados.map(concurso => criarCardConcurso(concurso)).join('');
+            }
+            
+            resultsContainer.style.display = 'block';
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Criar card de concurso
+        function criarCardConcurso(concurso) {
+            const statusClass = `status-${concurso.status}`;
+            const statusText = {
+                'open': 'Aberto',
+                'expected': 'Previsto',
+                'closed': 'Encerrado'
+            }[concurso.status] || 'Desconhecido';
+
+            // Garantir que a URL seja válida
+            let editalUrl = '';
+            if (concurso.url) {
+                editalUrl = concurso.url.startsWith('http') ? concurso.url : `https://${concurso.url}`;
+            }
+
+            return `
+                <div class="concurso-card fade-in">
+                    <div class="concurso-header">
+                        <div>
+                            <h3 class="concurso-title">${concurso.titulo}</h3>
+                            <p class="concurso-orgao">${concurso.orgao}</p>
+                        </div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </div>
+                    
+                    <div class="concurso-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Estado</div>
+                            <div class="detail-value">${concurso.estado || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Vagas</div>
+                            <div class="detail-value">${concurso.vagas || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Ano</div>
+                            <div class="detail-value">${concurso.ano}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Publicação</div>
+                            <div class="detail-value">${formatarData(concurso.data_publicacao)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="concurso-content">
+                        ${concurso.conteudo ? concurso.conteudo.substring(0, 200) : 'Sem conteúdo disponível'}${concurso.conteudo && concurso.conteudo.length > 200 ? '...' : ''}
+                    </div>
+                    
+                    <div class="concurso-actions">
+                        ${editalUrl ? `
+                            <a href="${editalUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-small">
+                                <i class="fas fa-external-link-alt"></i>
+                                Ver Edital
+                            </a>
+                        ` : ''}
+                        <button class="btn btn-secondary btn-small" onclick="iniciarChatComEdital('${concurso.titulo.replace(/'/g, "\\'")}', '${concurso.orgao.replace(/'/g, "\\'")}', '${concurso.estado}', '${(concurso.conteudo || '').replace(/'/g, "\\'")}')">
+                            <i class="fas fa-comments"></i>
+                            Chat IA
+                        </button>
+                        <button class="btn btn-info btn-small" onclick="analisarConcursoCompleto('${concurso.titulo.replace(/'/g, "\\'")}', '${concurso.orgao.replace(/'/g, "\\'")}', '${concurso.estado}', '${(concurso.conteudo || '').replace(/'/g, "\\'")}')">
+                            <i class="fas fa-brain"></i>
+                            Analisar IA
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Função para iniciar chat com edital do card
+        function iniciarChatComEdital(titulo, orgao, estado, conteudo) {
+            if (!conteudo || conteudo.trim() === '' || conteudo === 'undefined') {
+                alert('Este concurso não possui conteúdo do edital disponível para análise via chat.');
+                return;
+            }
+
+            // Preencher formulário de upload
+            document.getElementById('chat-titulo').value = titulo;
+            document.getElementById('chat-orgao').value = orgao;
+            document.getElementById('chat-estado').value = estado;
+            document.getElementById('chat-conteudo').value = conteudo;
+
+            // Abrir modal na aba de upload
+            mostrarTabChat('upload');
+            mostrarChatEdital();
+        }
+
+        // Função para análise completa do concurso
+        function analisarConcursoCompleto(titulo, orgao, estado, conteudo) {
+            if (!conteudo || conteudo.trim() === '' || conteudo === 'undefined') {
+                alert('Este concurso não possui conteúdo do edital disponível para análise.');
+                return;
+            }
+
+            // Preencher formulário de análise
+            document.getElementById('titulo-concurso').value = titulo;
+            document.getElementById('orgao-concurso').value = orgao;
+            document.getElementById('estado-concurso').value = estado;
+            document.getElementById('conteudo-edital').value = conteudo;
+
+            // Abrir modal de análise
+            mostrarAnaliseEdital();
+        }
+
+        // === FUNCIONALIDADES DE IA ===
+        
+        // Verificar status da IA
+        async function verificarStatusIA() {
+            try {
+                const response = await fetch('/ia/status');
+                const data = await response.json();
+                const indicator = document.getElementById('ia-status-indicator');
+                
+                if (data.status === 'online') {
+                    indicator.className = 'status-online';
+                    indicator.innerHTML = '<i class="fas fa-circle"></i> IA Online - Pronta para análises';
+                } else {
+                    indicator.className = 'status-offline';
+                    indicator.innerHTML = '<i class="fas fa-circle"></i> IA Offline - Verifique se o Ollama está rodando';
+                }
+            } catch (error) {
+                const indicator = document.getElementById('ia-status-indicator');
+                indicator.className = 'status-offline';
+                indicator.innerHTML = '<i class="fas fa-circle"></i> Erro na conexão com IA';
+            }
+        }
+
+        // Mostrar modais
+        function mostrarAnaliseEdital() {
+            document.getElementById('modal-analise-edital').style.display = 'block';
+        }
+
+        function mostrarDicasEstudo() {
+            document.getElementById('modal-dicas-estudo').style.display = 'block';
+        }
+
+        function mostrarComparacaoEditais() {
+            alert('Funcionalidade de comparação em desenvolvimento!');
+        }
+
+        function mostrarExplicacaoSecao() {
+            document.getElementById('modal-explicacao-secao').style.display = 'block';
+        }
+
+        function mostrarChatEdital() {
+            document.getElementById('modal-chat-edital').style.display = 'block';
+            carregarEditaisExistentes();
+        }
+
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'modal-chat-edital') {
+                resetarChat();
+            }
+        }
+
+        // === FUNCIONALIDADES DO CHAT CONVERSACIONAL ===
+        
+        let currentEditalId = null;
+        let currentUserId = 'user_' + Date.now(); // Gerar ID único para sessão
+        
+        function mostrarTabChat(tabName) {
+            // Atualizar botões
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="mostrarTabChat('${tabName}')"]`).classList.add('active');
+            
+            // Mostrar conteúdo
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+        
+        async function carregarEditaisExistentes() {
+            try {
+                const response = await fetch('/chat/editais-carregados');
+                const data = await response.json();
+                
+                const select = document.getElementById('select-edital-existente');
+                select.innerHTML = '<option value="">Selecione um edital</option>';
+                
+                if (data.success && data.editais.length > 0) {
+                    data.editais.forEach(edital => {
+                        const option = document.createElement('option');
+                        option.value = edital.edital_id;
+                        option.textContent = `${edital.info.titulo} - ${edital.info.orgao} (${edital.chunks} chunks)`;
+                        select.appendChild(option);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Nenhum edital carregado</option>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar editais:', error);
+                document.getElementById('select-edital-existente').innerHTML = '<option value="">Erro ao carregar</option>';
+            }
+        }
+        
+        // Upload de novo edital
+        document.getElementById('form-upload-edital').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const titulo = document.getElementById('chat-titulo').value;
+            const orgao = document.getElementById('chat-orgao').value;
+            const estado = document.getElementById('chat-estado').value;
+            const conteudo = document.getElementById('chat-conteudo').value;
+            
+            // Gerar ID único para o edital
+            currentEditalId = `edital_${Date.now()}`;
+            
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando edital...';
+            btnSubmit.disabled = true;
+            
+            try {
+                const response = await fetch('/chat/upload-edital', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        edital_id: currentEditalId,
+                        titulo: titulo,
+                        orgao: orgao,
+                        estado: estado,
+                        conteudo: conteudo
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Mostrar interface de chat
+                    iniciarChatInterface(titulo, orgao, data.summary);
+                } else {
+                    alert('Erro ao carregar edital: ' + (data.detail || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                alert('Erro na comunicação: ' + error.message);
+            } finally {
+                btnSubmit.innerHTML = '<i class="fas fa-upload"></i> Carregar e Iniciar Chat';
+                btnSubmit.disabled = false;
+            }
+        });
+        
+        function iniciarChatExistente() {
+            const select = document.getElementById('select-edital-existente');
+            const editalId = select.value;
+            
+            if (!editalId) {
+                alert('Por favor, selecione um edital');
+                return;
+            }
+            
+            currentEditalId = editalId;
+            
+            // Buscar informações do edital
+            fetch(`/chat/edital/${editalId}/resumo`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const info = data.summary.edital_info;
+                        iniciarChatInterface(info.titulo, info.orgao, data.summary);
+                    } else {
+                        alert('Erro ao carregar edital selecionado');
+                    }
+                })
+                .catch(error => {
+                    alert('Erro na comunicação: ' + error.message);
+                });
+        }
+        
+        function iniciarChatInterface(titulo, orgao, summary) {
+            // Esconder setup e mostrar chat
+            document.getElementById('chat-setup').style.display = 'none';
+            document.getElementById('chat-interface').style.display = 'flex';
+            
+            // Atualizar informações do edital
+            document.getElementById('chat-edital-titulo').textContent = titulo;
+            document.getElementById('chat-edital-detalhes').textContent = `${orgao} • ${summary.total_chunks} seções`;
+            document.getElementById('chunks-info').textContent = `Chunks: 0/${summary.total_chunks}`;
+            
+            // Limpar mensagens e carregar histórico
+            carregarHistoricoChat();
+            
+            // Focar no input
+            document.getElementById('chat-input').focus();
+        }
+        
+        async function carregarHistoricoChat() {
+            try {
+                const response = await fetch(`/chat/historico/${currentUserId}`);
+                const data = await response.json();
+                
+                const messagesContainer = document.getElementById('chat-messages');
+                
+                if (data.success && data.history.length > 0) {
+                    // Esconder mensagem de boas-vindas
+                    messagesContainer.querySelector('.welcome-message').style.display = 'none';
+                    
+                    // Mostrar histórico
+                    data.history.forEach(msg => {
+                        adicionarMensagemAoChat(msg.message, 'user', msg.timestamp);
+                        adicionarMensagemAoChat(msg.response, 'assistant', msg.timestamp, msg.sources);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar histórico:', error);
+            }
+        }
+        
+        function enviarPerguntaRapida(pergunta) {
+            document.getElementById('chat-input').value = pergunta;
+            enviarMensagem();
+        }
+        
+        async function enviarMensagem() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message || !currentEditalId) return;
+            
+            // Limpar input e desabilitar
+            input.value = '';
+            const sendBtn = document.getElementById('chat-send-btn');
+            sendBtn.disabled = true;
+            
+            // Adicionar mensagem do usuário
+            adicionarMensagemAoChat(message, 'user');
+            
+            // Mostrar indicador de digitação
+            const loadingMsg = adicionarMensagemCarregando();
+            
+            try {
+                const response = await fetch('/chat/conversar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: currentUserId,
+                        message: message,
+                        edital_id: currentEditalId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remover indicador de carregamento
+                loadingMsg.remove();
+                
+                if (data.success) {
+                    // Adicionar resposta da IA
+                    adicionarMensagemAoChat(data.response, 'assistant', data.timestamp, data.sources);
+                    
+                    // Atualizar info de chunks
+                    document.getElementById('chunks-info').textContent = `Chunks: ${data.chunks_used}/${data.total_chunks}`;
+                } else {
+                    adicionarMensagemAoChat('Desculpe, ocorreu um erro ao processar sua pergunta.', 'assistant');
+                }
+            } catch (error) {
+                loadingMsg.remove();
+                adicionarMensagemAoChat('Erro na comunicação com a IA. Tente novamente.', 'assistant');
+                console.error('Erro no chat:', error);
+            } finally {
+                sendBtn.disabled = false;
+                input.focus();
+            }
+        }
+        
+        function adicionarMensagemAoChat(texto, tipo, timestamp = null, sources = null) {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            // Esconder mensagem de boas-vindas se ainda estiver visível
+            const welcome = messagesContainer.querySelector('.welcome-message');
+            if (welcome && welcome.style.display !== 'none') {
+                welcome.style.display = 'none';
+            }
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${tipo}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = texto;
+            
+            if (sources && sources.length > 0) {
+                const sourcesDiv = document.createElement('div');
+                sourcesDiv.className = 'message-sources';
+                sourcesDiv.innerHTML = `<i class="fas fa-link"></i> Baseado em ${sources.length} seção(ões) do edital`;
+                contentDiv.appendChild(sourcesDiv);
+            }
+            
+            if (timestamp) {
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date(timestamp).toLocaleTimeString();
+                contentDiv.appendChild(timeDiv);
+            }
+            
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            
+            // Scroll para baixo
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+        
+        function adicionarMensagemCarregando() {
+            const messagesContainer = document.getElementById('chat-messages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = '<div class="loading-message"><i class="fas fa-circle-notch fa-spin"></i> Analisando edital<span class="loading-dots"></span></div>';
+            
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            return messageDiv;
+        }
+        
+        function limparHistorico() {
+            if (confirm('Tem certeza que deseja limpar todo o histórico desta conversa?')) {
+                fetch(`/chat/historico/${currentUserId}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Limpar interface
+                            const messagesContainer = document.getElementById('chat-messages');
+                            messagesContainer.innerHTML = `
+                                <div class="welcome-message">
+                                    <i class="fas fa-robot"></i>
+                                    <p>Histórico limpo! O que gostaria de saber sobre este edital?</p>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => console.error('Erro ao limpar histórico:', error));
+            }
+        }
+        
+        function voltarSetupChat() {
+            document.getElementById('chat-interface').style.display = 'none';
+            document.getElementById('chat-setup').style.display = 'block';
+            currentEditalId = null;
+        }
+        
+        function resetarChat() {
+            // Reset completo do chat
+            document.getElementById('chat-interface').style.display = 'none';
+            document.getElementById('chat-setup').style.display = 'block';
+            currentEditalId = null;
+            
+            // Limpar formulários
+            document.getElementById('form-upload-edital').reset();
+            document.getElementById('select-edital-existente').value = '';
+            
+            // Voltar para primeira aba
+            mostrarTabChat('upload');
+        }
+        
+        // Event listener para Enter no input do chat
+        document.getElementById('chat-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarMensagem();
+            }
+        });
+
+        // Analisar concurso específico
+        function analisarConcurso(titulo) {
+            document.getElementById('titulo-concurso').value = titulo;
+            mostrarAnaliseEdital();
+        }
+
+        // Mostrar resultados
+        function mostrarResultadoAnalise(analise) {
+            const container = document.getElementById('resultado-analise');
+            const conteudo = document.getElementById('conteudo-resultado-analise');
+            
+            let html = '';
+            if (analise.status === 'sucesso') {
+                html = `
+                    <div class="analise-estruturada">
+                        <h4>📋 Resumo Executivo</h4>
+                        <p>${analise.RESUMO_EXECUTIVO || 'Não disponível'}</p>
+                        
+                        <h4>💼 Cargos Disponíveis</h4>
+                        <pre>${JSON.stringify(analise.CARGOS_DISPONIVEIS || {}, null, 2)}</pre>
+                        
+                        <h4>📚 Requisitos Gerais</h4>
+                        <p>${analise.REQUISITOS_GERAIS || 'Não disponível'}</p>
+                        
+                        <h4>🎯 Destaques Importantes</h4>
+                        <p>${analise.DESTAQUES_IMPORTANTES || 'Não disponível'}</p>
+                        
+                        <h4>💡 Recomendações</h4>
+                        <p>${analise.RECOMENDACOES || 'Não disponível'}</p>
+                    </div>
+                `;
+            } else {
+                html = `<div class="analise-texto">${analise.analise_textual || 'Análise não disponível'}</div>`;
+            }
+            
+            conteudo.innerHTML = html;
+            container.style.display = 'block';
+        }
+
+        function mostrarResultadoDicas(dicas) {
+            const container = document.getElementById('resultado-dicas');
+            const conteudo = document.getElementById('conteudo-resultado-dicas');
+            
+            let html = '<div class="dicas-estudo">';
+            if (dicas.PRIORIDADES) {
+                html += `<h4>🎯 Prioridades de Estudo</h4><pre>${JSON.stringify(dicas.PRIORIDADES, null, 2)}</pre>`;
+            }
+            if (dicas.CRONOGRAMA_SUGERIDO) {
+                html += `<h4>📅 Cronograma</h4><pre>${JSON.stringify(dicas.CRONOGRAMA_SUGERIDO, null, 2)}</pre>`;
+            }
+            if (dicas.DICAS_ESPECIFICAS) {
+                html += `<h4>💡 Dicas Específicas</h4><pre>${JSON.stringify(dicas.DICAS_ESPECIFICAS, null, 2)}</pre>`;
+            }
+            html += '</div>';
+            
+            conteudo.innerHTML = html;
+            container.style.display = 'block';
+        }
+
+        function mostrarResultadoExplicacao(explicacao) {
+            const container = document.getElementById('resultado-explicacao');
+            const conteudo = document.getElementById('conteudo-resultado-explicacao');
+            
+            conteudo.innerHTML = `<div class="explicacao-secao">${explicacao}</div>`;
+            container.style.display = 'block';
+        }
+
+        // Filtrar por status
+        function filtrarPorStatus(status) {
+            // Atualizar botões
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filtrar concursos
+            if (status === 'all') {
+                concursosFiltrados = [...todosOsConcursos];
+            } else {
+                concursosFiltrados = todosOsConcursos.filter(concurso => concurso.status === status);
+            }
+            
+            exibirResultados();
+        }
+
+        // Análise de concurso com IA
+        async function analisarConcurso(titulo) {
+            try {
+                const response = await fetch('/rag', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pergunta: `Analise detalhadamente o concurso: ${titulo}. Forneça informações sobre requisitos, salário, vagas e dicas de estudo.`
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Análise IA:\n\n${result.resposta}`);
+                } else {
+                    alert('Análise IA temporariamente indisponível. Tente novamente mais tarde.');
+                }
+            } catch (error) {
+                console.error('Erro na análise:', error);
+                alert('Erro ao conectar com o sistema de análise IA.');
+            }
+        }
+
+        // Funções auxiliares
+        function formatarData(data) {
+            try {
+                return new Date(data).toLocaleDateString('pt-BR');
+            } catch {
+                return data;
+            }
+        }
+
+        function mostrarLoading(show) {
+            const loading = document.getElementById('loadingContainer');
+            const results = document.getElementById('resultsContainer');
+            
+            if (show) {
+                loading.style.display = 'block';
+                results.style.display = 'none';
+            } else {
+                loading.style.display = 'none';
+            }
+        }
+
+        function exibirErro(message) {
+            const container = document.getElementById('concursosGrid');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            container.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: var(--error);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <h3>Erro na busca</h3>
+                    <p>${message}</p>
+                    <button class="btn btn-primary" onclick="buscarConcursos()" style="margin-top: 1rem;">
+                        Tentar Novamente
+                    </button>
+                </div>
+            `;
+            
+            resultsContainer.style.display = 'block';
+        }
+
+        // Busca automática ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 ConcursAI carregado - iniciando busca automática');
+            buscarConcursos();
+            
+            // Busca ao pressionar Enter
+            document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    buscarConcursos();
+                }
+            });
+
+            // Verificar status da IA na inicialização
+            verificarStatusIA();
+
+            // Event listeners para os formulários de IA
+            document.getElementById('form-analise-edital').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const titulo = document.getElementById('titulo-concurso').value;
+                const orgao = document.getElementById('orgao-concurso').value;
+                const estado = document.getElementById('estado-concurso').value;
+                const conteudo = document.getElementById('conteudo-edital').value;
+                
+                const btnSubmit = e.target.querySelector('button[type="submit"]');
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisando...';
+                btnSubmit.disabled = true;
+                
+                try {
+                    const response = await fetch('/ia/analisar-edital', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            titulo: titulo,
+                            orgao: orgao,
+                            estado: estado,
+                            conteudo_edital: conteudo
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        mostrarResultadoAnalise(data.analise);
+                    } else {
+                        alert('Erro na análise: ' + (data.detail || 'Erro desconhecido'));
+                    }
+                } catch (error) {
+                    alert('Erro na comunicação com a IA: ' + error.message);
+                } finally {
+                    btnSubmit.innerHTML = '<i class="fas fa-cogs"></i> Analisar com IA';
+                    btnSubmit.disabled = false;
+                }
+            });
+
+            document.getElementById('form-dicas-estudo').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const cargo = document.getElementById('cargo-estudo').value;
+                const materiasTexto = document.getElementById('materias-estudo').value;
+                const materias = materiasTexto.split('\n').filter(m => m.trim()).map(m => m.trim());
+                
+                const btnSubmit = e.target.querySelector('button[type="submit"]');
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando dicas...';
+                btnSubmit.disabled = true;
+                
+                try {
+                    const params = new URLSearchParams();
+                    params.append('cargo', cargo);
+                    materias.forEach(materia => params.append('materias', materia));
+                    
+                    const response = await fetch('/ia/dicas-estudo?' + params.toString(), {
+                        method: 'POST'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        mostrarResultadoDicas(data.dicas_estudo);
+                    } else {
+                        alert('Erro ao gerar dicas: ' + (data.detail || 'Erro desconhecido'));
+                    }
+                } catch (error) {
+                    alert('Erro na comunicação com a IA: ' + error.message);
+                } finally {
+                    btnSubmit.innerHTML = '<i class="fas fa-lightbulb"></i> Gerar Dicas';
+                    btnSubmit.disabled = false;
+                }
+            });
+
+            document.getElementById('form-explicacao-secao').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const nomeSecao = document.getElementById('nome-secao').value;
+                const textoSecao = document.getElementById('texto-secao').value;
+                
+                const btnSubmit = e.target.querySelector('button[type="submit"]');
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Explicando...';
+                btnSubmit.disabled = true;
+                
+                try {
+                    const params = new URLSearchParams();
+                    params.append('secao_texto', textoSecao);
+                    params.append('nome_secao', nomeSecao);
+                    
+                    const response = await fetch('/ia/explicar-secao?' + params.toString(), {
+                        method: 'POST'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        mostrarResultadoExplicacao(data.explicacao);
+                    } else {
+                        alert('Erro na explicação: ' + (data.detail || 'Erro desconhecido'));
+                    }
+                } catch (error) {
+                    alert('Erro na comunicação com a IA: ' + error.message);
+                } finally {
+                    btnSubmit.innerHTML = '<i class="fas fa-comments"></i> Explicar';
+                    btnSubmit.disabled = false;
+                }
+            });
+
+            // Fechar modal ao clicar fora
+            window.onclick = function(event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // Smooth scroll para links internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

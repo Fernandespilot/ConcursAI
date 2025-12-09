@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Interface PDF</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .upload-section {
+            background: #f8f9ff;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #5a6fd8;
+            background: #f0f2ff;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .upload-button {
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .upload-button:hover {
+            background: #5a6fd8;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .feature-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .status-bar {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .status-item {
+            display: inline-block;
+            margin-right: 30px;
+            color: #0066cc;
+            font-weight: 500;
+        }
+        
+        .chat-section {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            min-height: 300px;
+        }
+        
+        .chat-header {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .chat-send {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-style: italic;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            background: #667eea;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 ConcursAI - Interface PDF</h1>
+            <p>Upload e análise inteligente de editais de concursos</p>
+        </div>
+        
+        <div class="main-content">
+            <!-- Status do Sistema -->
+            <div class="status-bar">
+                <span class="status-item">🟢 Sistema Online</span>
+                <span class="status-item">🤖 IA Disponível</span>
+                <span class="status-item">📄 0 PDFs Carregados</span>
+                <span class="status-item">💬 Chat Ativo</span>
+            </div>
+            
+            <!-- Área de Upload -->
+            <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📄</div>
+                <div class="upload-text">Clique aqui ou arraste um PDF de edital</div>
+                <button class="upload-button" type="button">Escolher Arquivo PDF</button>
+                <input type="file" id="fileInput" accept=".pdf" style="display: none;" onchange="handleFileUpload(this)">
+            </div>
+            
+            <!-- Seção de Progresso (oculta inicialmente) -->
+            <div id="progressSection" class="hidden">
+                <div class="alert alert-info">
+                    <strong>🔄 Processando PDF...</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <span id="progressText">Iniciando processamento...</span>
+                </div>
+            </div>
+            
+            <!-- Alertas -->
+            <div id="alertContainer"></div>
+            
+            <!-- Recursos Principais -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-title">Análise Inteligente</div>
+                    <div class="feature-description">
+                        IA avançada extrai informações importantes do edital: vagas, salários, requisitos, datas e cronograma completo.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-title">Chat Conversacional</div>
+                    <div class="feature-description">
+                        Converse com o edital em linguagem natural. Faça perguntas específicas e obtenha respostas precisas.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-title">Busca Semântica</div>
+                    <div class="feature-description">
+                        Encontre informações relevantes mesmo quando não souber os termos exatos. Busca inteligente por contexto.
+                    </div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Resumos Estruturados</div>
+                    <div class="feature-description">
+                        Gera resumos organizados com pontos principais, facilitando o estudo e preparação para o concurso.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Seção de Chat -->
+            <div class="chat-section" id="chatSection">
+                <div class="chat-header">💬 Chat com o Edital</div>
+                <div class="chat-messages" id="chatMessages">
+                    <p style="text-align: center; color: #666; font-style: italic;">
+                        Faça upload de um PDF para começar a conversar...
+                    </p>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua pergunta sobre o edital..." disabled>
+                    <button class="chat-send" id="chatSend" onclick="sendMessage()" disabled>Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDocumentId = null;
+        
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            if (file.type !== 'application/pdf') {
+                showAlert('error', 'Por favor, selecione apenas arquivos PDF.');
+                return;
+            }
+            
+            if (file.size > 50 * 1024 * 1024) { // 50MB
+                showAlert('error', 'Arquivo muito grande. Máximo 50MB.');
+                return;
+            }
+            
+            uploadPDF(file);
+        }
+        
+        async function uploadPDF(file) {
+            try {
+                showProgress();
+                updateProgress(10, 'Preparando upload...');
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('titulo', file.name.replace('.pdf', ''));
+                formData.append('orgao', 'Não especificado');
+                formData.append('estado', 'BR');
+                
+                updateProgress(30, 'Enviando arquivo...');
+                
+                // Simular upload e processamento (substituir por chamada real à API)
+                await simulateProcessing();
+                
+                updateProgress(100, 'Concluído!');
+                
+                setTimeout(() => {
+                    hideProgress();
+                    showAlert('success', `✅ PDF "${file.name}" processado com sucesso! Agora você pode fazer perguntas.`);
+                    enableChat(file.name);
+                }, 1000);
+                
+            } catch (error) {
+                hideProgress();
+                showAlert('error', `❌ Erro ao processar PDF: ${error.message}`);
+            }
+        }
+        
+        async function simulateProcessing() {
+            // Simular processamento com delays realistas
+            const steps = [
+                { progress: 40, text: 'Extraindo texto do PDF...' },
+                { progress: 60, text: 'Criando embeddings...' },
+                { progress: 80, text: 'Indexando conteúdo...' },
+                { progress: 95, text: 'Finalizando processamento...' }
+            ];
+            
+            for (const step of steps) {
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                updateProgress(step.progress, step.text);
+            }
+        }
+        
+        function showProgress() {
+            document.getElementById('progressSection').classList.remove('hidden');
+        }
+        
+        function hideProgress() {
+            document.getElementById('progressSection').classList.add('hidden');
+            document.getElementById('progressFill').style.width = '0%';
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+        
+        function showAlert(type, message) {
+            const container = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                container.removeChild(alert);
+            }, 5000);
+        }
+        
+        function enableChat(fileName) {
+            currentDocumentId = fileName;
+            document.getElementById('chatInput').disabled = false;
+            document.getElementById('chatSend').disabled = false;
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.innerHTML = `
+                <div style="text-align: center; color: #667eea; font-weight: 500;">
+                    📄 Documento "${fileName}" carregado!<br>
+                    Agora você pode fazer perguntas sobre o edital.
+                </div>
+            `;
+            
+            // Atualizar status
+            updateStatus();
+        }
+        
+        function updateStatus() {
+            const statusBar = document.querySelector('.status-bar');
+            statusBar.innerHTML = `
+                <span class="status-item">🟢 Sistema Online</span>
+                <span class="status-item">🤖 IA Disponível</span>
+                <span class="status-item">📄 1 PDF Carregado</span>
+                <span class="status-item">💬 Chat Ativo</span>
+            `;
+        }
+        
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            
+            // Adicionar mensagem do usuário
+            addMessage('user', message);
+            input.value = '';
+            
+            // Mostrar indicador de digitação
+            addMessage('ai', '🤖 Analisando sua pergunta...', true);
+            
+            try {
+                // Simular resposta da IA (substituir por chamada real à API)
+                const response = await simulateAIResponse(message);
+                
+                // Remover indicador de digitação
+                removeTypingIndicator();
+                
+                // Adicionar resposta da IA
+                addMessage('ai', response);
+                
+            } catch (error) {
+                removeTypingIndicator();
+                addMessage('ai', '❌ Erro ao processar pergunta. Tente novamente.');
+            }
+        }
+        
+        function addMessage(sender, text, isTyping = false) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                margin-bottom: 15px;
+                padding: 12px;
+                border-radius: 8px;
+                ${sender === 'user' ? 
+                    'background: #667eea; color: white; margin-left: 20%;' : 
+                    'background: #f0f2f6; color: #333; margin-right: 20%;'
+                }
+                ${isTyping ? 'id="typingIndicator"' : ''}
+            `;
+            
+            messageDiv.innerHTML = `
+                <strong>${sender === 'user' ? '👤 Você' : '🤖 IA'}:</strong><br>
+                ${text}
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+        
+        async function simulateAIResponse(question) {
+            // Simular delay de processamento
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Respostas simuladas baseadas em palavras-chave
+            if (question.toLowerCase().includes('vaga') || question.toLowerCase().includes('cargo')) {
+                return 'Baseado no edital carregado, encontrei informações sobre vagas e cargos. O edital especifica os requisitos, atribuições e número de vagas disponíveis para cada cargo. Gostaria que eu detalhe algum cargo específico?';
+            }
+            
+            if (question.toLowerCase().includes('salário') || question.toLowerCase().includes('remuneração')) {
+                return 'O edital contém informações sobre remuneração dos cargos. Os valores variam conforme o nível e a categoria do cargo. Posso buscar a remuneração específica de algum cargo que te interessa?';
+            }
+            
+            if (question.toLowerCase().includes('inscrição') || question.toLowerCase().includes('prazo')) {
+                return 'Encontrei as informações sobre inscrições no edital. Há prazos específicos para inscrição, documentação necessária e procedimentos. Gostaria que eu detalhe o cronograma completo?';
+            }
+            
+            if (question.toLowerCase().includes('prova') || question.toLowerCase().includes('exame')) {
+                return 'O edital especifica detalhes sobre as provas, incluindo datas, locais, conteúdo programático e critérios de avaliação. Posso explicar sobre as fases do concurso ou o conteúdo de alguma matéria específica?';
+            }
+            
+            return `Analisei sua pergunta: "${question}". Com base no edital carregado, posso fornecer informações específicas. Para uma resposta mais precisa, você pode reformular a pergunta ou ser mais específico sobre o que gostaria de saber.`;
+        }
+        
+        // Event listeners
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadSection = document.querySelector('.upload-section');
+            
+            uploadSection.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#5a6fd8';
+                this.style.background = '#f0f2ff';
+            });
+            
+            uploadSection.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#667eea';
+                this.style.background = '#f8f9ff';
+            });
+            
+            uploadSection.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#667eea';
+                this.style.background = '#f8f9ff';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    document.getElementById('fileInput').files = files;
+                    handleFileUpload(document.getElementById('fileInput'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>

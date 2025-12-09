@@ -1,0 +1,14 @@
+{
+  "data": "2025-12-04T10:17:56.349697",
+  "estatisticas": {
+    "concursos_encontrados": 5540,
+    "provas_baixadas": 19,
+    "provas_falhadas": 0,
+    "bancas": {
+      "desconhecida": 19
+    }
+  },
+  "bancas": [
+    "desconhecida"
+  ]
+}

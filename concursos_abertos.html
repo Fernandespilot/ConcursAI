@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Concursos Abertos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 25px;
+            width: 300px;
+            font-size: 14px;
+        }
+        
+        .search-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .search-btn:hover {
+            background: #45a049;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .filter-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .filter-btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .concursos-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .concurso-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #4CAF50;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .concurso-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .concurso-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .concurso-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .concurso-orgao {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .status-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-badge.urgente {
+            background: #FF5722;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .concurso-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-icon {
+            width: 16px;
+            height: 16px;
+            color: #667eea;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .concurso-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .chat-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .chat-button:hover {
+            background: #5a6fd8;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🎯 ConcursAI - Concursos Abertos</div>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchGlobal" placeholder="Buscar por cargo, órgão ou local...">
+                <button class="search-btn" onclick="buscarGlobal()">🔍 Buscar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Região:</label>
+                    <select id="filtroRegiao">
+                        <option value="">Todas as regiões</option>
+                        <option value="Norte">Norte</option>
+                        <option value="Nordeste">Nordeste</option>
+                        <option value="Centro-Oeste">Centro-Oeste</option>
+                        <option value="Sudeste">Sudeste</option>
+                        <option value="Sul">Sul</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Órgão:</label>
+                    <select id="filtroOrgao">
+                        <option value="">Todos os órgãos</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Escolaridade:</label>
+                    <select id="filtroEscolaridade">
+                        <option value="">Todas</option>
+                        <option value="fundamental">Fundamental</option>
+                        <option value="medio">Médio</option>
+                        <option value="superior">Superior</option>
+                        <option value="pos">Pós-graduação</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Salário mínimo:</label>
+                    <input type="number" id="filtroSalario" placeholder="Ex: 5000">
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button class="filter-btn" onclick="aplicarFiltros()">Filtrar</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats" id="statsContainer">
+            <div class="stat-card">
+                <div class="stat-number" id="totalConcursos">-</div>
+                <div class="stat-label">Concursos Abertos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalVagas">-</div>
+                <div class="stat-label">Total de Vagas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="mediaValario">-</div>
+                <div class="stat-label">Salário Médio</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalOrgaos">-</div>
+                <div class="stat-label">Órgãos Diferentes</div>
+            </div>
+        </div>
+        
+        <div id="concursosContainer">
+            <div class="loading">
+                <h3>🔄 Carregando concursos abertos...</h3>
+                <p>Aguarde enquanto buscamos as melhores oportunidades para você!</p>
+            </div>
+        </div>
+    </div>
+    
+    <button class="chat-button" onclick="abrirChat()" title="Chat com IA - Tire dúvidas e crie planos de estudo">
+        💬
+    </button>
+    
+    <!-- Modal do Chat -->
+    <div id="chatModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 0; border-radius: 15px; width: 90%; max-width: 600px; height: 70%; display: flex; flex-direction: column;">
+            <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0;">💬 Chat Inteligente ConcursAI</h2>
+                <button onclick="fecharChat()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+            </div>
+            
+            <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; background: #f9f9f9;">
+                <div class="chat-message bot">
+                    <strong>🤖 IA ConcursAI:</strong>
+                    <p>Olá! 👋 Sou sua assistente inteligente para concursos públicos!</p>
+                    <p><strong>Posso ajudar você com:</strong></p>
+                    <ul>
+                        <li>📚 <strong>Criar planos de estudo</strong> personalizados</li>
+                        <li>❓ <strong>Tirar dúvidas</strong> sobre editais e processos</li>
+                        <li>🔍 <strong>Encontrar concursos</strong> específicos</li>
+                        <li>📊 <strong>Analisar informações</strong> de concursos</li>
+                    </ul>
+                    <p><strong>Experimente perguntar:</strong></p>
+                    <ul>
+                        <li>"Criar plano de estudo para Analista Judiciário"</li>
+                        <li>"Como me inscrever em concursos?"</li>
+                        <li>"Quais concursos estão com maior salário?"</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="padding: 20px; border-top: 1px solid #eee;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="chatInput" placeholder="Digite sua pergunta ou pedido..." style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; font-size: 14px;">
+                    <button onclick="enviarMensagem()" style="background: #667eea; color: white; border: none; padding: 12px 20px; border-radius: 25px; cursor: pointer; font-weight: bold;">Enviar</button>
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: #666; text-align: center;">
+                    💡 Dica: Seja específico em suas perguntas para respostas mais precisas!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let concursosData = [];
+        let concursosFiltrados = [];
+        
+        // Carregar dados ao iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarConcursosAbertos();
+            configurarEventos();
+        });
+        
+        function configurarEventos() {
+            // Enter no campo de busca global
+            document.getElementById('searchGlobal').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    buscarGlobal();
+                }
+            });
+            
+            // Enter no chat
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    enviarMensagem();
+                }
+            });
+        }
+        
+        async function carregarConcursosAbertos() {
+            try {
+                const response = await fetch('http://localhost:8006/concursos-abertos');
+                if (response.ok) {
+                    concursosData = await response.json();
+                    concursosFiltrados = [...concursosData];
+                    
+                    atualizarEstatisticas();
+                    popularFiltros();
+                    renderizarConcursos();
+                } else {
+                    mostrarErro('Erro ao carregar concursos');
+                }
+            } catch (error) {
+                mostrarErro('Erro de conexão com a API');
+            }
+        }
+        
+        function atualizarEstatisticas() {
+            const total = concursosFiltrados.length;
+            const totalVagas = concursosFiltrados.reduce((sum, c) => {
+                const vagas = parseInt(String(c.vagas).replace(/\D/g, '')) || 0;
+                return sum + vagas;
+            }, 0);
+            
+            const salariosNumericos = concursosFiltrados
+                .map(c => {
+                    const match = String(c.salario).match(/[\d.,]+/);
+                    return match ? parseFloat(match[0].replace(/[.,]/g, '')) : 0;
+                })
+                .filter(s => s > 0);
+            
+            const mediaSalario = salariosNumericos.length > 0 
+                ? (salariosNumericos.reduce((a, b) => a + b, 0) / salariosNumericos.length)
+                : 0;
+            
+            const orgaosUnicos = new Set(concursosFiltrados.map(c => c.orgao)).size;
+            
+            document.getElementById('totalConcursos').textContent = total;
+            document.getElementById('totalVagas').textContent = totalVagas.toLocaleString();
+            document.getElementById('mediaValario').textContent = mediaSalario > 0 
+                ? `R$ ${(mediaSalario/100).toLocaleString('pt-BR', {minimumFractionDigits: 0})}` 
+                : 'N/A';
+            document.getElementById('totalOrgaos').textContent = orgaosUnicos;
+        }
+        
+        function popularFiltros() {
+            const orgaos = [...new Set(concursosData.map(c => c.orgao))].sort();
+            const selectOrgao = document.getElementById('filtroOrgao');
+            
+            selectOrgao.innerHTML = '<option value="">Todos os órgãos</option>';
+            orgaos.forEach(orgao => {
+                const option = document.createElement('option');
+                option.value = orgao;
+                option.textContent = orgao;
+                selectOrgao.appendChild(option);
+            });
+        }
+        
+        function renderizarConcursos() {
+            const container = document.getElementById('concursosContainer');
+            
+            if (concursosFiltrados.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h3>🔍 Nenhum concurso encontrado</h3>
+                        <p>Tente ajustar os filtros ou fazer uma nova busca.</p>
+                        <button class="btn btn-primary" onclick="limparFiltros()" style="margin-top: 15px;">
+                            Limpar Filtros
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = concursosFiltrados.map(concurso => `
+                <div class="concurso-card">
+                    <div class="concurso-header">
+                        <div>
+                            <div class="concurso-title">${concurso.titulo || concurso.cargo}</div>
+                            <div class="concurso-orgao">${concurso.orgao}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="status-badge ${concurso.urgencia === 'alta' ? 'urgente' : ''}">
+                                ${concurso.urgencia === 'alta' ? '🔥 URGENTE' : '✅ ABERTO'}
+                            </div>
+                            ${concurso.dias_restantes > 0 ? `<div style="font-size: 12px; color: #ff5722; font-weight: bold; margin-top: 5px;">${concurso.dias_restantes} dias restantes</div>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="concurso-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">👔</span>
+                            <span class="detail-label">Cargo:</span>
+                            <span class="detail-value">${concurso.cargo}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">👥</span>
+                            <span class="detail-label">Vagas:</span>
+                            <span class="detail-value">${concurso.vagas}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">💰</span>
+                            <span class="detail-label">Salário:</span>
+                            <span class="detail-value">${concurso.salario}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📍</span>
+                            <span class="detail-label">Região:</span>
+                            <span class="detail-value">${concurso.regiao} - ${concurso.estado}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🎓</span>
+                            <span class="detail-label">Escolaridade:</span>
+                            <span class="detail-value">${concurso.escolaridade}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">�</span>
+                            <span class="detail-label">Taxa:</span>
+                            <span class="detail-value">${concurso.taxa_inscricao}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span class="detail-label">Inscrições:</span>
+                            <span class="detail-value">${concurso.prazo_inscricoes}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📝</span>
+                            <span class="detail-label">Prova:</span>
+                            <span class="detail-value">${concurso.data_prova}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📋</span>
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value" style="color: ${concurso.status === 'Inscrições abertas' ? '#4CAF50' : '#FF9800'};">${concurso.status}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="concurso-actions">
+                        <button class="btn btn-primary" onclick="criarPlanoEstudo('${concurso.cargo}')">
+                            📚 Plano de Estudo
+                        </button>
+                        <button class="btn btn-secondary" onclick="verDetalhes('${concurso.id}')">
+                            📄 Ver Detalhes
+                        </button>
+                        <button class="btn btn-secondary" onclick="salvarConcurso('${concurso.id}')">
+                            ⭐ Favoritar
+                        </button>
+                        ${concurso.status === 'Inscrições abertas' ? 
+                            `<button class="btn btn-primary" onclick="alert('🔗 Redirecionando para o site oficial...')" style="background: #4CAF50;">
+                                🌐 Inscrever-se
+                            </button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = `<div class="concursos-grid">${html}</div>`;
+        }
+        
+        function aplicarFiltros() {
+            const regiaoSelecionada = document.getElementById('filtroRegiao').value;
+            const orgaoSelecionado = document.getElementById('filtroOrgao').value;
+            const escolaridadeSelecionada = document.getElementById('filtroEscolaridade').value;
+            const salarioMinimo = parseFloat(document.getElementById('filtroSalario').value) || 0;
+            
+            concursosFiltrados = concursosData.filter(concurso => {
+                let passa = true;
+                
+                if (regiaoSelecionada && concurso.regiao !== regiaoSelecionada) {
+                    passa = false;
+                }
+                
+                if (orgaoSelecionado && !concurso.orgao.includes(orgaoSelecionado)) {
+                    passa = false;
+                }
+                
+                if (escolaridadeSelecionada) {
+                    const escolaridade = concurso.escolaridade.toLowerCase();
+                    if (!escolaridade.includes(escolaridadeSelecionada)) {
+                        passa = false;
+                    }
+                }
+                
+                if (salarioMinimo > 0) {
+                    const salario = parseFloat(String(concurso.salario).replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+                    if (salario < salarioMinimo) {
+                        passa = false;
+                    }
+                }
+                
+                return passa;
+            });
+            
+            atualizarEstatisticas();
+            renderizarConcursos();
+        }
+        
+        function buscarGlobal() {
+            const termo = document.getElementById('searchGlobal').value.toLowerCase();
+            if (!termo) {
+                concursosFiltrados = [...concursosData];
+            } else {
+                concursosFiltrados = concursosData.filter(concurso => 
+                    concurso.titulo.toLowerCase().includes(termo) ||
+                    concurso.orgao.toLowerCase().includes(termo) ||
+                    concurso.cargo.toLowerCase().includes(termo) ||
+                    concurso.local.toLowerCase().includes(termo) ||
+                    concurso.regiao.toLowerCase().includes(termo) ||
+                    concurso.estado.toLowerCase().includes(termo)
+                );
+            }
+            
+            atualizarEstatisticas();
+            renderizarConcursos();
+        }
+        
+        function limparFiltros() {
+            document.getElementById('filtroRegiao').value = '';
+            document.getElementById('filtroOrgao').value = '';
+            document.getElementById('filtroEscolaridade').value = '';
+            document.getElementById('filtroSalario').value = '';
+            document.getElementById('searchGlobal').value = '';
+            
+            concursosFiltrados = [...concursosData];
+            atualizarEstatisticas();
+            renderizarConcursos();
+        }
+        
+        function mostrarErro(mensagem) {
+            document.getElementById('concursosContainer').innerHTML = `
+                <div class="no-results">
+                    <h3>❌ ${mensagem}</h3>
+                    <p>Tente recarregar a página ou entre em contato com o suporte.</p>
+                    <button class="btn btn-primary" onclick="carregarConcursosAbertos()" style="margin-top: 15px;">
+                        🔄 Tentar Novamente
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Funções do Chat
+        function abrirChat() {
+            document.getElementById('chatModal').style.display = 'block';
+        }
+        
+        function fecharChat() {
+            document.getElementById('chatModal').style.display = 'none';
+        }
+        
+        async function enviarMensagem() {
+            const input = document.getElementById('chatInput');
+            const mensagem = input.value.trim();
+            if (!mensagem) return;
+            
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Adicionar mensagem do usuário
+            chatMessages.innerHTML += `
+                <div class="chat-message user" style="margin: 10px 0; padding: 15px; background: #667eea; color: white; border-radius: 15px 15px 5px 15px; margin-left: 50px;">
+                    <strong>Você:</strong> ${mensagem}
+                </div>
+            `;
+            
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Mostrar loading
+            chatMessages.innerHTML += `
+                <div class="chat-message bot loading" style="margin: 10px 0; padding: 15px; background: #f0f0f0; border-radius: 15px 15px 15px 5px; margin-right: 50px;">
+                    <strong>🤖 IA:</strong> Processando... ⏳
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            try {
+                const response = await fetch('http://localhost:8006/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ mensagem: mensagem })
+                });
+                
+                // Remover loading
+                const loadingElement = chatMessages.querySelector('.loading');
+                if (loadingElement) loadingElement.remove();
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    chatMessages.innerHTML += `
+                        <div class="chat-message bot" style="margin: 10px 0; padding: 15px; background: #f0f0f0; border-radius: 15px 15px 15px 5px; margin-right: 50px;">
+                            <strong>🤖 IA ConcursAI:</strong>
+                            <div style="margin-top: 10px; white-space: pre-line;">${data.resposta}</div>
+                        </div>
+                    `;
+                } else {
+                    chatMessages.innerHTML += `
+                        <div class="chat-message bot error" style="margin: 10px 0; padding: 15px; background: #ffebee; border-radius: 15px 15px 15px 5px; margin-right: 50px; border-left: 4px solid #f44336;">
+                            <strong>🤖 IA:</strong> Desculpe, não consegui processar sua mensagem no momento. Tente novamente em alguns instantes.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                // Remover loading
+                const loadingElement = chatMessages.querySelector('.loading');
+                if (loadingElement) loadingElement.remove();
+                
+                chatMessages.innerHTML += `
+                    <div class="chat-message bot error" style="margin: 10px 0; padding: 15px; background: #ffebee; border-radius: 15px 15px 15px 5px; margin-right: 50px; border-left: 4px solid #f44336;">
+                        <strong>🤖 IA:</strong> Erro de conexão. Verifique sua internet e tente novamente.
+                    </div>
+                `;
+            }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function criarPlanoEstudo(cargo) {
+            abrirChat();
+            document.getElementById('chatInput').value = `Criar plano de estudo para ${cargo}`;
+            setTimeout(() => enviarMensagem(), 500);
+        }
+        
+        function verDetalhes(concursoId) {
+            const concurso = concursosData.find(c => c.id === concursoId);
+            if (concurso) {
+                abrirChat();
+                document.getElementById('chatInput').value = `Me fale mais sobre o concurso de ${concurso.cargo} do ${concurso.orgao}`;
+                setTimeout(() => enviarMensagem(), 500);
+            }
+        }
+        
+        function salvarConcurso(concursoId) {
+            // Simular salvamento (aqui você implementaria a lógica real)
+            alert('🌟 Concurso salvo nos seus favoritos!\n\nVocê receberá notificações sobre atualizações deste concurso.');
+        }
+    </script>
+</body>
+</html>

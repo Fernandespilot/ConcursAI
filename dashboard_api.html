@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConcursAI - Dashboard Conectado</title>
+    
+    <!-- Fonts e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --background-color: #f8f9ff;
+            --text-color: #333333;
+            --text-light: #666666;
+            --white: #ffffff;
+            --shadow: 0 10px 40px rgba(0,0,0,0.1);
+            --border-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+        }
+        
+        .concursos-section {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .filters {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .filter-group label {
+            font-weight: 500;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .filter-group select, .filter-group input {
+            padding: 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .concursos-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .concurso-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: var(--transition);
+        }
+        
+        .concurso-item:hover {
+            background: var(--background-color);
+        }
+        
+        .concurso-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .concurso-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .concurso-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-aberto {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status-previsto {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .status-unknown {
+            background: #f5f5f5;
+            color: #757575;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .api-status {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .api-controls {
+            padding: 1.5rem;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .search-section {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+        }
+        
+        .search-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+            
+            .concurso-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="container">
+                <h1><i class="fas fa-robot"></i> ConcursAI Dashboard</h1>
+                <p>Sistema inteligente conectado à API - Dados em tempo real</p>
+            </div>
+        </div>
+        
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stat-number" id="totalConcursos">-</div>
+                <div class="stat-label">Total de Concursos</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div class="stat-number" id="totalOrgaos">-</div>
+                <div class="stat-label">Órgãos Únicos</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-number" id="totalAnos">-</div>
+                <div class="stat-label">Anos Disponíveis</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <div class="stat-number" id="totalCargos">-</div>
+                <div class="stat-label">Cargos Únicos</div>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <!-- Lista de Concursos -->
+            <div class="concursos-section">
+                <div class="section-header">
+                    <i class="fas fa-list"></i> Lista de Concursos
+                </div>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Órgão</label>
+                        <select id="filtroOrgao">
+                            <option value="">Todos os órgãos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Ano</label>
+                        <select id="filtroAno">
+                            <option value="">Todos os anos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Cargo</label>
+                        <select id="filtroCargo">
+                            <option value="">Todos os cargos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filtroStatus">
+                            <option value="">Todos os status</option>
+                            <option value="aberto">Aberto</option>
+                            <option value="previsto">Previsto</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="loading" id="loadingConcursos">
+                    <i class="fas fa-spinner"></i>
+                    <div>Carregando concursos...</div>
+                </div>
+                
+                <div class="concursos-list" id="concursosList">
+                    <!-- Concursos serão carregados aqui -->
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Status da API -->
+                <div class="api-status">
+                    <div class="section-header">
+                        <i class="fas fa-server"></i> Status da API
+                    </div>
+                    <div class="api-controls">
+                        <div id="apiStatus" style="padding: 1rem; text-align: center;">
+                            <i class="fas fa-spinner fa-spin"></i> Verificando...
+                        </div>
+                        
+                        <button class="btn" onclick="atualizarDados()">
+                            <i class="fas fa-sync-alt"></i> Atualizar Dados
+                        </button>
+                        
+                        <button class="btn" onclick="executarScraper()">
+                            <i class="fas fa-spider"></i> Executar Scraper
+                        </button>
+                        
+                        <a href="http://localhost:8005/docs" target="_blank" class="btn" style="text-decoration: none; display: block; text-align: center;">
+                            <i class="fas fa-book"></i> Documentação API
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Busca Inteligente -->
+                <div class="search-section">
+                    <div class="section-header">
+                        <i class="fas fa-search"></i> Busca Inteligente
+                    </div>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Digite sua pergunta (ex: concursos da Polícia Federal)">
+                    <button class="btn" onclick="buscarConcursos()">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                    <div class="search-results" id="searchResults">
+                        <!-- Resultados da busca -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuração da API
+        const API_BASE = 'http://localhost:8005';
+        
+        // Estado da aplicação
+        let concursosData = [];
+        let filteredData = [];
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarStatusAPI();
+            carregarEstatisticas();
+            carregarConcursos();
+            carregarFiltros();
+            
+            // Event listeners para filtros
+            document.getElementById('filtroOrgao').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroAno').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroCargo').addEventListener('change', aplicarFiltros);
+            document.getElementById('filtroStatus').addEventListener('change', aplicarFiltros);
+            
+            // Enter na busca
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    buscarConcursos();
+                }
+            });
+        });
+        
+        // Verificar status da API
+        async function verificarStatusAPI() {
+            try {
+                const response = await fetch(`${API_BASE}/status`);
+                const data = await response.json();
+                
+                document.getElementById('apiStatus').innerHTML = `
+                    <div style="color: #2e7d32;">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>API Online</strong>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                            Versão: ${data.versao || '1.0.0'}<br>
+                            Status: ${data.status}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = `
+                    <div style="color: #d32f2f;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>API Offline</strong>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                            Erro de conexão
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Carregar estatísticas
+        async function carregarEstatisticas() {
+            try {
+                const response = await fetch(`${API_BASE}/estatisticas`);
+                const data = await response.json();
+                
+                document.getElementById('totalConcursos').textContent = 
+                    data.resumo_geral?.total_concursos || 0;
+                document.getElementById('totalOrgaos').textContent = 
+                    data.resumo_geral?.total_orgaos || 0;
+                document.getElementById('totalAnos').textContent = 
+                    data.resumo_geral?.anos_disponiveis || 0;
+                document.getElementById('totalCargos').textContent = 
+                    data.resumo_geral?.total_cargos || 0;
+                    
+            } catch (error) {
+                console.error('Erro ao carregar estatísticas:', error);
+            }
+        }
+        
+        // Carregar lista de concursos
+        async function carregarConcursos() {
+            const loading = document.getElementById('loadingConcursos');
+            const list = document.getElementById('concursosList');
+            
+            loading.classList.add('show');
+            
+            try {
+                const response = await fetch(`${API_BASE}/concursos?limit=100`);
+                concursosData = await response.json();
+                filteredData = [...concursosData];
+                
+                renderizarConcursos(filteredData);
+                
+            } catch (error) {
+                list.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #d32f2f;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Erro ao carregar concursos: ${error.message}
+                    </div>
+                `;
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+        
+        // Carregar opções dos filtros
+        async function carregarFiltros() {
+            try {
+                // Carregar órgãos
+                const orgaosResponse = await fetch(`${API_BASE}/orgaos`);
+                const orgaosData = await orgaosResponse.json();
+                const selectOrgao = document.getElementById('filtroOrgao');
+                orgaosData.orgaos.forEach(orgao => {
+                    const option = document.createElement('option');
+                    option.value = orgao;
+                    option.textContent = orgao;
+                    selectOrgao.appendChild(option);
+                });
+                
+                // Carregar anos
+                const anosResponse = await fetch(`${API_BASE}/anos`);
+                const anosData = await anosResponse.json();
+                const selectAno = document.getElementById('filtroAno');
+                anosData.anos.forEach(ano => {
+                    const option = document.createElement('option');
+                    option.value = ano;
+                    option.textContent = ano;
+                    selectAno.appendChild(option);
+                });
+                
+                // Carregar cargos
+                const cargosResponse = await fetch(`${API_BASE}/cargos`);
+                const cargosData = await cargosResponse.json();
+                const selectCargo = document.getElementById('filtroCargo');
+                cargosData.cargos.forEach(cargo => {
+                    const option = document.createElement('option');
+                    option.value = cargo;
+                    option.textContent = cargo;
+                    selectCargo.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar filtros:', error);
+            }
+        }
+        
+        // Aplicar filtros
+        function aplicarFiltros() {
+            const orgaoFiltro = document.getElementById('filtroOrgao').value;
+            const anoFiltro = document.getElementById('filtroAno').value;
+            const cargoFiltro = document.getElementById('filtroCargo').value;
+            const statusFiltro = document.getElementById('filtroStatus').value;
+            
+            filteredData = concursosData.filter(concurso => {
+                return (!orgaoFiltro || concurso.orgao.includes(orgaoFiltro)) &&
+                       (!anoFiltro || concurso.ano === anoFiltro) &&
+                       (!cargoFiltro || concurso.cargo.includes(cargoFiltro)) &&
+                       (!statusFiltro || concurso.status === statusFiltro);
+            });
+            
+            renderizarConcursos(filteredData);
+        }
+        
+        // Renderizar lista de concursos
+        function renderizarConcursos(concursos) {
+            const list = document.getElementById('concursosList');
+            
+            if (concursos.length === 0) {
+                list.innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #666;">
+                        <i class="fas fa-search"></i>
+                        <div>Nenhum concurso encontrado com os filtros aplicados</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = concursos.map(concurso => `
+                <div class="concurso-item">
+                    <div class="concurso-title">${concurso.titulo}</div>
+                    <div class="concurso-details">
+                        <div class="concurso-detail">
+                            <i class="fas fa-building"></i>
+                            <strong>Órgão:</strong> ${concurso.orgao}
+                        </div>
+                        <div class="concurso-detail">
+                            <i class="fas fa-briefcase"></i>
+                            <strong>Cargo:</strong> ${concurso.cargo}
+                        </div>
+                        <div class="concurso-detail">
+                            <i class="fas fa-calendar"></i>
+                            <strong>Ano:</strong> ${concurso.ano}
+                        </div>
+                        <div class="concurso-detail">
+                            <i class="fas fa-users"></i>
+                            <strong>Vagas:</strong> ${concurso.vagas}
+                        </div>
+                        <div class="concurso-detail">
+                            <span class="status-badge status-${concurso.status}">
+                                ${concurso.status}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Buscar concursos
+        async function buscarConcursos() {
+            const input = document.getElementById('searchInput');
+            const results = document.getElementById('searchResults');
+            const pergunta = input.value.trim();
+            
+            if (!pergunta) {
+                alert('Digite uma pergunta para buscar');
+                return;
+            }
+            
+            results.innerHTML = '<div style="padding: 1rem; text-align: center;"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/buscar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pergunta: pergunta
+                    })
+                });
+                
+                const data = await response.json();
+                
+                results.innerHTML = `
+                    <div style="padding: 1rem; background: #f5f5f5; border-radius: 10px; margin-top: 1rem;">
+                        <strong>Resultado da busca:</strong>
+                        <div style="margin-top: 0.5rem; white-space: pre-line;">${data.resposta}</div>
+                        <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                            Encontrados: ${data.total_encontrados} resultado(s)
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                results.innerHTML = `
+                    <div style="padding: 1rem; background: #ffebee; border-radius: 10px; margin-top: 1rem; color: #d32f2f;">
+                        <strong>Erro na busca:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Atualizar dados
+        async function atualizarDados() {
+            await carregarEstatisticas();
+            await carregarConcursos();
+            await carregarFiltros();
+            verificarStatusAPI();
+        }
+        
+        // Executar scraper (real)
+        async function executarScraper() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Executando Scraping...';
+                
+                const response = await fetch(`${API_BASE}/scraper/executar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'sucesso') {
+                    alert(`Scraping realizado com sucesso!\n\nConcursos coletados: ${data.concursos_coletados}\nArquivo: ${data.arquivo_salvo}\nFonte: ${data.fonte}`);
+                    
+                    // Recarregar dados após scraping
+                    await atualizarDados();
+                } else {
+                    alert(`Erro no scraping: ${data.mensagem}`);
+                }
+                
+            } catch (error) {
+                alert(`Erro ao executar scraping: ${error.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    </script>
+</body>
+</html>
