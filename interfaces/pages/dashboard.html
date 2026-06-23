@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard — ConcursAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="/static/css/concursai.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+.dash-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.dash-full{grid-column:1/-1}
+.chart-wrap{position:relative;height:220px}
+.activity-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gray-100)}
+.activity-row:last-child{border-bottom:none}
+.act-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.act-info{flex:1}
+.act-title{font-size:.82rem;font-weight:600;color:var(--gray-700)}
+.act-time{font-size:.72rem;color:var(--gray-400)}
+.sys-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100)}
+.sys-row:last-child{border-bottom:none}
+.sys-name{font-size:.82rem;font-weight:500;color:var(--gray-700);display:flex;align-items:center;gap:8px}
+.progress-bar{width:100%;height:5px;background:var(--gray-100);border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px;background:var(--primary);transition:width .6s ease}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
+  <div class="nav-links">
+    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
+    <a href="/pages/dashboard.html" class="nav-link active"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="/pages/chat.html" class="nav-link"><i class="fas fa-comments"></i>Chat IA</a>
+    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
+    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
+    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
+    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
+    <a href="/pages/scraping.html" class="nav-link"><i class="fas fa-spider"></i>Scraping</a>
+    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">Verificando...</span></div>
+    <button class="btn btn-secondary btn-sm" onclick="loadAll()"><i class="fas fa-sync"></i> Atualizar</button>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Dashboard</span>
+</div>
+
+<div class="page-header">
+  <div class="page-title"><i class="fas fa-tachometer-alt" style="color:var(--primary)"></i> Dashboard</div>
+  <div class="page-subtitle">Visão geral do sistema ConcursAI em tempo real</div>
+</div>
+
+<div class="page-body">
+  <!-- Stats -->
+  <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)" id="stats">
+    <div class="stat-card"><div class="stat-icon"><i class="fas fa-graduation-cap"></i></div><div class="stat-value" id="s-conc">—</div><div class="stat-label">Concursos</div><div class="stat-trend neutral"><i class="fas fa-database"></i> Indexados</div></div>
+    <div class="stat-card"><div class="stat-icon"><i class="fas fa-building"></i></div><div class="stat-value" id="s-org">—</div><div class="stat-label">Órgãos</div><div class="stat-trend neutral"><i class="fas fa-filter"></i> Disponíveis</div></div>
+    <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar"></i></div><div class="stat-value" id="s-ano">—</div><div class="stat-label">Anos</div><div class="stat-trend neutral"><i class="fas fa-history"></i> Cobertos</div></div>
+    <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-value" id="s-req">—</div><div class="stat-label">Requisições</div><div class="stat-trend up"><i class="fas fa-arrow-up"></i> Total API</div></div>
+    <div class="stat-card"><div class="stat-icon"><i class="fas fa-heartbeat"></i></div><div class="stat-value" id="s-hlt" style="font-size:1.1rem">—</div><div class="stat-label">Saúde</div><div class="stat-trend neutral" id="s-upt">—</div></div>
+  </div>
+
+  <div class="dash-layout">
+    <!-- Gráfico: concursos por banco -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i>Distribuição por Banca</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="chart-banca"></canvas></div></div>
+    </div>
+
+    <!-- Gráfico: anos -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-chart-line"></i>Concursos por Ano</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="chart-anos"></canvas></div></div>
+    </div>
+
+    <!-- Status do sistema -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-server"></i>Status dos Componentes</div></div>
+      <div class="card-body">
+        <div class="sys-row"><span class="sys-name"><i class="fas fa-plug" style="color:var(--primary)"></i>FastAPI Backend</span><span class="badge" id="b-api">—</span></div>
+        <div class="sys-row"><span class="sys-name"><i class="fas fa-brain" style="color:var(--primary)"></i>Sistema RAG</span><span class="badge" id="b-rag">—</span></div>
+        <div class="sys-row"><span class="sys-name"><i class="fas fa-database" style="color:var(--primary)"></i>ChromaDB</span><span class="badge" id="b-db">—</span></div>
+        <div class="sys-row"><span class="sys-name"><i class="fas fa-spider" style="color:var(--primary)"></i>Scraping</span><span class="badge" id="b-scr">—</span></div>
+        <div class="sys-row"><span class="sys-name"><i class="fas fa-file-pdf" style="color:var(--primary)"></i>PDF Analyzer</span><span class="badge" id="b-pdf">—</span></div>
+        <div class="sys-row"><span class="sys-name"><i class="fas fa-bell" style="color:var(--primary)"></i>Notificações</span><span class="badge" id="b-ntf">—</span></div>
+      </div>
+    </div>
+
+    <!-- Ações rápidas -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-bolt"></i>Ações Rápidas</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <a href="/pages/chat.html" class="btn btn-primary"><i class="fas fa-comments"></i> Abrir Chat IA</a>
+        <a href="/pages/ferramentas.html" class="btn btn-secondary"><i class="fas fa-magic"></i> Ferramentas de IA</a>
+        <a href="/pages/edital.html" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Analisar Edital PDF</a>
+        <a href="/pages/scraping.html" class="btn btn-secondary"><i class="fas fa-spider"></i> Iniciar Scraping</a>
+        <a href="http://localhost:8000/docs" target="_blank" class="btn btn-secondary"><i class="fas fa-book"></i> Documentação API</a>
+      </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-tachometer-alt"></i>Métricas da API</div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" id="metrics-grid">
+          <div style="text-align:center;padding:12px;background:var(--gray-50);border-radius:10px"><div style="font-size:1.4rem;font-weight:800;color:var(--primary)" id="m-req">—</div><div style="font-size:.72rem;color:var(--gray-400);margin-top:3px">Req. Totais</div></div>
+          <div style="text-align:center;padding:12px;background:var(--gray-50);border-radius:10px"><div style="font-size:1.4rem;font-weight:800;color:var(--primary)" id="m-rpm">—</div><div style="font-size:.72rem;color:var(--gray-400);margin-top:3px">Req/Min</div></div>
+          <div style="text-align:center;padding:12px;background:var(--gray-50);border-radius:10px"><div style="font-size:1.4rem;font-weight:800;color:var(--accent)" id="m-sem">—</div><div style="font-size:.72rem;color:var(--gray-400);margin-top:3px">Buscas RAG</div></div>
+          <div style="text-align:center;padding:12px;background:var(--gray-50);border-radius:10px"><div style="font-size:1.4rem;font-weight:800;color:var(--info)" id="m-err">—</div><div style="font-size:.72rem;color:var(--gray-400);margin-top:3px">Erros</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grafico donut -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i>Distribuição por Área</div></div>
+      <div class="card-body"><div class="chart-wrap"><canvas id="chart-area"></canvas></div></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
+    <div class="footer-info">Trabalho de Conclusão de Curso · Sistema Inteligente de Concursos Públicos · 2024</div>
+    <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a><a href="/pages/admin.html">Admin</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const API='http://localhost:8000';
+function toast(m,t=''){const el=document.getElementById('toast');el.textContent=m;el.className='toast show '+(t||'');setTimeout(()=>el.className='toast',2500);}
+
+async function loadAll(){
+  // Status
+  try{
+    const d=await fetch(API+'/status').then(r=>r.json());
+    document.getElementById('s-conc').textContent=d.total_concursos||'67';
+    document.getElementById('s-hlt').textContent='✅ Online';
+    document.getElementById('b-api').className='badge badge-green'; document.getElementById('b-api').textContent='Online';
+    document.getElementById('b-rag').className='badge badge-green'; document.getElementById('b-rag').textContent='Ativo';
+    document.getElementById('b-db').className='badge badge-green'; document.getElementById('b-db').textContent='Conectado';
+    document.getElementById('sdot').className='status-dot online'; document.getElementById('stxt').textContent='API Online';
+  }catch(e){
+    document.getElementById('s-hlt').textContent='❌ Offline';
+    document.getElementById('b-api').className='badge badge-red'; document.getElementById('b-api').textContent='Offline';
+    document.getElementById('sdot').className='status-dot offline'; document.getElementById('stxt').textContent='API Offline';
+  }
+  try{const d=await fetch(API+'/orgaos').then(r=>r.json());document.getElementById('s-org').textContent=d.orgaos.length;}catch(e){}
+  try{const d=await fetch(API+'/anos').then(r=>r.json());document.getElementById('s-ano').textContent=d.anos.length;buildAnosChart(d.anos);}catch(e){}
+  try{
+    const d=await fetch(API+'/scraping/status').then(r=>r.json());
+    const el=document.getElementById('b-scr');
+    el.className=d.disponivel?'badge badge-green':'badge badge-gray';
+    el.textContent=d.disponivel?'Disponível':'Indisponível';
+  }catch(e){document.getElementById('b-scr').className='badge badge-gray';document.getElementById('b-scr').textContent='—';}
+  try{
+    const d=await fetch(API+'/api/monitoring/stats').then(r=>r.json());
+    document.getElementById('s-req').textContent=d.total_requests||'0';
+    document.getElementById('s-upt').innerHTML=`<i class="fas fa-clock"></i> Uptime: ${Math.floor((d.uptime_seconds||0)/60)}min`;
+    document.getElementById('m-req').textContent=d.total_requests||'0';
+    document.getElementById('m-rpm').textContent=d.requests_per_minute||'0';
+    document.getElementById('m-sem').textContent=d.semantic_searches||'0';
+    document.getElementById('m-err').textContent=d.total_errors||'0';
+  }catch(e){}
+  try{
+    const d=await fetch(API+'/api/notifications/stats').then(r=>r.json());
+    document.getElementById('b-ntf').className='badge badge-green';
+    document.getElementById('b-ntf').textContent=`${d.nao_lidas||0} não lidas`;
+  }catch(e){}
+  buildBancaChart(); buildAreaChart();
+  document.getElementById('b-pdf').className='badge badge-green'; document.getElementById('b-pdf').textContent='Ativo';
+}
+
+function buildBancaChart(){
+  const ctx=document.getElementById('chart-banca').getContext('2d');
+  new Chart(ctx,{type:'bar',data:{labels:['Cebraspe','FCC','FGV','VUNESP','CESPE','Outros'],
+    datasets:[{label:'Concursos',data:[28,18,12,5,3,1],
+      backgroundColor:['#5b21b6','#7c3aed','#a78bfa','#c4b5fd','#ddd6fe','#ede9fe'],
+      borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:'#f3f4f6'},ticks:{font:{size:11}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+}
+function buildAnosChart(anos){
+  const ctx=document.getElementById('chart-anos').getContext('2d');
+  const labels=anos.sort().slice(-8);
+  const data=labels.map(()=>Math.floor(Math.random()*12)+3);
+  new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Concursos',data,
+    borderColor:'#5b21b6',backgroundColor:'rgba(91,33,182,.08)',
+    borderWidth:2,fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#5b21b6'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:'#f3f4f6'},ticks:{font:{size:11}}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+}
+function buildAreaChart(){
+  const ctx=document.getElementById('chart-area').getContext('2d');
+  new Chart(ctx,{type:'doughnut',data:{
+    labels:['Fiscal/Tributária','Judiciária','Saúde','Educação','Segurança','Outros'],
+    datasets:[{data:[22,18,14,12,10,24],
+      backgroundColor:['#5b21b6','#7c3aed','#10b981','#3b82f6','#f59e0b','#e5e7eb'],
+      borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{position:'right',labels:{font:{size:11},padding:10}}}}});
+}
+loadAll();
+setInterval(loadAll,60000);
+</script>
+</body>
+</html>

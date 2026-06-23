@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PDF / Edital — ConcursAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="/static/css/concursai.css" rel="stylesheet">
+<style>
+.edital-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.edital-full{grid-column:1/-1}
+.editais-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--gray-100)}
+.editais-item:last-child{border-bottom:none}
+.ei-info strong{font-size:.83rem;color:var(--gray-800)}
+.ei-info span{font-size:.72rem;color:var(--gray-400);display:block;margin-top:1px}
+.chat-edital{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);min-height:160px;max-height:300px;overflow-y:auto;padding:14px;font-size:.82rem;line-height:1.7;color:var(--gray-500)}
+.msg-user{text-align:right;margin-bottom:8px}
+.msg-user span{background:var(--primary);color:white;border-radius:10px;padding:6px 12px;display:inline-block;font-size:.82rem}
+.msg-ai{margin-bottom:8px}.msg-ai span{background:white;border:1px solid var(--gray-200);border-radius:10px;padding:6px 12px;display:inline-block;font-size:.82rem;color:var(--gray-700)}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
+  <div class="nav-links">
+    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
+    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="/pages/chat.html" class="nav-link"><i class="fas fa-comments"></i>Chat IA</a>
+    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
+    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
+    <a href="/pages/edital.html" class="nav-link active"><i class="fas fa-file-pdf"></i>Edital</a>
+    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
+    <a href="/pages/scraping.html" class="nav-link"><i class="fas fa-spider"></i>Scraping</a>
+    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
+  </div>
+  <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
+</nav>
+<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">PDF / Edital</span></div>
+<div class="page-header">
+  <div class="page-title"><i class="fas fa-file-pdf" style="color:#dc2626"></i> PDF & Análise de Editais</div>
+  <div class="page-subtitle">Faça upload de editais em PDF e converse diretamente com o conteúdo</div>
+</div>
+<div class="page-body">
+  <!-- Upload -->
+  <div class="card edital-full mb-6">
+    <div class="card-header"><div class="card-title"><i class="fas fa-upload"></i>Upload de Edital em PDF</div></div>
+    <div class="card-body">
+      <div class="upload-area" id="uparea" ondrop="dropPDF(event)" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')">
+        <input type="file" accept=".pdf" onchange="uploadPDF(event)">
+        <div class="upload-icon"><i class="fas fa-file-pdf"></i></div>
+        <div class="upload-title">Clique ou arraste um edital em PDF</div>
+        <div class="upload-sub">Tamanho máximo: 50MB · Formatos: PDF</div>
+      </div>
+      <div id="up-st" style="display:none;margin-top:14px" class="result-box"></div>
+    </div>
+  </div>
+
+  <div class="edital-layout">
+    <!-- Editais carregados -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-list"></i>Editais Carregados</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadEditais()"><i class="fas fa-sync"></i> Atualizar</button>
+      </div>
+      <div class="card-body" id="editais-list" style="min-height:80px">
+        <p style="font-size:.82rem;color:var(--gray-400)">Nenhum edital carregado. Faça upload acima.</p>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-file-contract"></i>Gerar Resumo</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">ID do edital</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="form-control" id="res-id" placeholder="Ex: edital_abc123">
+            <button class="btn btn-primary btn-sm" onclick="resumoEdital()" style="flex-shrink:0"><i class="fas fa-magic"></i> Resumir</button>
+          </div>
+        </div>
+        <div id="res-r" class="result-box" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Chat com edital -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-comments"></i>Conversar com o Edital</div></div>
+      <div class="card-body">
+        <div class="form-row" style="margin-bottom:12px">
+          <div class="form-group"><label class="form-label">ID do edital</label><input type="text" class="form-control" id="ed-id" placeholder="ID do edital carregado"></div>
+          <div class="form-group"><label class="form-label">User ID</label><input type="text" class="form-control" id="ed-uid" value="user1"></div>
+        </div>
+        <div class="chat-edital" id="edchat">Selecione um edital acima e faça uma pergunta...</div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input type="text" class="form-control" id="ed-q" placeholder="O que quer saber sobre este edital?" onkeydown="if(event.key==='Enter')convEdital()">
+          <button class="btn btn-primary btn-sm" onclick="convEdital()" style="flex-shrink:0"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analisar PDF com IA -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-microscope"></i>Analisar PDF com IA</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Selecionar PDF</label><input type="file" class="form-control" id="pdf-f" accept=".pdf" style="padding:6px"></div>
+        <div class="form-group"><label class="form-label">Pergunta sobre o PDF</label><input type="text" class="form-control" id="pdf-q" placeholder="O que quer saber sobre este documento?"></div>
+        <button class="btn btn-primary" style="width:100%" onclick="analisarPDF()"><i class="fas fa-microscope"></i> Analisar com IA</button>
+        <div id="pdf-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- Histórico -->
+    <div class="card edital-full">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-history"></i>Histórico de Conversas</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="hist-uid" value="user1" placeholder="User ID" style="border:1px solid var(--gray-200);border-radius:6px;padding:5px 10px;font-size:.78rem;font-family:inherit;outline:none;width:100px">
+          <button class="btn btn-secondary btn-sm" onclick="loadHist()"><i class="fas fa-search"></i> Carregar</button>
+          <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="delHist()"><i class="fas fa-trash"></i> Limpar</button>
+        </div>
+      </div>
+      <div class="card-body" id="hist-list" style="min-height:60px;font-size:.82rem;color:var(--gray-400)">
+        Clique em Carregar para ver o histórico de conversas.
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
+  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
+  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
+</div></footer>
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+function show(id,txt){const el=G(id);el.style.display='block';el.classList.remove('loading');el.textContent=typeof txt==='object'?JSON.stringify(txt,null,2):txt;}
+function loading(id){const el=G(id);el.style.display='block';el.classList.add('loading');el.textContent='Processando...';}
+
+async function uploadPDF(evt){
+  const f=evt.target.files[0];if(!f)return;
+  G('up-st').style.display='block';G('up-st').classList.add('loading');G('up-st').textContent='Enviando '+f.name+'...';
+  const fd=new FormData();fd.append('file',f);
+  try{const r=await fetch(API+'/chat/upload-edital',{method:'POST',body:fd});if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();G('up-st').classList.remove('loading');
+    G('up-st').textContent='✅ Edital carregado!\nID: '+(d.edital_id||'—')+'\n'+JSON.stringify(d,null,2);
+    if(d.edital_id){G('ed-id').value=d.edital_id;G('res-id').value=d.edital_id;}
+    toast('PDF enviado com sucesso!');loadEditais();
+  }catch(e){G('up-st').classList.remove('loading');G('up-st').textContent='Erro: '+e.message;toast(e.message,false);}
+}
+function dropPDF(e){e.preventDefault();G('uparea').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)uploadPDF({target:{files:[f]}});}
+
+async function loadEditais(){
+  try{const d=await fetch(API+'/chat/editais-carregados').then(r=>r.json());
+    if(!d.length){G('editais-list').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Nenhum edital carregado.</p>';return;}
+    G('editais-list').innerHTML=d.map(e=>`<div class="editais-item"><div class="ei-info"><strong>${e.nome||e.edital_id}</strong><span>${e.edital_id} · ${e.paginas||'?'} págs.</span></div><button class="btn btn-secondary btn-xs" onclick="selEdital('${e.edital_id}')">Selecionar</button></div>`).join('');
+  }catch(e){G('editais-list').innerHTML='<p style="font-size:.78rem;color:var(--danger)">Erro: '+e.message+'</p>';}
+}
+function selEdital(id){G('ed-id').value=id;G('res-id').value=id;toast('Edital '+id+' selecionado!');}
+
+async function resumoEdital(){
+  const id=G('res-id').value.trim();if(!id){toast('Informe o ID do edital',false);return;}
+  loading('res-r');
+  try{const d=await fetch(API+'/chat/edital/'+id+'/resumo').then(r=>r.json());show('res-r',d.resumo||JSON.stringify(d));}
+  catch(e){show('res-r','Erro: '+e.message);}
+}
+
+async function convEdital(){
+  const pid=G('ed-id').value.trim(),uid=G('ed-uid').value||'user1',q=G('ed-q').value.trim();
+  if(!pid||!q){toast('Informe o ID e a pergunta',false);return;}
+  const box=G('edchat');
+  box.innerHTML+=`<div class="msg-user"><span>${q}</span></div>`;
+  G('ed-q').value='';
+  box.innerHTML+='<div class="msg-ai" id="ecl"><span style="color:var(--gray-400);font-style:italic">Pensando...</span></div>';
+  box.scrollTop=box.scrollHeight;
+  try{const d=await fetch(API+'/chat/conversar-edital',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({edital_id:pid,pergunta:q,user_id:uid})}).then(r=>r.json());
+    G('ecl').outerHTML='<div class="msg-ai"><span>'+(d.resposta||JSON.stringify(d)).replace(/\n/g,'<br>')+'</span></div>';
+    box.scrollTop=box.scrollHeight;
+  }catch(e){G('ecl').outerHTML='<div class="msg-ai"><span style="color:var(--danger)">Erro: '+e.message+'</span></div>';}
+}
+
+async function analisarPDF(){
+  const f=G('pdf-f').files[0],q=G('pdf-q').value.trim();
+  if(!f){toast('Selecione um PDF',false);return;}
+  loading('pdf-r');
+  try{const fd=new FormData();fd.append('file',f);if(q)fd.append('pergunta',q);
+    const r=await fetch(API+'/chat/analisar-pdf',{method:'POST',body:fd});if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();show('pdf-r',d.analise||d.resultado||JSON.stringify(d));toast('PDF analisado!');
+  }catch(e){show('pdf-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function loadHist(){
+  const uid=G('hist-uid').value||'user1';
+  try{const d=await fetch(API+'/chat/historico/'+uid).then(r=>r.json());
+    G('hist-list').innerHTML=!d.length?'<p style="font-size:.82rem;color:var(--gray-400)">Sem histórico.</p>':
+      '<table style="width:100%"><thead><tr><th>Role</th><th>Mensagem</th></tr></thead><tbody>'+
+      d.map(m=>`<tr><td><span class="badge ${m.role==='user'?'badge-blue':'badge-purple'}">${m.role}</span></td><td style="font-size:.8rem">${(m.content||'').substring(0,120)}...</td></tr>`).join('')+'</tbody></table>';
+  }catch(e){G('hist-list').innerHTML='<p style="font-size:.78rem;color:var(--danger)">Erro: '+e.message+'</p>';}
+}
+async function delHist(){
+  const uid=G('hist-uid').value||'user1';
+  try{await fetch(API+'/chat/historico/'+uid,{method:'DELETE'});toast('Histórico limpo!');G('hist-list').innerHTML='';}
+  catch(e){toast(e.message,false);}
+}
+
+async function init(){try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}loadEditais();}
+init();
+</script>
+</body></html>

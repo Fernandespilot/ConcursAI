@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Provas — ConcursAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="/static/css/concursai.css" rel="stylesheet">
+<style>
+.provas-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.provas-full{grid-column:1/-1}
+.pdf-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100)}
+.pdf-item:last-child{border-bottom:none}
+.pdf-info strong{font-size:.83rem;color:var(--gray-800)}
+.pdf-info span{font-size:.72rem;color:var(--gray-400);display:block}
+.stat-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sm-card{background:white;border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px;text-align:center}
+.sm-val{font-size:1.5rem;font-weight:800;color:var(--primary)}
+.sm-lbl{font-size:.72rem;color:var(--gray-400);margin-top:2px}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
+  <div class="nav-links">
+    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
+    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="/pages/chat.html" class="nav-link"><i class="fas fa-comments"></i>Chat IA</a>
+    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
+    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
+    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
+    <a href="/pages/provas.html" class="nav-link active"><i class="fas fa-file-alt"></i>Provas</a>
+    <a href="/pages/scraping.html" class="nav-link"><i class="fas fa-spider"></i>Scraping</a>
+    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
+  </div>
+  <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
+</nav>
+<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Provas</span></div>
+<div class="page-header">
+  <div class="page-title"><i class="fas fa-file-alt" style="color:#7c3aed"></i> Provas de Concursos</div>
+  <div class="page-subtitle">Coleta, indexação e análise inteligente de provas anteriores</div>
+</div>
+<div class="page-body">
+  <!-- Mini stats -->
+  <div class="stat-mini" id="stats-row">
+    <div class="sm-card"><div class="sm-val" id="st-pdfs">—</div><div class="sm-lbl">PDFs Indexados</div></div>
+    <div class="sm-card"><div class="sm-val" id="st-bancas">—</div><div class="sm-lbl">Bancas</div></div>
+    <div class="sm-card"><div class="sm-val" id="st-anos">—</div><div class="sm-lbl">Anos</div></div>
+    <div class="sm-card"><div class="sm-val" id="st-size">—</div><div class="sm-lbl">Tamanho Total</div></div>
+  </div>
+
+  <div class="provas-layout">
+    <!-- Coletar provas -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-download"></i>Coletar Provas</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Banca Examinadora</label>
+          <select class="form-control" id="col-banca">
+            <option value="">Todas as bancas</option>
+            <option value="cebraspe">Cebraspe / CESPE</option>
+            <option value="fgv">FGV</option>
+            <option value="fcc">FCC</option>
+            <option value="vunesp">VUNESP</option>
+            <option value="iades">IADES</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Ano</label>
+          <input type="number" class="form-control" id="col-ano" placeholder="Ex: 2023" min="2010" max="2030">
+        </div>
+        <div class="form-group"><label class="form-label">Concurso / Órgão</label>
+          <input type="text" class="form-control" id="col-concurso" placeholder="Ex: TRF, INSS, Receita Federal">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="coletarProvas()"><i class="fas fa-spider"></i> Coletar Provas</button>
+        <div id="col-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- Listar PDFs -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-list"></i>PDFs Disponíveis</div>
+        <button class="btn btn-secondary btn-sm" onclick="listarPDFs()"><i class="fas fa-sync"></i> Atualizar</button>
+      </div>
+      <div class="card-body" id="pdf-list" style="min-height:120px">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando lista de PDFs...</p>
+      </div>
+    </div>
+
+    <!-- Perguntar sobre provas -->
+    <div class="card provas-full">
+      <div class="card-header"><div class="card-title"><i class="fas fa-comments"></i>Perguntar sobre Provas</div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="form-group"><label class="form-label">Banca (opcional)</label>
+            <select class="form-control" id="ask-banca"><option value="">Todas</option><option value="cebraspe">Cebraspe</option><option value="fgv">FGV</option><option value="fcc">FCC</option></select>
+          </div>
+          <div class="form-group"><label class="form-label">Ano (opcional)</label>
+            <input type="text" class="form-control" id="ask-ano" placeholder="Ex: 2023">
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Pergunta</label>
+          <textarea class="form-control" id="ask-q" rows="3" placeholder="Ex: Quais são as questões mais frequentes da banca Cebraspe em direito constitucional?"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="perguntarProvas()"><i class="fas fa-paper-plane"></i> Perguntar à IA</button>
+        <div id="ask-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- Estatísticas de provas -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i>Estatísticas por Banca</div></div>
+      <div class="card-body" id="banca-stats" style="min-height:80px">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando estatísticas...</p>
+      </div>
+    </div>
+
+    <!-- Busca em provas -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-search"></i>Busca Semântica em Provas</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Termo de busca</label>
+          <input type="text" class="form-control" id="sem-q" placeholder="Ex: direito constitucional, licitação" onkeydown="if(event.key==='Enter')buscaSem()">
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Top K</label><input type="number" class="form-control" id="sem-k" value="5" min="1" max="20"></div>
+          <div class="form-group"><label class="form-label">Filtro banca</label><input type="text" class="form-control" id="sem-b" placeholder="Banca"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="buscaSem()"><i class="fas fa-search"></i> Buscar</button>
+        <div id="sem-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
+  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
+  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
+</div></footer>
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+function show(id,txt){const el=G(id);el.style.display='block';el.classList.remove('loading');el.textContent=typeof txt==='object'?JSON.stringify(txt,null,2):txt;}
+function loading(id){const el=G(id);el.style.display='block';el.classList.add('loading');el.textContent='Processando...';}
+
+async function listarPDFs(){
+  try{const d=await fetch(API+'/scraping/pdfs').then(r=>r.json());
+    const list=d.pdfs||d||[];
+    G('st-pdfs').textContent=list.length||0;
+    if(!list.length){G('pdf-list').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Nenhum PDF indexado ainda. Use Coletar Provas acima.</p>';return;}
+    G('pdf-list').innerHTML=list.slice(0,15).map(p=>`<div class="pdf-item"><div class="pdf-info"><strong>${p.nome||p.arquivo||p.titulo||p}</strong><span>${p.banca||''} ${p.ano||''} · ${p.tamanho||''}</span></div><button class="btn btn-secondary btn-xs" onclick="verPDF('${(p.nome||p.arquivo||p).replace(/'/g,'')}')" title="Ver detalhes"><i class="fas fa-eye"></i></button></div>`).join('');
+  }catch(e){G('pdf-list').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+}
+function verPDF(n){toast('PDF selecionado: '+n);}
+
+async function coletarProvas(){
+  const banca=G('col-banca').value,ano=G('col-ano').value,conc=G('col-concurso').value.trim();
+  loading('col-r');
+  try{const body={};if(banca)body.banca=banca;if(ano)body.ano=parseInt(ano);if(conc)body.concurso=conc;
+    const d=await fetch(API+'/scraping/provas/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    show('col-r',d.mensagem||JSON.stringify(d));toast('Coleta iniciada!');listarPDFs();
+  }catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function perguntarProvas(){
+  const q=G('ask-q').value.trim(),banca=G('ask-banca').value,ano=G('ask-ano').value;
+  if(!q){toast('Digite uma pergunta',false);return;}
+  loading('ask-r');
+  // Usa o endpoint RAG principal com contexto adicional de banca/ano
+  const pergunta_completa=q+(banca?' (banca: '+banca+')'':'')+(ano?' (ano: '+ano+')'':'');
+  try{const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:pergunta_completa,top_k:5})}).then(r=>r.json());
+    show('ask-r',d.resposta||d.resultado||JSON.stringify(d));
+  }catch(e){show('ask-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function buscaSem(){
+  const q=G('sem-q').value.trim(),k=G('sem-k').value||5,b=G('sem-b').value;
+  if(!q){toast('Digite um termo',false);return;}
+  loading('sem-r');
+  try{const pergunta=q+(b?' banca '+b:'');
+    const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta,top_k:parseInt(k)})}).then(r=>r.json());
+    show('sem-r',d.resposta||JSON.stringify(d));
+  }catch(e){show('sem-r','Erro: '+e.message);}
+}
+
+async function loadStats(){
+  try{
+    // Busca stats do /status principal
+    const s=await fetch(API+'/status').then(r=>r.json());
+    G('st-pdfs').textContent=s.total_pdfs||'—';
+    G('st-anos').textContent=s.total_anos||'—';
+    // Tenta carregar info de scraping para bancas
+    const sc=await fetch(API+'/scraping/status').then(r=>r.json()).catch(()=>({}));
+    const scrapers=sc.scrapers||{};
+    const bancas=Object.keys(scrapers).length||3;
+    G('st-bancas').textContent=bancas;
+    G('st-size').textContent=s.total_embeddings?s.total_embeddings+' emb':'—';
+    G('banca-stats').innerHTML=Object.keys(scrapers).length?
+      Object.entries(scrapers).map(([b,i])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--gray-100)"><span style="font-size:.82rem;text-transform:capitalize">${b}</span><span class="badge badge-purple">${i.total_coletados||'—'}</span></div>`).join(''):
+      '<p style="font-size:.82rem;color:var(--gray-400)">Dados de bancas: Cebraspe, FGV, FCC, VUNESP.</p>';
+  }catch(e){G('banca-stats').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+}
+
+async function init(){
+  try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}
+  catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
+  loadStats();listarPDFs();
+}
+init();
+</script>
+</body></html>

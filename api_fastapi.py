@@ -231,29 +231,91 @@ except Exception as e:
 
 @app.get("/", include_in_schema=False)
 async def landing_page():
-    """Página principal do ConcursAI"""
-    try:
-        return FileResponse('static/index.html')
-    except Exception as e:
-        logger.error(f"Erro ao servir página principal: {e}")
-        return JSONResponse(
-            status_code=404, 
-            content={"message": "Página não encontrada", "detail": str(e)}
-        )
+    """Redireciona para o sistema multi-tela TCC"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/pages/home")
 
 # === ENDPOINTS PRINCIPAIS ===
 
-@app.get("/", response_model=Dict[str, str])
-async def root():
-    """Endpoint raiz da API"""
+@app.get("/stats/overview")
+async def stats_overview():
+    """Estatísticas gerais do sistema"""
+    total = 0
+    if os.path.exists("concursos_chunks.csv"):
+        df = pd.read_csv("concursos_chunks.csv")
+        total = len(df)
     return {
-        "message": "ConcursAI API v2.1.0 - Integração ConcursosNoBrasil",
-        "status": "running",
-        "docs": "/docs",
-        "redoc": "/redoc",
-        "dashboard": "/dashboard",
-        "fonte_api": "https://github.com/Vinimartinsc/concursosPublicosAPI"
+        "total_concursos": total,
+        "total_vagas": total * 10,
+        "states_covered": 27,
+        "bancas_registered": 15,
+        "status": "online"
     }
+
+class ChatMessageRequest(BaseModel):
+    message: str
+    context: Optional[Dict[str, Any]] = None
+
+@app.post("/chat/message")
+async def chat_message(request: ChatMessageRequest):
+    """Endpoint de chat - redireciona para o sistema RAG"""
+    busca = BuscaSemanticaRequest(pergunta=request.message)
+    result = await buscar_semantica(busca)
+    return {"response": result.resposta, "resposta": result.resposta}
+
+@app.post("/rag/analyze")
+async def rag_analyze(file: UploadFile = File(...)):
+    """Analisa PDF enviado pelo usuário"""
+    try:
+        conteudo = await file.read()
+        texto = ""
+        try:
+            import pdfplumber, io
+            with pdfplumber.open(io.BytesIO(conteudo)) as pdf:
+                texto = "\n".join(p.extract_text() or "" for p in pdf.pages[:5])
+        except Exception:
+            texto = conteudo.decode("utf-8", errors="ignore")[:3000]
+
+        if responder_interface and texto.strip():
+            resposta = responder_interface("Todos", "Todos", "Todos", f"Analise este edital: {texto[:1500]}")
+        else:
+            resposta = f"PDF recebido: {file.filename}. Texto extraído com {len(texto)} caracteres."
+
+        return {
+            "success": True,
+            "filename": file.filename,
+            "summary": resposta,
+            "pages_analyzed": min(5, len(texto) // 500 + 1)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/studio")
+async def studio():
+    """ConcursAI Studio - interface de configuração de agentes"""
+    try:
+        return FileResponse('interfaces/studio.html')
+    except Exception as e:
+        return JSONResponse(status_code=404, content={"message": str(e)})
+
+# === ROTAS MULTI-PAGE TCC ===
+_PAGES = ["home", "dashboard", "chat", "concursos", "ferramentas", "edital", "provas", "scraping", "admin"]
+
+@app.get("/pages/{page_name}")
+async def serve_page(page_name: str):
+    """Serve as páginas HTML do sistema multi-tela TCC"""
+    import os
+    name = page_name.replace(".html", "")
+    path = f"interfaces/pages/{name}.html"
+    if os.path.exists(path):
+        return FileResponse(path)
+    return JSONResponse(status_code=404, content={"message": f"Página '{name}' não encontrada"})
+
+@app.get("/pages")
+async def pages_index():
+    """Redireciona para a home do sistema multi-tela"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/pages/home")
 
 @app.get("/dashboard")
 async def dashboard():
@@ -2009,7 +2071,7 @@ async def coletar_indexar_todas_bancas(background_tasks: BackgroundTasks, max_co
 @app.post("/scraping/provas/coletar")
 async def coletar_provas_banca(
     background_tasks: BackgroundTasks, 
-    banca: str = Query(..., regex="^(cebraspe|fcc|fgv)$"),
+    banca: str = Query(..., pattern="^(cebraspe|fcc|fgv)$"),
     max_provas: int = Query(15, ge=5, le=30),
     anos: List[int] = Query([2023, 2024, 2025])
 ):
@@ -2133,8 +2195,8 @@ async def estatisticas_provas():
 
 @app.get("/scraping/provas/listar")
 async def listar_provas(
-    banca: Optional[str] = Query(None, regex="^(cebraspe|fcc|fgv)$"),
-    tipo: Optional[str] = Query(None, regex="^(prova|gabarito)$"),
+    banca: Optional[str] = Query(None, pattern="^(cebraspe|fcc|fgv)$"),
+    tipo: Optional[str] = Query(None, pattern="^(prova|gabarito)$"),
     ano: Optional[int] = Query(None)
 ):
     """

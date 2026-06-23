@@ -2,6 +2,14 @@
 # -*- coding: utf-8 -*-
 """ConcursAI - Aplicação Principal de Concursos Públicos"""
 
+import sys
+import io
+# Força UTF-8 no stdout/stderr para suportar emojis no Windows
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+if sys.stderr.encoding != 'utf-8':
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+
 import gradio as gr
 import os
 from dotenv import load_dotenv
@@ -82,7 +90,7 @@ def criar_interface():
     stats = obter_estatisticas()
     groq_status = "✅ Groq ativo" if stats.get("llm_ativo", "").startswith("Groq") else "⚠️ Sem GROQ_API_KEY — respostas limitadas"
 
-    with gr.Blocks(title="ConcursAI - Assistente de Concursos Públicos", theme=gr.themes.Soft()) as app:
+    with gr.Blocks(title="ConcursAI - Assistente de Concursos Públicos") as app:
         gr.Markdown(f"""
 # 🎯 ConcursAI — Assistente de Concursos Públicos
 Seu assistente inteligente para consultas sobre editais | **{groq_status}**
@@ -182,7 +190,8 @@ if __name__ == "__main__":
             server_port=7861,
             share=False,
             debug=False,
-            show_error=True
+            show_error=True,
+            theme=gr.themes.Soft()
         )
     except Exception as e:
         print(f"❌ Erro ao iniciar: {e}")

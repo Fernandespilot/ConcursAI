@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Chat IA — ConcursAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="/static/css/concursai.css" rel="stylesheet">
+<style>
+.chat-layout{display:flex;height:calc(100vh - 60px);overflow:hidden}
+.chat-sidebar{width:268px;background:white;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sb-block{border-bottom:1px solid var(--gray-100);padding:16px}
+.sb-head{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-400);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
+.msgs{flex:1;overflow-y:auto;padding:28px 40px;display:flex;flex-direction:column;gap:18px}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
+  <div class="nav-links">
+    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
+    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="/pages/chat.html" class="nav-link active"><i class="fas fa-comments"></i>Chat IA</a>
+    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
+    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
+    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
+    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
+    <a href="/pages/scraping.html" class="nav-link"><i class="fas fa-spider"></i>Scraping</a>
+    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div>
+  </div>
+</nav>
+
+<div class="chat-layout">
+  <!-- SIDEBAR CONFIG -->
+  <div class="chat-sidebar">
+    <div class="sb-block">
+      <div class="sb-head"><i class="fas fa-robot"></i>Agente</div>
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-control" id="agtype" onchange="onAgent()">
+          <option value="concursos">🎯 Assistente de Concursos</option>
+          <option value="edital">📄 Analisador de Editais</option>
+          <option value="estudo">📚 Orientador de Estudos</option>
+          <option value="banca">🏛️ Especialista em Bancas</option>
+          <option value="custom">⚙️ Personalizado</option>
+        </select>
+      </div>
+    </div>
+    <div class="sb-block">
+      <div class="sb-head"><i class="fas fa-microchip"></i>Modelo</div>
+      <div class="form-group">
+        <label class="form-label">Provedor</label>
+        <select class="form-control" id="prov" onchange="onProv()">
+          <option value="groq">Groq (Cloud)</option>
+          <option value="openai">OpenAI</option>
+          <option value="ollama">Ollama (Local)</option>
+          <option value="backend">Backend (.env)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Modelo</label>
+        <select class="form-control" id="msel"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Chave de API</label>
+        <div style="display:flex;gap:6px">
+          <input type="password" class="form-control" id="akey" placeholder="gsk_..." oninput="updHint()">
+          <button class="btn btn-secondary btn-sm" onclick="togKey()" style="flex-shrink:0"><i class="fas fa-eye" id="eyi"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="sb-block">
+      <div class="sb-head"><i class="fas fa-sliders-h"></i>Parâmetros</div>
+      <div class="form-group">
+        <label class="form-label">Temperatura: <strong id="tv">0.3</strong></label>
+        <input type="range" style="width:100%;accent-color:var(--primary)" min="0" max="1" step="0.05" value="0.3" oninput="document.getElementById('tv').textContent=this.value" id="temp">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Máx. Tokens: <strong id="mtv">1000</strong></label>
+        <input type="range" style="width:100%;accent-color:var(--primary)" min="256" max="4096" step="128" value="1000" oninput="document.getElementById('mtv').textContent=this.value" id="maxtok">
+      </div>
+    </div>
+    <div class="sb-block">
+      <div class="sb-head"><i class="fas fa-terminal"></i>System Prompt</div>
+      <textarea class="form-control" id="sysp" rows="5" placeholder="Comportamento do agente..."></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px" id="chips">
+        <span class="badge badge-purple" style="cursor:pointer" onclick="setPr('concursos')">Concursos</span>
+        <span class="badge badge-gray" style="cursor:pointer" onclick="setPr('edital')">Edital</span>
+        <span class="badge badge-gray" style="cursor:pointer" onclick="setPr('estudo')">Estudo</span>
+        <span class="badge badge-gray" style="cursor:pointer" onclick="setPr('banca')">Bancas</span>
+      </div>
+    </div>
+    <div class="sb-block">
+      <div class="sb-head"><i class="fas fa-filter"></i>Filtros RAG</div>
+      <div class="form-group"><label class="form-label">Órgão</label><select class="form-control" id="forg"><option value="">Todos</option></select></div>
+      <div class="form-group"><label class="form-label">Ano</label><select class="form-control" id="fano"><option value="">Todos</option></select></div>
+      <div class="form-group"><label class="form-label">Cargo</label><input type="text" class="form-control" id="fcar" placeholder="Ex: Analista..."></div>
+    </div>
+    <div class="sb-block">
+      <button class="btn btn-primary" style="width:100%" onclick="saveCfg()"><i class="fas fa-save"></i> Salvar Config</button>
+      <div id="sv" style="font-size:.72rem;color:var(--accent);text-align:center;margin-top:5px;opacity:0;transition:.3s">✓ Salvo!</div>
+    </div>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-area">
+    <div class="msgs" id="msgs">
+      <div class="chat-empty" id="empty">
+        <div class="chat-empty-icon"><i class="fas fa-robot"></i></div>
+        <h3>Assistente ConcursAI</h3>
+        <p>Configure o agente no painel lateral e faça sua primeira pergunta.</p>
+        <div class="suggestions">
+          <button class="sug-btn" onclick="usex('Quais concursos estão abertos agora?')">Concursos abertos</button>
+          <button class="sug-btn" onclick="usex('Monte um cronograma de 3 meses para concurso federal')">Cronograma de estudos</button>
+          <button class="sug-btn" onclick="usex('Quais temas a FGV mais cobra em Direito Administrativo?')">Temas FGV</button>
+          <button class="sug-btn" onclick="usex('Diferenças entre Cebraspe e FCC')">Cebraspe vs FCC</button>
+          <button class="sug-btn" onclick="usex('Qual salário médio de Analista Judiciário?')">Salários TRF</button>
+          <button class="sug-btn" onclick="usex('Estratégia de estudo para Português em concursos')">Estratégia Português</button>
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-wrap">
+      <div class="input-box">
+        <textarea id="ci" rows="1" placeholder="Pergunte sobre concursos, editais, estratégias de estudo..." onkeydown="hkey(event)" oninput="ar(this)"></textarea>
+        <button class="send-btn" id="sbtn" onclick="send()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <div class="input-hint">
+        <span id="mhint">— configure o modelo —</span>
+        <span>Enter = enviar · Shift+Enter = nova linha</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:8000';
+const MODELS={groq:[{v:'llama-3.3-70b-versatile',l:'Llama 3.3 70B'},{v:'llama-3.1-8b-instant',l:'Llama 3.1 8B'},{v:'mixtral-8x7b-32768',l:'Mixtral 8x7B'},{v:'gemma2-9b-it',l:'Gemma 2 9B'}],openai:[{v:'gpt-4o',l:'GPT-4o'},{v:'gpt-4o-mini',l:'GPT-4o Mini'}],ollama:[{v:'llama3',l:'Llama 3'},{v:'mistral',l:'Mistral'}],backend:[{v:'llama-3.3-70b-versatile',l:'(usa .env)'}]};
+const PROMPTS={concursos:'Você é o ConcursAI, especialista em concursos públicos brasileiros. Use APENAS o contexto fornecido. Seja direto e cite dados específicos.',edital:'Você é especialista em análise de editais. Extraia: vagas, cargos, salários, requisitos e cronograma.',estudo:'Você é orientador de estudos para concursos. Crie planos personalizados, defina prioridades e sugira materiais.',banca:'Você é especialista nas bancas (Cebraspe, FCC, FGV). Analise estilos de prova e estratégias.',custom:''};
+function G(id){return document.getElementById(id);}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+function onProv(){const p=G('prov').value,s=G('msel');s.innerHTML='';(MODELS[p]||[]).forEach(m=>{const o=document.createElement('option');o.value=m.v;o.textContent=m.l;s.appendChild(o);});G('akey').placeholder=p==='groq'?'gsk_...':p==='openai'?'sk-...':'(não necessário)';updHint();}
+function updHint(){G('mhint').textContent=G('prov').value+' / '+G('msel').value;}
+function togKey(){const i=G('akey'),ic=G('eyi');i.type=i.type==='password'?'text':'password';ic.className=i.type==='password'?'fas fa-eye':'fas fa-eye-slash';}
+function onAgent(){const t=G('agtype').value;if(t!=='custom')setPr(t);}
+function setPr(k){G('sysp').value=PROMPTS[k]||'';document.querySelectorAll('#chips span').forEach(c=>{c.className=c.textContent.toLowerCase().startsWith(k.slice(0,4))?'badge badge-purple':'badge badge-gray';c.style.cursor='pointer';});}
+function saveCfg(){localStorage.setItem('cai_chat',JSON.stringify({prov:G('prov').value,model:G('msel').value,key:G('akey').value,temp:G('temp').value,tok:G('maxtok').value,prompt:G('sysp').value,agent:G('agtype').value}));const el=G('sv');el.style.opacity='1';setTimeout(()=>el.style.opacity='0',1800);}
+function loadCfg(){try{const c=JSON.parse(localStorage.getItem('cai_chat')||'{}');if(c.prov){G('prov').value=c.prov;onProv();}if(c.model)G('msel').value=c.model;if(c.key)G('akey').value=c.key;if(c.temp){G('temp').value=c.temp;G('tv').textContent=c.temp;}if(c.tok){G('maxtok').value=c.tok;G('mtv').textContent=c.tok;}if(c.prompt)G('sysp').value=c.prompt;if(c.agent)G('agtype').value=c.agent;}catch(e){}}
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+function hkey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
+function usex(t){G('ci').value=t;send();}
+function addMsg(txt,role){G('empty')?.remove();const c=G('msgs');const d=document.createElement('div');d.className='chat-msg '+role;d.innerHTML=`<div class="msg-avatar ${role==='user'?'user':'ai'}">${role==='user'?'Eu':'AI'}</div><div class="msg-bubble">${txt.replace(/\n/g,'<br>')}</div>`;c.appendChild(d);c.scrollTop=c.scrollHeight;return d.querySelector('.msg-bubble');}
+async function send(){const inp=G('ci'),msg=inp.value.trim();if(!msg)return;inp.value='';inp.style.height='auto';G('sbtn').disabled=true;addMsg(msg,'user');const b=addMsg('Pensando...','ai');b.classList.add('thinking');
+try{
+  const rd=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:msg,filtro_orgao:G('forg').value||null,filtro_ano:G('fano').value||null,filtro_cargo:G('fcar').value||null})}).then(r=>r.json());
+  let resp=rd.resposta||'Sem resposta.';
+  const key=G('akey').value.trim(),pv=G('prov').value,model=G('msel').value,sys=G('sysp').value;
+  if(key&&pv==='groq'){const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model,messages:[{role:'system',content:sys||PROMPTS.concursos},{role:'user',content:'CONTEXTO:\n'+rd.resposta+'\n\nPERGUNTA: '+msg}],temperature:parseFloat(G('temp').value),max_tokens:parseInt(G('maxtok').value)})});if(!r.ok)throw new Error('Groq: '+(await r.json()).error?.message);resp=(await r.json()).choices[0].message.content;}
+  else if(key&&pv==='openai'){const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model,messages:[{role:'system',content:sys||PROMPTS.concursos},{role:'user',content:'CONTEXTO:\n'+rd.resposta+'\n\nPERGUNTA: '+msg}],temperature:parseFloat(G('temp').value),max_tokens:parseInt(G('maxtok').value)})});if(!r.ok)throw new Error('OpenAI: '+(await r.json()).error?.message);resp=(await r.json()).choices[0].message.content;}
+  b.classList.remove('thinking');b.innerHTML=resp.replace(/\n/g,'<br>');
+}catch(e){b.classList.remove('thinking');b.innerHTML='<span style="color:var(--danger)">Erro: '+e.message+'</span>';}
+G('sbtn').disabled=false;G('ci').focus();}
+
+async function init(){
+  onProv();G('sysp').value=PROMPTS.concursos;loadCfg();updHint();
+  try{const d=await fetch(API+'/status').then(r=>r.json());G('sdot').className='status-dot online';G('stxt').textContent='Online';}catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
+  try{const d=await fetch(API+'/orgaos').then(r=>r.json());d.orgaos.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;G('forg').appendChild(op);});}catch(e){}
+  try{const d=await fetch(API+'/anos').then(r=>r.json());d.anos.forEach(a=>{const op=document.createElement('option');op.value=a;op.textContent=a;G('fano').appendChild(op);});}catch(e){}
+}
+init();
+</script>
+</body>
+</html>

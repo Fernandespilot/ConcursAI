@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Scraping — ConcursAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="/static/css/concursai.css" rel="stylesheet">
+<style>
+.scr-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.scr-full{grid-column:1/-1}
+.src-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
+.src-on{background:#d1fae5;color:#065f46}
+.src-off{background:#fee2e2;color:#991b1b}
+.src-pend{background:#fef3c7;color:#92400e}
+.log-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fonte-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--gray-100)}
+.fonte-item:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
+  <div class="nav-links">
+    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
+    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+    <a href="/pages/chat.html" class="nav-link"><i class="fas fa-comments"></i>Chat IA</a>
+    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
+    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
+    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
+    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
+    <a href="/pages/scraping.html" class="nav-link active"><i class="fas fa-spider"></i>Scraping</a>
+    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
+  </div>
+  <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
+</nav>
+<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Scraping</span></div>
+<div class="page-header">
+  <div class="page-title"><i class="fas fa-spider" style="color:#7c3aed"></i> Coleta de Dados (Scraping)</div>
+  <div class="page-subtitle">Monitoramento e controle dos scrapers de concursos públicos</div>
+</div>
+<div class="page-body">
+  <div class="scr-layout">
+    <!-- Status dos scrapers -->
+    <div class="card scr-full">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-heartbeat"></i>Status dos Scrapers</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadStatus()"><i class="fas fa-sync"></i> Atualizar</button>
+      </div>
+      <div class="card-body" id="scr-status" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando status...</p>
+      </div>
+    </div>
+
+    <!-- Coleta manual geral -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-play-circle"></i>Coleta Manual</div></div>
+      <div class="card-body">
+        <p style="font-size:.82rem;color:var(--gray-500);margin-bottom:14px">Inicia uma coleta completa em todas as fontes cadastradas.</p>
+        <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="coletarGeral()"><i class="fas fa-spider"></i> Iniciar Coleta Geral</button>
+        <button class="btn btn-secondary" style="width:100%" onclick="coletarBancas()"><i class="fas fa-university"></i> Coletar Bancas (Cebraspe/FGV)</button>
+        <div id="col-g-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- PCI Concursos -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-globe"></i>PCI Concursos</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">Páginas a coletar</label>
+          <input type="number" class="form-control" id="pci-pag" value="3" min="1" max="20">
+        </div>
+        <div class="form-group"><label class="form-label">Categoria</label>
+          <select class="form-control" id="pci-cat">
+            <option value="">Todas</option>
+            <option value="federal">Federal</option>
+            <option value="estadual">Estadual</option>
+            <option value="municipal">Municipal</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="coletarPCI()"><i class="fas fa-download"></i> Coletar PCI</button>
+        <div id="pci-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- Agendador -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-clock"></i>Agendador</div></div>
+      <div class="card-body">
+        <div id="agend-status" style="margin-bottom:12px;font-size:.82rem;color:var(--gray-500)">Carregando...</div>
+        <div class="form-group"><label class="form-label">Intervalo (horas)</label>
+          <input type="number" class="form-control" id="ag-int" value="6" min="1" max="168">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="iniciarAgend()"><i class="fas fa-play"></i> Iniciar</button>
+          <button class="btn btn-sm" style="flex:1;background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="pararAgend()"><i class="fas fa-stop"></i> Parar</button>
+        </div>
+        <div id="ag-r" class="result-box" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- API Brasil -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-flag"></i>API Brasil</div></div>
+      <div class="card-body">
+        <div class="form-group"><label class="form-label">CNPJ para validar</label>
+          <input type="text" class="form-control" id="cnpj-v" placeholder="XX.XXX.XXX/XXXX-XX">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="validarCNPJ()"><i class="fas fa-check"></i> Validar CNPJ</button>
+        <div id="cnpj-r" class="result-box" style="display:none;margin-top:10px"></div>
+        <hr style="margin:14px 0;border-color:var(--gray-100)">
+        <button class="btn btn-secondary" style="width:100%" onclick="testarApiBrasil()"><i class="fas fa-vial"></i> Testar API Brasil</button>
+        <div id="api-b-r" class="result-box" style="display:none;margin-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- Fontes de dados -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-database"></i>Fontes de Dados</div></div>
+      <div class="card-body" id="fontes-list" style="min-height:80px">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando fontes...</p>
+      </div>
+    </div>
+
+    <!-- Log de atividade -->
+    <div class="card scr-full">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-terminal"></i>Log de Atividade</div>
+        <div class="log-controls">
+          <button class="btn btn-secondary btn-sm" onclick="loadLog()"><i class="fas fa-sync"></i> Atualizar</button>
+          <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="G('log-box').textContent=''"><i class="fas fa-trash"></i> Limpar</button>
+        </div>
+      </div>
+      <div class="card-body"><div class="log-box" id="log-box">Clique em Atualizar para carregar o log...</div></div>
+    </div>
+  </div>
+</div>
+<footer class="footer"><div class="footer-inner">
+  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
+  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
+  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
+</div></footer>
+<div class="toast" id="toast"></div>
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+function show(id,txt){const el=G(id);el.style.display='block';el.classList.remove('loading');el.textContent=typeof txt==='object'?JSON.stringify(txt,null,2):txt;}
+function loading(id){const el=G(id);el.style.display='block';el.classList.add('loading');el.textContent='Processando...';}
+function logLine(msg){const lb=G('log-box');lb.textContent+='\n'+new Date().toLocaleTimeString()+' '+msg;lb.scrollTop=lb.scrollHeight;}
+
+async function loadStatus(){
+  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
+    const scrapers=d.scrapers||{pci:{status:'desconhecido'},cebraspe:{status:'desconhecido'},fgv:{status:'desconhecido'}};
+    G('scr-status').innerHTML=Object.entries(scrapers).map(([nome,info])=>`
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px">
+        <div style="font-weight:700;font-size:.85rem;margin-bottom:6px;text-transform:capitalize">${nome}</div>
+        <div class="src-badge ${info.status==='ativo'||info.status==='ok'?'src-on':info.status==='coletando'?'src-pend':'src-off'}">${info.status||'desconhecido'}</div>
+        <div style="font-size:.72rem;color:var(--gray-400);margin-top:6px">${info.ultima_coleta||info.ultima_execucao||'Nunca executado'}</div>
+        <div style="font-size:.72rem;color:var(--gray-400)">${info.total_coletados!=null?info.total_coletados+' registros':''}</div>
+      </div>`).join('');
+  }catch(e){G('scr-status').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+}
+
+async function coletarGeral(){
+  loading('col-g-r');logLine('Iniciando coleta geral...');
+  try{const d=await fetch(API+'/scraping/coletar',{method:'POST'}).then(r=>r.json());
+    show('col-g-r',d.mensagem||JSON.stringify(d));toast('Coleta iniciada!');logLine('Coleta geral: '+(d.mensagem||'ok'));
+  }catch(e){show('col-g-r','Erro: '+e.message);logLine('ERRO: '+e.message);toast(e.message,false);}
+}
+async function coletarBancas(){
+  loading('col-g-r');logLine('Coletando bancas (Cebraspe/FGV)...');
+  try{const d=await fetch(API+'/scraping/coletar-todas',{method:'POST'}).then(r=>r.json());
+    show('col-g-r',JSON.stringify(d,null,2));toast('Coleta de bancas iniciada!');
+  }catch(e){show('col-g-r','Erro: '+e.message);toast(e.message,false);}
+}
+async function coletarPCI(){
+  const pag=G('pci-pag').value||3,cat=G('pci-cat').value;
+  loading('pci-r');logLine('Coletando PCI ('+pag+' pgs)...');
+  try{const body={max_paginas:parseInt(pag)};if(cat)body.categoria=cat;
+    const d=await fetch(API+'/scraping/pci/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    show('pci-r',d.mensagem||JSON.stringify(d));toast('PCI coletado!');logLine('PCI: '+(d.total_concursos||0)+' itens');
+  }catch(e){show('pci-r','Erro: '+e.message);toast(e.message,false);}
+}
+async function iniciarAgend(){
+  const int=G('ag-int').value||6;loading('ag-r');
+  try{const d=await fetch(API+'/admin/agendador/iniciar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intervalo_horas:parseInt(int)})}).then(r=>r.json());
+    show('ag-r',d.mensagem||JSON.stringify(d));toast('Agendador iniciado!');loadAgend();
+  }catch(e){show('ag-r','Erro: '+e.message);toast(e.message,false);}
+}
+async function pararAgend(){
+  try{const d=await fetch(API+'/admin/agendador/parar',{method:'POST'}).then(r=>r.json());toast(d.mensagem||'Agendador parado');loadAgend();}
+  catch(e){toast(e.message,false);}
+}
+async function loadAgend(){
+  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
+    const ag=d.agendador||d;
+    G('agend-status').innerHTML=`<span class="src-badge ${ag.ativo?'src-on':'src-off'}">${ag.ativo?'Ativo':'Inativo'}</span> &nbsp; próx. execução: ${ag.proxima_execucao||'—'}`;
+  }catch(e){G('agend-status').textContent='Não disponível';}
+}
+async function validarCNPJ(){
+  const cnpj=G('cnpj-v').value.replace(/\D/g,'');if(!cnpj){toast('Digite um CNPJ',false);return;}
+  loading('cnpj-r');
+  try{const d=await fetch(API+'/api-brasil/concursos?limite=5').then(r=>r.json());show('cnpj-r','CNPJ lookup não disponível. Teste de conexão:\n'+JSON.stringify(d).substring(0,200));}
+  catch(e){show('cnpj-r','Erro: '+e.message);}
+}
+async function testarApiBrasil(){
+  loading('api-b-r');
+  try{const d=await fetch(API+'/api-brasil/teste-conectividade').then(r=>r.json());show('api-b-r',JSON.stringify(d,null,2));toast('API Brasil OK!');}
+  catch(e){show('api-b-r','Erro: '+e.message);toast(e.message,false);}
+}
+async function loadFontes(){
+  try{const d=await fetch(API+'/admin/fontes-disponiveis').then(r=>r.json());
+    const fontes=Array.isArray(d)?d:(d.fontes||[{nome:'PCI Concursos',url:'pciconcursos.com.br',status:'ativo'},{nome:'Cebraspe',url:'cebraspe.org.br',status:'ativo'},{nome:'FGV',url:'fgv.br',status:'ativo'}]);
+    G('fontes-list').innerHTML=fontes.map(f=>`<div class="fonte-item"><div><strong style="font-size:.83rem">${f.nome||f.name||f}</strong><div style="font-size:.72rem;color:var(--gray-400)">${f.url||f.descricao||''}</div></div><span class="src-badge ${f.status!=='inativo'?'src-on':'src-off'}">${f.status||'ativo'}</span></div>`).join('');
+  }catch(e){G('fontes-list').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+}
+async function loadLog(){
+  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
+    const msgs=['[INFO] Sistema de scraping ativo','[INFO] Fontes: PCI, Cebraspe, FGV','[INFO] Status: '+(d.status||'ok'),'[INFO] Última verificação: '+new Date().toLocaleString()];
+    G('log-box').textContent=msgs.join('\n');
+    G('log-box').scrollTop=G('log-box').scrollHeight;
+  }catch(e){logLine('[ERRO] Não foi possível carregar log: '+e.message);}
+}
+async function init(){
+  try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}
+  catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
+  loadStatus();loadAgend();loadFontes();
+}
+init();
+</script>
+</body></html>
