@@ -3,90 +3,53 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Scraping — ConcursAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.stat-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
-.stat-h{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;display:flex;align-items:center;gap:12px}
-.stat-h-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stat-h-icon i{font-size:1rem}
-.stat-h-val{font-size:1.4rem;font-weight:700;color:var(--text);line-height:1}
-.stat-h-label{font-size:.72rem;color:var(--text-3);margin-top:3px}
-.page-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.col-full{grid-column:1/-1}
-.ra{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:.8rem;line-height:1.75;color:var(--text-2);word-break:break-word;display:none;margin-top:10px;max-height:240px;overflow-y:auto}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.full{grid-column:1/-1}
+.ra{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:.8rem;line-height:1.75;color:var(--text-2);word-break:break-word;display:none;margin-top:10px;max-height:220px;overflow-y:auto}
 .ra.show{display:block}
 .ra.loading{display:block;color:var(--text-3)}
-.fonte-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;cursor:pointer;transition:border-color .12s}
+.fonte-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;cursor:pointer;transition:border-color .1s}
 .fonte-item:hover{border-color:var(--primary);background:var(--primary-light)}
 .fonte-item input{accent-color:var(--primary)}
 .prog{height:4px;background:var(--border);border-radius:2px;margin-top:8px;display:none}
 .prog.show{display:block}
-.prog-fill{height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width .4s}
-/* pdf list */
-.pdf-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:var(--radius-sm);background:var(--gray-50);border:1px solid var(--gray-100);margin-bottom:6px;font-size:.82rem}
-.pdf-name{font-weight:500;color:var(--gray-700);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:8px}
-@media(max-width:900px){.stat-row-4{grid-template-columns:1fr 1fr}.page-grid{grid-template-columns:1fr}}
+.prog-fill{height:100%;background:var(--primary);border-radius:2px;width:0%;transition:width .4s}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem}
+.stat-row:last-child{border-bottom:none}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
-  <div class="nav-links">
-    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
-    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
-    <a href="/pages/chat.html" class="nav-link"><i class="fas fa-comments"></i>Chat IA</a>
-    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
-    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
-    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
-    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
-    <a href="/pages/scraping.html" class="nav-link active"><i class="fas fa-spider"></i>Scraping</a>
-    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
-  </div>
-  <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
-</nav>
-<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Scraping de Concursos</span></div>
 <div class="page-header">
-  <div class="page-title"><i class="fas fa-spider" style="color:#7c3aed"></i> Scraping de Concursos</div>
+  <div class="page-title"><i class="fas fa-spider"></i>Scraping de Concursos</div>
   <div class="page-subtitle">Coleta automática de editais, provas e dados de bancas organizadoras</div>
 </div>
-
 <div class="page-body">
-  <!-- Estatísticas -->
-  <div class="stat-row-4">
-    <div class="stat-h">
-      <div class="stat-h-icon" style="background:#ede9fe"><i class="fas fa-database" style="color:#7c3aed"></i></div>
-      <div><div class="stat-h-val" id="st-total">—</div><div class="stat-h-label">Concursos coletados</div></div>
-    </div>
-    <div class="stat-h">
-      <div class="stat-h-icon" style="background:#d1fae5"><i class="fas fa-file-pdf" style="color:#059669"></i></div>
-      <div><div class="stat-h-val" id="st-pdfs">—</div><div class="stat-h-label">PDFs indexados</div></div>
-    </div>
-    <div class="stat-h">
-      <div class="stat-h-icon" style="background:#dbeafe"><i class="fas fa-clock" style="color:#2563eb"></i></div>
-      <div><div class="stat-h-val" id="st-ultima" style="font-size:1rem">—</div><div class="stat-h-label">Última coleta</div></div>
-    </div>
-    <div class="stat-h">
-      <div class="stat-h-icon" style="background:#fef3c7"><i class="fas fa-building" style="color:#d97706"></i></div>
-      <div><div class="stat-h-val" id="st-bancas">—</div><div class="stat-h-label">Bancas monitoradas</div></div>
-    </div>
+  <!-- Stats -->
+  <div class="grid-4 mb-6">
+    <div class="stat-card"><div class="stat-icon"><i class="fas fa-database"></i></div><div><div class="stat-value" id="st-total">—</div><div class="stat-label">Concursos coletados</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#dcfce7"><i class="fas fa-file-pdf" style="color:#16a34a"></i></div><div><div class="stat-value" id="st-pdfs">—</div><div class="stat-label">PDFs indexados</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#fef9c3"><i class="fas fa-clock" style="color:#d97706"></i></div><div><div class="stat-value" id="st-ultima" style="font-size:.85rem">—</div><div class="stat-label">Última coleta</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#f3e8ff"><i class="fas fa-building" style="color:#7c3aed"></i></div><div><div class="stat-value" id="st-bancas">—</div><div class="stat-label">Bancas</div></div></div>
   </div>
 
-  <div class="page-grid">
-    <!-- Coletar Concursos -->
+  <div class="two-col">
+    <!-- Coletar concursos -->
     <div class="card">
       <div class="card-header"><div class="card-title"><i class="fas fa-download"></i>Coletar Concursos</div></div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
         <div class="form-group" style="margin:0">
-          <label class="form-label">Fontes de dados</label>
-          <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="form-label">Fontes</label>
+          <div style="display:flex;flex-direction:column;gap:5px">
             <label class="fonte-item"><input type="checkbox" id="src-pc" checked> PCI Concursos</label>
             <label class="fonte-item"><input type="checkbox" id="src-qc" checked> QConcursos</label>
             <label class="fonte-item"><input type="checkbox" id="src-gc"> Gran Cursos</label>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div class="form-group" style="margin:0">
             <label class="form-label">Área</label>
             <select class="form-control" id="sc-area">
@@ -94,7 +57,6 @@
               <option value="federal">Federal</option>
               <option value="estadual">Estadual</option>
               <option value="municipal">Municipal</option>
-              <option value="policia">Polícia</option>
               <option value="tribunal">Tribunal</option>
             </select>
           </div>
@@ -109,11 +71,21 @@
       </div>
     </div>
 
+    <!-- Status do scraper -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-heartbeat"></i>Status do Scraper</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadStatus()"><i class="fas fa-sync"></i></button>
+      </div>
+      <div class="card-body" id="status-box">
+        <p style="font-size:.78rem;color:var(--text-3)">Clique em atualizar.</p>
+      </div>
+    </div>
+
     <!-- Coleta de PDFs -->
     <div class="card">
       <div class="card-header"><div class="card-title"><i class="fas fa-file-pdf"></i>Coleta de PDFs</div></div>
       <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <p style="font-size:.83rem;color:var(--gray-500);margin:0">Baixa e indexa editais e provas em PDF das bancas monitoradas.</p>
         <div class="form-group" style="margin:0">
           <label class="form-label">Tipo de documento</label>
           <select class="form-control" id="pdf-tipo">
@@ -124,79 +96,44 @@
           </select>
         </div>
         <button class="btn btn-primary" onclick="coletarPDFs()"><i class="fas fa-download"></i> Coletar PDFs</button>
-        <button class="btn btn-secondary" onclick="listarPDFs()"><i class="fas fa-list"></i> Listar PDFs coletados</button>
+        <button class="btn btn-secondary" onclick="listarPDFs()"><i class="fas fa-list"></i> Listar PDFs</button>
         <div class="prog" id="prog-pdf"><div class="prog-fill" id="prog-pdf-fill"></div></div>
         <div id="pdf-r" class="ra"></div>
       </div>
     </div>
 
-    <!-- Lista de PDFs (full) -->
-    <div class="card col-full" id="pdf-list-card" style="display:none">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-folder-open"></i>PDFs Coletados</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input type="text" class="form-control" id="pdf-filtro" placeholder="Filtrar..." style="width:200px;font-size:.82rem" oninput="filtrarPDFs()">
-          <button class="btn btn-secondary btn-sm" onclick="listarPDFs()"><i class="fas fa-sync"></i></button>
-        </div>
-      </div>
-      <div class="card-body" id="pdf-list-body">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando lista...</p>
-      </div>
-    </div>
-
-    <!-- Busca RAG (full) -->
-    <div class="card col-full">
+    <!-- Busca RAG -->
+    <div class="card">
       <div class="card-header"><div class="card-title"><i class="fas fa-search"></i>Busca Semântica (RAG)</div></div>
       <div class="card-body">
-        <div style="display:flex;gap:10px;margin-bottom:10px">
-          <input type="text" class="form-control" id="rag-q" placeholder="Ex: concursos de TI com salário acima de R$ 5.000" style="flex:1" onkeydown="if(event.key==='Enter')buscarRAG()">
-          <input type="number" class="form-control" id="rag-k" value="5" min="1" max="20" style="width:80px">
-          <button class="btn btn-primary" onclick="buscarRAG()"><i class="fas fa-search"></i> Buscar</button>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" class="form-control" id="rag-q" placeholder="Buscar na base vetorial..." style="flex:1" onkeydown="if(event.key==='Enter')buscarRAG()">
+          <input type="number" class="form-control" id="rag-k" value="5" min="1" max="20" style="width:64px">
+          <button class="btn btn-primary" onclick="buscarRAG()"><i class="fas fa-search"></i></button>
         </div>
         <div id="rag-r" class="ra"></div>
       </div>
     </div>
 
-    <!-- Histórico -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-history"></i>Histórico de Coletas</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadHistorico()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body" id="hist-box">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando histórico...</p>
-      </div>
-    </div>
-
-    <!-- Status do scraper -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-heartbeat"></i>Status do Scraper</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadStatus()"><i class="fas fa-sync"></i> Verificar</button>
-      </div>
-      <div class="card-body" id="status-box">
-        <p style="font-size:.82rem;color:var(--gray-400)">Clique em Verificar para checar o scraper.</p>
-      </div>
-    </div>
-
     <!-- Log (full) -->
-    <div class="card col-full">
+    <div class="card full">
       <div class="card-header">
         <div class="card-title"><i class="fas fa-terminal"></i>Log de Operações</div>
         <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="G('log-box').innerHTML=''"><i class="fas fa-trash"></i> Limpar</button>
       </div>
-      <div class="card-body"><div class="log-box" id="log-box">Aguardando operações...</div></div>
+      <div class="card-body" style="padding:12px">
+        <div class="log-box" id="log-box">Aguardando operações...</div>
+      </div>
     </div>
   </div>
 </div>
-
 <footer class="footer"><div class="footer-inner">
   <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
   <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
   <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
-
+<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
@@ -209,8 +146,8 @@ function show(id,txt){
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
 }
 function loading(id,m='Processando...'){
-  const el=G(id);el.classList.add('loading');el.classList.remove('show');
-  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="color:var(--primary)"></i> ${m}`;
+  const el=G(id);el.classList.add('loading','show');
+  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="margin-right:5px;color:var(--primary)"></i>${m}`;
 }
 function log(msg,type='info'){
   const lb=G('log-box'),t=new Date().toLocaleTimeString('pt-BR');
@@ -224,8 +161,6 @@ function prog(id,pct){
   else{bar.classList.remove('show');fill.style.width='0%';}
 }
 
-let allPDFs=[];
-
 async function loadStats(){
   try{
     const d=await fetch(API+'/scraping/status').then(r=>r.json());
@@ -237,35 +172,23 @@ async function loadStats(){
 }
 
 async function loadStatus(){
-  G('status-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Verificando...</p>';
+  G('status-box').innerHTML='<p style="font-size:.78rem;color:var(--text-3)">Verificando...</p>';
   try{
     const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    const rows=[
-      ['Status',d.status||'ativo'],['Total coletados',d.total_concursos??d.total??'—'],
-      ['PDFs baixados',d.pdfs_coletados??d.pdfs??'—'],['Bancas',d.bancas_monitoradas??'—'],
-      ['Última coleta',d.ultima_coleta||'—'],
-    ];
-    G('status-box').innerHTML=rows.map(([l,v])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:.82rem">
-        <span style="color:var(--gray-600)">${l}</span>
-        <span style="font-weight:600;color:var(--gray-800)">${esc(String(v))}</span>
-      </div>`).join('');
+    const rows=[['Status',d.status||'ativo'],['Concursos',d.total_concursos??'—'],['PDFs',d.pdfs_coletados??'—'],['Bancas',d.bancas_monitoradas??'—'],['Última coleta',d.ultima_coleta||'—']];
+    G('status-box').innerHTML=rows.map(([l,v])=>`<div class="stat-row"><span style="color:var(--text-3)">${l}</span><span style="font-weight:600">${esc(String(v))}</span></div>`).join('');
     log('Status verificado','ok');
-  }catch(e){
-    G('status-box').innerHTML='<p style="font-size:.82rem;color:#dc2626">Scraper indisponível</p>';
-    log(e.message,'err');
-  }
+  }catch(e){G('status-box').innerHTML='<p style="font-size:.78rem;color:var(--danger)">Scraper indisponível</p>';log(e.message,'err');}
 }
 
 async function coletarConcursos(){
   const area=G('sc-area').value,limite=parseInt(G('sc-limite').value);
-  loading('col-r','Coletando concursos...');prog('prog-col',30);log('Iniciando coleta (limite='+limite+')...');
+  loading('col-r','Coletando...');prog('prog-col',30);log('Coleta iniciada (limite='+limite+')...');
   try{
     const body={limite};if(area)body.area=area;
     const d=await fetch(API+'/scraping/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
     prog('prog-col',100);setTimeout(()=>prog('prog-col',-1),1200);
-    show('col-r',d.mensagem||d.message||JSON.stringify(d));
-    toast('Coleta concluída!');log(d.mensagem||'ok','ok');loadStats();
+    show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('Coleta iniciada!');log(d.mensagem||'ok','ok');loadStats();
   }catch(e){prog('prog-col',-1);show('col-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
 
@@ -276,75 +199,31 @@ async function coletarPDFs(){
     const url=tipo?`${API}/scraping/pdfs?tipo=${tipo}`:API+'/scraping/pdfs';
     const d=await fetch(url,{method:'POST'}).then(r=>r.json());
     prog('prog-pdf',100);setTimeout(()=>prog('prog-pdf',-1),1200);
-    show('pdf-r',d.mensagem||d.message||JSON.stringify(d));
-    toast('PDFs coletados!');log(d.mensagem||'ok','ok');loadStats();listarPDFs();
+    show('pdf-r',d.mensagem||d.message||JSON.stringify(d));toast('Concluído!');log(d.mensagem||'ok','ok');loadStats();
   }catch(e){prog('prog-pdf',-1);show('pdf-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
 
 async function listarPDFs(){
-  G('pdf-list-card').style.display='block';
-  G('pdf-list-body').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Carregando...</p>';
+  loading('pdf-r','Carregando lista...');
   try{
     const d=await fetch(API+'/scraping/pdfs').then(r=>r.json());
-    allPDFs=d.pdfs||d||[];renderPDFs(allPDFs);log('PDFs carregados: '+allPDFs.length,'ok');
-  }catch(e){G('pdf-list-body').innerHTML='<p style="font-size:.82rem;color:#dc2626">Erro: '+esc(e.message)+'</p>';log(e.message,'err');}
+    const list=d.pdfs||d||[];
+    show('pdf-r',list.length?list.map(p=>esc(p.nome||p.filename||p)).join('\n'):'Nenhum PDF encontrado.');
+    log(list.length+' PDFs encontrados','ok');
+  }catch(e){show('pdf-r','Erro: '+e.message);log(e.message,'err');}
 }
-
-function filtrarPDFs(){
-  const q=G('pdf-filtro').value.toLowerCase();
-  renderPDFs(allPDFs.filter(p=>(p.nome||p.filename||String(p)).toLowerCase().includes(q)));
-}
-
-function renderPDFs(list){
-  if(!list.length){G('pdf-list-body').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Nenhum PDF encontrado.</p>';return;}
-  G('pdf-list-body').innerHTML=list.map(p=>{
-    const nome=esc(p.nome||p.filename||p);
-    const tipo=p.tipo?`<span class="badge badge-purple" style="margin-left:6px">${esc(p.tipo)}</span>`:'';
-    return `<div class="pdf-row">
-      <i class="fas fa-file-pdf" style="color:#dc2626;flex-shrink:0"></i>
-      <span class="pdf-name">${nome}${tipo}</span>
-      <div style="display:flex;gap:6px;margin-left:10px;flex-shrink:0">
-        ${p.url?`<a href="${esc(p.url)}" target="_blank" class="btn btn-secondary btn-xs"><i class="fas fa-external-link-alt"></i></a>`:''}
-        <button class="btn btn-secondary btn-xs" onclick="analisarPDF('${nome}')"><i class="fas fa-search"></i></button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function analisarPDF(nome){G('rag-q').value='Informações sobre: '+nome;buscarRAG();}
 
 async function buscarRAG(){
   const q=G('rag-q').value.trim(),k=parseInt(G('rag-k').value)||5;
-  if(!q){toast('Digite uma pergunta',false);return;}
-  loading('rag-r','Buscando com RAG...');log('Busca: '+q);
+  if(!q){toast('Digite uma busca',false);return;}
+  loading('rag-r','Buscando...');log('RAG: '+q);
   try{
     const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,n_resultados:k})}).then(r=>r.json());
-    show('rag-r',d.resposta||d.resultado||d.answer||JSON.stringify(d));log('Busca ok','ok');
+    show('rag-r',d.resposta||d.resultado||d.answer||JSON.stringify(d));log('ok','ok');
   }catch(e){show('rag-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
 
-async function loadHistorico(){
-  G('hist-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Carregando...</p>';
-  try{
-    const d=await fetch(API+'/scraping/historico').then(r=>r.json());
-    const hist=d.historico||d||[];
-    if(!hist.length){G('hist-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Sem histórico disponível.</p>';return;}
-    G('hist-box').innerHTML=hist.slice(0,10).map(h=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:.82rem">
-        <div>
-          <span style="font-weight:500;color:var(--gray-700)">${esc(h.tipo||h.operacao||'Coleta')}</span>
-          <span style="color:var(--gray-400);font-size:.76rem;margin-left:6px">${esc(h.data||h.timestamp||'—')}</span>
-        </div>
-        <span class="badge ${h.status==='ok'||h.sucesso?'badge-green':'badge-red'}">${esc(String(h.resultado||h.total||'—'))}</span>
-      </div>`).join('');
-  }catch(e){G('hist-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Histórico indisponível.</p>';}
-}
-
-async function init(){
-  try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}
-  catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
-  loadStats();loadStatus();loadHistorico();
-}
-init();
+initLayout({active:'scraping',title:'Scraping'});
+loadStats();loadStatus();
 </script>
 </body></html>

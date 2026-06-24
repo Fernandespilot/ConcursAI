@@ -3,306 +3,143 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Chat IA — ConcursAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.chat-layout{display:flex;height:calc(100vh - 60px);overflow:hidden}
-.chat-sidebar{width:272px;background:white;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;scrollbar-width:thin}
-.sb-block{border-bottom:1px solid var(--gray-100);padding:14px 16px}
-.sb-head{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-400);margin-bottom:10px;display:flex;align-items:center;gap:5px}
-.sb-head i{font-size:.7rem}
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--gray-50)}
-.msgs{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin}
-.msg-meta{font-size:.7rem;color:var(--gray-400);margin-top:4px;padding:0 4px}
-.chat-msg.user .msg-meta{text-align:right}
-.msg-bubble pre{background:rgba(0,0,0,.06);border-radius:6px;padding:8px 10px;font-size:.78rem;overflow-x:auto;margin-top:6px;font-family:'Courier New',monospace}
-.chat-msg.user .msg-bubble pre{background:rgba(255,255,255,.15)}
+.chat-layout{display:flex;height:calc(100vh - 48px);overflow:hidden}
+.chat-cfg{width:220px;min-width:220px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column}
+.cfg-head{padding:11px 14px;border-bottom:1px solid var(--border);font-size:.79rem;font-weight:600;color:var(--text-2)}
+.cfg-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-topbar{padding:9px 18px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
+.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--text-3);gap:8px;padding:40px}
+.sug-btn{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:4px 11px;font-size:.73rem;cursor:pointer;color:var(--text-2);font-family:inherit;transition:all .1s}
+.sug-btn:hover{border-color:var(--primary);color:var(--primary)}
+.input-wrap{padding:11px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.input-box{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;transition:border-color .1s,box-shadow .1s}
+.input-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.input-box textarea{flex:1;border:none;outline:none;font-size:.82rem;font-family:inherit;resize:none;min-height:20px;max-height:100px;line-height:1.6;background:transparent;color:var(--text)}
+.send-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.send-btn:hover{background:var(--primary-hover)}
+.send-btn:disabled{background:var(--border);cursor:not-allowed}
+.msg-bubble code{background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85em}
+.chat-msg.user .msg-bubble code{background:rgba(255,255,255,.2)}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
-  <div class="nav-links">
-    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
-    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
-    <a href="/pages/chat.html" class="nav-link active"><i class="fas fa-comments"></i>Chat IA</a>
-    <a href="/pages/concursos.html" class="nav-link"><i class="fas fa-search"></i>Concursos</a>
-    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
-    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
-    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
-    <a href="/pages/scraping.html" class="nav-link"><i class="fas fa-spider"></i>Scraping</a>
-    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
-  </div>
-  <div class="nav-right">
-    <div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div>
-  </div>
-</nav>
-
 <div class="chat-layout">
-  <!-- SIDEBAR -->
-  <div class="chat-sidebar">
-    <div class="sb-block">
-      <div class="sb-head"><i class="fas fa-robot"></i> Agente</div>
-      <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">Tipo de agente</label>
-        <select class="form-control" id="agtype" onchange="onAgent()">
-          <option value="concursos">🎯 Assistente de Concursos</option>
-          <option value="edital">📄 Analisador de Editais</option>
-          <option value="estudo">📚 Orientador de Estudos</option>
-          <option value="banca">🏛️ Especialista em Bancas</option>
-          <option value="custom">⚙️ Personalizado</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="sb-block">
-      <div class="sb-head"><i class="fas fa-microchip"></i> Modelo</div>
+  <div class="chat-cfg">
+    <div class="cfg-head"><i class="fas fa-sliders-h" style="margin-right:6px;color:var(--primary)"></i>Configurações</div>
+    <div class="cfg-body">
       <div class="form-group">
         <label class="form-label">Provedor</label>
-        <select class="form-control" id="prov" onchange="onProv()">
-          <option value="backend">Backend (padrão)</option>
-          <option value="groq">Groq (sua chave)</option>
-          <option value="openai">OpenAI (sua chave)</option>
-          <option value="ollama">Ollama (local)</option>
+        <select class="form-control" id="prov" onchange="onProvChange()">
+          <option value="backend">Backend (Groq)</option>
+          <option value="openai">OpenAI</option>
+          <option value="ollama">Ollama</option>
+        </select>
+      </div>
+      <div class="form-group" id="key-wrap" style="display:none">
+        <label class="form-label">API Key</label>
+        <input type="password" class="form-control" id="api-key" placeholder="sk-...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Modo</label>
+        <select class="form-control" id="mode">
+          <option value="rag">RAG (base de dados)</option>
+          <option value="direto">Direto</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Modelo</label>
-        <select class="form-control" id="msel" onchange="updHint()"></select>
+        <label class="form-label">Temperatura — <span id="temp-val">0.7</span></label>
+        <input type="range" id="temp" min="0" max="1" step="0.1" value="0.7" style="width:100%;accent-color:var(--primary)" oninput="G('temp-val').textContent=this.value">
       </div>
-      <div class="form-group" id="key-wrap">
-        <label class="form-label">Chave de API</label>
-        <div style="display:flex;gap:6px">
-          <input type="password" class="form-control" id="akey" placeholder="gsk_..." oninput="updHint()">
-          <button class="btn btn-secondary btn-sm" onclick="togKey()" title="Mostrar/ocultar" style="flex-shrink:0"><i class="fas fa-eye" id="eyi"></i></button>
-        </div>
+      <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:auto" onclick="clearChat()"><i class="fas fa-rotate-left"></i> Nova conversa</button>
+      <div style="padding-top:10px;border-top:1px solid var(--border);font-size:.71rem;color:var(--text-3);line-height:1.7">
+        <strong style="color:var(--text-2);display:block;margin-bottom:2px">Pipeline RAG</strong>
+        ChromaDB → SentenceTransformers → Groq llama-3.3-70b
       </div>
-    </div>
-
-    <div class="sb-block">
-      <div class="sb-head"><i class="fas fa-sliders-h"></i> Parâmetros</div>
-      <div class="form-group">
-        <label class="form-label">Temperatura: <strong id="tv">0.3</strong></label>
-        <input type="range" style="width:100%;accent-color:var(--primary)" min="0" max="1" step="0.05" value="0.3" oninput="G('tv').textContent=this.value" id="temp">
-      </div>
-      <div class="form-group" style="margin-bottom:0">
-        <label class="form-label">Máx. tokens: <strong id="mtv">1024</strong></label>
-        <input type="range" style="width:100%;accent-color:var(--primary)" min="256" max="4096" step="128" value="1024" oninput="G('mtv').textContent=this.value" id="maxtok">
-      </div>
-    </div>
-
-    <div class="sb-block">
-      <div class="sb-head"><i class="fas fa-terminal"></i> System Prompt</div>
-      <textarea class="form-control" id="sysp" rows="5" placeholder="Comportamento do agente..." style="font-size:.78rem"></textarea>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
-        <span class="badge badge-purple" style="cursor:pointer" onclick="setPr('concursos')">Concursos</span>
-        <span class="badge badge-gray" style="cursor:pointer" onclick="setPr('edital')">Edital</span>
-        <span class="badge badge-gray" style="cursor:pointer" onclick="setPr('estudo')">Estudo</span>
-        <span class="badge badge-gray" style="cursor:pointer" onclick="setPr('banca')">Bancas</span>
-      </div>
-    </div>
-
-    <div class="sb-block">
-      <div class="sb-head"><i class="fas fa-filter"></i> Filtros RAG</div>
-      <div class="form-group"><label class="form-label">Órgão</label><select class="form-control" id="forg"><option value="">Todos</option></select></div>
-      <div class="form-group"><label class="form-label">Ano</label><select class="form-control" id="fano"><option value="">Todos</option></select></div>
-      <div class="form-group" style="margin-bottom:0"><label class="form-label">Cargo</label><input type="text" class="form-control" id="fcar" placeholder="Ex: Analista..."></div>
-    </div>
-
-    <div class="sb-block" style="margin-top:auto">
-      <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="saveCfg()"><i class="fas fa-save"></i> Salvar configuração</button>
-      <button class="btn btn-secondary" style="width:100%" onclick="clearChat()"><i class="fas fa-trash"></i> Limpar conversa</button>
-      <div id="sv" style="font-size:.72rem;color:var(--accent);text-align:center;margin-top:6px;opacity:0;transition:.3s">✓ Salvo com sucesso!</div>
     </div>
   </div>
 
-  <!-- ÁREA DO CHAT -->
-  <div class="chat-area">
+  <div class="chat-main">
+    <div class="chat-topbar">
+      <span style="font-size:.82rem;font-weight:600;color:var(--text)"><i class="fas fa-comments" style="color:var(--primary);margin-right:6px"></i>Chat IA</span>
+      <span id="msg-count" style="font-size:.71rem;color:var(--text-3)">0 mensagens</span>
+    </div>
+
     <div class="msgs" id="msgs">
       <div class="chat-empty" id="empty">
-        <div class="chat-empty-icon"><i class="fas fa-robot"></i></div>
-        <h3>Assistente ConcursAI</h3>
-        <p>Configure o agente no painel lateral e faça sua primeira pergunta sobre concursos públicos.</p>
-        <div class="suggestions">
-          <button class="sug-btn" onclick="usex('Quais concursos estão abertos atualmente?')">Concursos abertos</button>
-          <button class="sug-btn" onclick="usex('Monte um cronograma de 3 meses para concurso federal')">Cronograma de estudos</button>
-          <button class="sug-btn" onclick="usex('Quais temas a FGV mais cobra em Direito Administrativo?')">Temas FGV</button>
-          <button class="sug-btn" onclick="usex('Diferenças entre Cebraspe e FCC na correção')">Cebraspe vs FCC</button>
-          <button class="sug-btn" onclick="usex('Qual salário médio de Analista Judiciário nos TRFs?')">Salários TRF</button>
-          <button class="sug-btn" onclick="usex('Estratégia de estudo para Português em concursos')">Estratégia Português</button>
+        <div style="font-size:1.6rem;opacity:.18"><i class="fas fa-comments"></i></div>
+        <div style="font-size:.87rem;font-weight:600;color:var(--text-2)">Como posso ajudar?</div>
+        <div style="font-size:.77rem;color:var(--text-3);max-width:260px;line-height:1.7">Pergunte sobre concursos, editais, bancas ou conteúdo de provas.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:6px">
+          <button class="sug-btn" onclick="suggest(this)">Concursos abertos em TI</button>
+          <button class="sug-btn" onclick="suggest(this)">Estilo de prova da CEBRASPE</button>
+          <button class="sug-btn" onclick="suggest(this)">Diferença entre lei e decreto</button>
+          <button class="sug-btn" onclick="suggest(this)">Concursos federais 2024</button>
         </div>
       </div>
     </div>
 
-    <div class="chat-input-wrap">
+    <div class="input-wrap">
       <div class="input-box">
-        <textarea id="ci" rows="1" placeholder="Pergunte sobre concursos, editais, estratégias de estudo..." onkeydown="hkey(event)" oninput="ar(this)"></textarea>
-        <button class="send-btn" id="sbtn" onclick="send()" title="Enviar (Enter)"><i class="fas fa-paper-plane"></i></button>
+        <textarea id="ci" placeholder="Sua pergunta... (Enter para enviar)" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';G('cc').textContent=this.value.length"></textarea>
+        <button class="send-btn" id="sbtn" onclick="send()"><i class="fas fa-paper-plane" style="font-size:.7rem"></i></button>
       </div>
-      <div class="input-hint">
-        <span id="mhint" style="color:var(--primary);font-weight:500">— selecione o provedor —</span>
-        <span>Enter = enviar &nbsp;·&nbsp; Shift+Enter = nova linha</span>
+      <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:.69rem;color:var(--text-3)">
+        <span>Shift+Enter = nova linha</span><span id="cc">0</span>
       </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
-const MODELS={
-  backend:[{v:'llama-3.3-70b-versatile',l:'Llama 3.3 70B (padrão)'}],
-  groq:[{v:'llama-3.3-70b-versatile',l:'Llama 3.3 70B'},{v:'llama-3.1-8b-instant',l:'Llama 3.1 8B'},{v:'mixtral-8x7b-32768',l:'Mixtral 8x7B'},{v:'gemma2-9b-it',l:'Gemma 2 9B'}],
-  openai:[{v:'gpt-4o',l:'GPT-4o'},{v:'gpt-4o-mini',l:'GPT-4o Mini'},{v:'gpt-3.5-turbo',l:'GPT-3.5 Turbo'}],
-  ollama:[{v:'llama3',l:'Llama 3'},{v:'mistral',l:'Mistral'},{v:'phi3',l:'Phi-3'}]
-};
-const PROMPTS={
-  concursos:'Você é o ConcursAI, especialista em concursos públicos brasileiros. Responda com base no contexto fornecido. Cite órgãos, bancas e dados específicos quando disponíveis. Seja direto e objetivo.',
-  edital:'Você é especialista em análise de editais de concursos públicos. Extraia e destaque: vagas disponíveis, cargos, salários, requisitos, cronograma e conteúdo programático.',
-  estudo:'Você é orientador de estudos para concursos públicos. Crie planos personalizados, defina prioridades de matérias, sugira técnicas de estudo e materiais de qualidade.',
-  banca:'Você é especialista nas bancas organizadoras (Cebraspe, FCC, FGV, VUNESP). Analise estilos de questão, padrões de cobrança e estratégias específicas para cada banca.',
-  custom:''
-};
-
+let n=0;
 function G(id){return document.getElementById(id);}
-function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-
-function onProv(){
-  const p=G('prov').value,s=G('msel');
-  s.innerHTML='';
-  (MODELS[p]||[]).forEach(m=>{const o=document.createElement('option');o.value=m.v;o.textContent=m.l;s.appendChild(o);});
-  G('akey').placeholder=p==='groq'?'gsk_...' : p==='openai'?'sk-...' : '(não necessário)';
-  G('key-wrap').style.display=p==='backend'||p==='ollama'?'none':'block';
-  updHint();
-}
-
-function updHint(){
-  const p=G('prov').value,m=G('msel').value;
-  G('mhint').textContent=p==='backend'?'usando backend ConcursAI':p+' / '+m;
-}
-
-function togKey(){const i=G('akey');i.type=i.type==='password'?'text':'password';G('eyi').className=i.type==='password'?'fas fa-eye':'fas fa-eye-slash';}
-
-function onAgent(){const t=G('agtype').value;if(t!=='custom')setPr(t);}
-
-function setPr(k){
-  G('sysp').value=PROMPTS[k]||'';
-  document.querySelectorAll('.sb-block span.badge').forEach(c=>{
-    const match=c.textContent.toLowerCase().includes(k.slice(0,3));
-    c.className='badge '+(match?'badge-purple':'badge-gray');
-  });
-}
-
-function saveCfg(){
-  localStorage.setItem('cai_chat',JSON.stringify({prov:G('prov').value,model:G('msel').value,key:G('akey').value,temp:G('temp').value,tok:G('maxtok').value,prompt:G('sysp').value,agent:G('agtype').value}));
-  const el=G('sv');el.style.opacity='1';setTimeout(()=>el.style.opacity='0',2000);
-  toast('Configuração salva!');
-}
-
-function loadCfg(){
-  try{
-    const c=JSON.parse(localStorage.getItem('cai_chat')||'{}');
-    if(c.prov){G('prov').value=c.prov;onProv();}
-    if(c.model)G('msel').value=c.model;
-    if(c.key)G('akey').value=c.key;
-    if(c.temp){G('temp').value=c.temp;G('tv').textContent=c.temp;}
-    if(c.tok){G('maxtok').value=c.tok;G('mtv').textContent=c.tok;}
-    if(c.prompt)G('sysp').value=c.prompt;
-    if(c.agent)G('agtype').value=c.agent;
-  }catch(e){}
-}
-
-function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
-function hkey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
-function usex(t){G('ci').value=t;G('empty')&&send();}
-
-function clearChat(){
-  G('msgs').innerHTML='';
-  G('msgs').innerHTML=`<div class="chat-empty" id="empty">
-    <div class="chat-empty-icon"><i class="fas fa-robot"></i></div>
-    <h3>Conversa limpa</h3>
-    <p>Pronto para uma nova sessão.</p>
-  </div>`;
-}
-
-function fmt(txt){
-  // Formata markdown básico: **bold**, `code`, newlines
-  return txt
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+function fmt(t){
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/`([^`]+)`/g,'<code style="background:rgba(0,0,0,.07);padding:1px 5px;border-radius:4px;font-size:.9em">$1</code>')
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
     .replace(/\n/g,'<br>');
 }
-
-function addMsg(txt,role){
-  G('empty')?.remove();
-  const c=G('msgs');
+function addMsg(role,html){
+  const el=G('empty');if(el)el.style.display='none';
+  n++;G('msg-count').textContent=n+' mensagem'+(n>1?'s':'');
   const d=document.createElement('div');
-  d.className='chat-msg '+role;
-  const time=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  d.innerHTML=`<div class="msg-avatar ${role==='user'?'user':'ai'}">${role==='user'?'Eu':'AI'}</div>
-    <div><div class="msg-bubble">${fmt(txt)}</div><div class="msg-meta">${time}</div></div>`;
-  c.appendChild(d);
-  c.scrollTop=c.scrollHeight;
+  d.className='chat-msg'+(role==='user'?' user':'');
+  d.innerHTML=`<div class="msg-avatar ${role==='user'?'user':'ai'}">${role==='user'?'<i class="fas fa-user" style="font-size:.58rem"></i>':'AI'}</div><div class="msg-bubble">${html}</div>`;
+  G('msgs').appendChild(d);
+  G('msgs').scrollTop=G('msgs').scrollHeight;
   return d.querySelector('.msg-bubble');
 }
-
 async function send(){
-  const inp=G('ci'),msg=inp.value.trim();
-  if(!msg||G('sbtn').disabled)return;
-  inp.value='';inp.style.height='auto';
-  G('sbtn').disabled=true;
-  addMsg(msg,'user');
-  const b=addMsg('…','ai');
-  b.classList.add('thinking');
-  b.innerHTML='<i class="fas fa-circle-notch fa-spin" style="color:var(--gray-300)"></i>';
-
+  const ci=G('ci'),q=ci.value.trim();if(!q)return;
+  ci.value='';ci.style.height='auto';G('cc').textContent=0;G('sbtn').disabled=true;
+  addMsg('user',fmt(q));
+  const bubble=addMsg('ai','<span style="color:var(--text-3);font-style:italic"><i class="fas fa-circle-notch fa-spin" style="font-size:.72rem;margin-right:4px"></i>Pensando...</span>');
   try{
-    // Busca RAG no backend
-    const rag=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({pergunta:msg,filtro_orgao:G('forg').value||null,filtro_ano:G('fano').value||null,filtro_cargo:G('fcar').value||null,top_k:5})
-    }).then(r=>r.json());
-    let resp=rag.resposta||'Sem resposta disponível.';
-
-    const key=G('akey').value.trim(),pv=G('prov').value,model=G('msel').value,sys=G('sysp').value||PROMPTS.concursos;
-
-    if(key&&pv==='groq'){
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model,temperature:parseFloat(G('temp').value),max_tokens:parseInt(G('maxtok').value),
-          messages:[{role:'system',content:sys},{role:'user',content:'CONTEXTO DO BANCO DE DADOS:\n'+rag.resposta+'\n\n---\nPERGUNTA DO USUÁRIO: '+msg}]})});
-      if(!r.ok){const err=await r.json();throw new Error('Groq: '+(err.error?.message||r.status));}
-      resp=(await r.json()).choices[0].message.content;
-    } else if(key&&pv==='openai'){
-      const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model,temperature:parseFloat(G('temp').value),max_tokens:parseInt(G('maxtok').value),
-          messages:[{role:'system',content:sys},{role:'user',content:'CONTEXTO:\n'+rag.resposta+'\n\n---\nPERGUNTA: '+msg}]})});
-      if(!r.ok){const err=await r.json();throw new Error('OpenAI: '+(err.error?.message||r.status));}
-      resp=(await r.json()).choices[0].message.content;
-    }
-
-    b.classList.remove('thinking');
-    b.innerHTML=fmt(resp);
-  }catch(e){
-    b.classList.remove('thinking');
-    b.innerHTML=`<span style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i> ${e.message}</span>`;
-  }
-  G('sbtn').disabled=false;
-  G('ci').focus();
+    const body={pergunta:q,query:q,temperatura:parseFloat(G('temp').value),modo:G('mode').value};
+    if(G('prov').value!=='backend')body.api_key=G('api-key').value;
+    const d=await fetch(API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    bubble.innerHTML=fmt(d.resposta||d.response||d.answer||d.message||JSON.stringify(d));
+  }catch(e){bubble.innerHTML=`<span style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i> ${e.message}</span>`;}
+  G('sbtn').disabled=false;G('msgs').scrollTop=G('msgs').scrollHeight;
 }
+function suggest(b){G('ci').value=b.textContent;send();}
+function clearChat(){n=0;G('msgs').innerHTML='';G('msg-count').textContent='0 mensagens';location.reload();}
+function onProvChange(){G('key-wrap').style.display=G('prov').value==='openai'?'block':'none';}
 
-async function init(){
-  onProv();G('sysp').value=PROMPTS.concursos;loadCfg();updHint();
-  try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}
-  catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
-  try{const d=await fetch(API+'/orgaos').then(r=>r.json());(d.orgaos||[]).forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;G('forg').appendChild(op);});}catch(e){}
-  try{const d=await fetch(API+'/anos').then(r=>r.json());(d.anos||[]).sort((a,b)=>b-a).forEach(a=>{const op=document.createElement('option');op.value=a;op.textContent=a;G('fano').appendChild(op);});}catch(e){}
-  // URL param pré-preenche e dispara
-  const q=new URLSearchParams(location.search).get('q');
-  if(q){G('ci').value=q;setTimeout(send,400);}
-}
-init();
+const qp=new URLSearchParams(location.search).get('q');
+if(qp){G('ci').value=qp;setTimeout(send,400);}
+
+initLayout({active:'chat',title:'Chat IA'});
 </script>
 </body></html>

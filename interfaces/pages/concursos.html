@@ -3,72 +3,77 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Concursos — ConcursAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.search-hero{background:linear-gradient(135deg,#4c1d95,#7c3aed);padding:28px 28px 32px;color:white}
-.search-hero h2{font-size:1.3rem;font-weight:700;margin-bottom:4px}
-.search-hero p{font-size:.83rem;opacity:.8;margin-bottom:18px}
-.search-box{display:flex;gap:8px;flex-wrap:wrap}
-.search-box input,.search-box select{flex:1;min-width:140px;border:none;border-radius:9px;padding:9px 14px;font-size:.83rem;font-family:inherit;outline:none;background:rgba(255,255,255,.95);color:#1a1a2e}
-.search-box button{background:white;color:#5b21b6;border:none;border-radius:9px;padding:9px 20px;font-size:.84rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:7px;white-space:nowrap}
-.search-box button:hover{background:#f3f4f6}
-.results-bar{display:flex;justify-content:space-between;align-items:center;padding:14px 0;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.results-count{font-size:.82rem;color:var(--gray-500)}
-.conc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.conc-card{background:white;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;transition:all .2s;display:flex;flex-direction:column;gap:10px}
-.conc-card:hover{border-color:#c4b5fd;box-shadow:0 6px 20px rgba(91,33,182,.1);transform:translateY(-2px)}
-.conc-title{font-size:.9rem;font-weight:700;color:var(--gray-900);line-height:1.4}
-.conc-tags{display:flex;flex-wrap:wrap;gap:5px}
-.conc-tag{font-size:.68rem;padding:2px 8px;border-radius:5px;font-weight:500}
-.conc-body{font-size:.78rem;color:var(--gray-500);line-height:1.65;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;flex:1}
-.conc-footer{display:flex;gap:7px;margin-top:4px}
-.empty-grid{grid-column:1/-1;text-align:center;padding:60px;color:var(--gray-400)}
-.empty-grid i{font-size:2.5rem;opacity:.2;display:block;margin-bottom:12px}
-.loading-grid{grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-400);display:flex;flex-direction:column;align-items:center;gap:12px}
-.loading-grid i{font-size:2rem;color:var(--primary);opacity:.6}
+.search-bar{display:flex;gap:8px;margin-bottom:16px}
+.search-bar input{flex:1}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filters select{font-size:.78rem}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.c-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:15px;cursor:pointer;transition:border-color .12s}
+.c-card:hover{border-color:var(--primary)}
+.c-title{font-size:.84rem;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4}
+.c-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.c-desc{font-size:.76rem;color:var(--text-3);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);width:90%;max-width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.12)}
+.modal-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:18px;font-size:.82rem;color:var(--text-2);line-height:1.8}
+.modal-body strong{color:var(--text)}
 </style>
 </head>
 <body>
-<nav class="navbar">
-  <a href="/pages/home.html" class="nav-brand"><div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>ConcursAI</a>
-  <div class="nav-links">
-    <a href="/pages/home.html" class="nav-link"><i class="fas fa-home"></i>Início</a>
-    <a href="/pages/dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
-    <a href="/pages/chat.html" class="nav-link"><i class="fas fa-comments"></i>Chat IA</a>
-    <a href="/pages/concursos.html" class="nav-link active"><i class="fas fa-search"></i>Concursos</a>
-    <a href="/pages/ferramentas.html" class="nav-link"><i class="fas fa-magic"></i>Ferramentas</a>
-    <a href="/pages/edital.html" class="nav-link"><i class="fas fa-file-pdf"></i>Edital</a>
-    <a href="/pages/provas.html" class="nav-link"><i class="fas fa-file-alt"></i>Provas</a>
-    <a href="/pages/scraping.html" class="nav-link"><i class="fas fa-spider"></i>Scraping</a>
-    <a href="/pages/admin.html" class="nav-link"><i class="fas fa-shield-alt"></i>Admin</a>
+<div class="page-header">
+  <div class="page-title"><i class="fas fa-search"></i>Busca de Concursos</div>
+  <div class="page-subtitle">Busca semântica por RAG na base de concursos coletados</div>
+</div>
+<div class="page-body">
+  <div class="search-bar">
+    <input type="text" class="form-control" id="qb" placeholder="Ex: concursos de TI no governo federal...">
+    <button class="btn btn-primary" onclick="buscar()"><i class="fas fa-search"></i> Buscar</button>
   </div>
-  <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
-</nav>
-
-<div class="search-hero">
-  <h2><i class="fas fa-search"></i> Busca de Concursos</h2>
-  <p>Busca semântica com RAG em <strong id="total-badge">67</strong> concursos públicos indexados</p>
-  <div class="search-box">
-    <input type="text" id="qb" placeholder="🔍 Buscar por cargo, órgão, conteúdo..." onkeydown="if(event.key==='Enter')buscar()">
-    <select id="qorg"><option value="">Todos os órgãos</option></select>
-    <select id="qano"><option value="">Todos os anos</option></select>
-    <input type="text" id="qcargo" placeholder="Cargo..." style="max-width:160px">
-    <button onclick="buscar()"><i class="fas fa-search"></i> Buscar</button>
+  <div class="filters">
+    <select class="form-control" id="f-area" style="width:auto">
+      <option value="">Todas as áreas</option>
+      <option value="federal">Federal</option>
+      <option value="estadual">Estadual</option>
+      <option value="municipal">Municipal</option>
+      <option value="tribunal">Tribunal</option>
+      <option value="policia">Polícia</option>
+    </select>
+    <select class="form-control" id="f-status" style="width:auto">
+      <option value="">Todos os status</option>
+      <option value="Aberto">Inscrições abertas</option>
+      <option value="Previsto">Previsto</option>
+      <option value="Encerrado">Encerrado</option>
+    </select>
+    <select class="form-control" id="f-limit" style="width:auto">
+      <option value="10">10 resultados</option>
+      <option value="20" selected>20 resultados</option>
+      <option value="50">50 resultados</option>
+    </select>
+    <button class="btn btn-secondary btn-sm" onclick="limpar()"><i class="fas fa-times"></i> Limpar</button>
+  </div>
+  <div id="info" style="font-size:.77rem;color:var(--text-3);margin-bottom:10px"></div>
+  <div class="results-grid" id="grid"></div>
+  <div id="empty-msg" style="display:none;text-align:center;padding:40px;color:var(--text-3)">
+    <i class="fas fa-search" style="font-size:1.8rem;opacity:.2;display:block;margin-bottom:10px"></i>
+    Nenhum resultado encontrado. Tente outros termos.
   </div>
 </div>
 
-<div class="page-body">
-  <div class="results-bar">
-    <span class="results-count" id="rcount">Carregando concursos...</span>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-secondary btn-sm" onclick="limparFiltros()"><i class="fas fa-times"></i> Limpar filtros</button>
-      <a href="/pages/chat.html" class="btn btn-primary btn-sm"><i class="fas fa-comments"></i> Perguntar à IA</a>
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <span id="m-title" style="font-weight:600;font-size:.88rem"></span>
+      <button class="btn btn-secondary btn-xs" onclick="closeModal()"><i class="fas fa-times"></i></button>
     </div>
-  </div>
-  <div class="conc-grid" id="grid">
-    <div class="loading-grid"><i class="fas fa-spinner fa-spin"></i><span>Carregando concursos...</span></div>
+    <div class="modal-body" id="m-body"></div>
   </div>
 </div>
 
@@ -78,106 +83,70 @@
   <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
-
+<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+let data=[];
 
-let allData=[];
+function renderCard(c,i){
+  const status=c.status||'—';
+  const sc={'Aberto':'badge-green','Previsto':'badge-blue','Encerrado':'badge-gray'};
+  return `<div class="c-card" onclick="openModal(${i})">
+    <div class="c-title">${esc(c.cargo||c.titulo||c.orgao||'Concurso')}</div>
+    <div class="c-meta">
+      <span class="badge ${sc[status]||'badge-gray'}">${esc(status)}</span>
+      ${c.banca?`<span class="badge badge-blue">${esc(c.banca)}</span>`:''}
+      ${c.area?`<span class="badge badge-gray">${esc(c.area)}</span>`:''}
+    </div>
+    <div class="c-desc">${esc(c.descricao||c.conteudo||'')}</div>
+    <div class="c-footer">
+      <span style="font-size:.73rem;color:var(--text-3)">${c.vagas?'<i class="fas fa-users" style="margin-right:3px"></i>'+esc(String(c.vagas))+' vagas':''}</span>
+      <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();verChat(${i})"><i class="fas fa-comments"></i> Perguntar</button>
+    </div>
+  </div>`;
+}
 
-function limparFiltros(){G('qb').value='';G('qorg').value='';G('qano').value='';G('qcargo').value='';buscar();}
+function openModal(i){
+  const c=data[i];
+  G('m-title').textContent=c.cargo||c.titulo||c.orgao||'Detalhes';
+  const rows=[['Órgão',c.orgao],['Banca',c.banca],['Vagas',c.vagas],['Salário',c.salario||c.remuneracao],['Status',c.status],['Área',c.area],['Edital',c.edital],['Data',c.data_publicacao||c.data]].filter(([,v])=>v);
+  G('m-body').innerHTML=rows.map(([k,v])=>`<div style="display:flex;gap:8px;margin-bottom:8px"><strong style="min-width:70px;color:var(--text-3)">${esc(k)}</strong><span>${esc(String(v))}</span></div>`).join('')
+    +(c.descricao?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);color:var(--text-2);font-size:.8rem;line-height:1.7">${esc(c.descricao)}</div>`:'');
+  G('overlay').classList.add('open');
+}
+function closeModal(){G('overlay').classList.remove('open');}
+function verChat(i){const c=data[i];location.href='/pages/chat?q='+encodeURIComponent('Me fale sobre: '+(c.cargo||c.titulo||c.orgao||'este concurso'));}
 
 async function buscar(){
-  const q=G('qb').value.trim(),org=G('qorg').value,ano=G('qano').value,cg=G('qcargo').value.trim();
-  G('grid').innerHTML='<div class="loading-grid"><i class="fas fa-spinner fa-spin"></i><span>Buscando...</span></div>';
+  const q=G('qb').value.trim(),area=G('f-area').value,status=G('f-status').value,limit=parseInt(G('f-limit').value);
+  G('grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-3)"><i class="fas fa-circle-notch fa-spin"></i> Buscando...</div>';
+  G('empty-msg').style.display='none';
   try{
-    let url=API+'/concursos?limit=100';
-    if(org)url+=`&orgao=${encodeURIComponent(org)}`;
-    if(ano)url+=`&ano=${ano}`;
-    if(cg)url+=`&cargo=${encodeURIComponent(cg)}`;
-    let data=await fetch(url).then(r=>r.json());
-    if(q){
-      const ql=q.toLowerCase();
-      data=data.filter(c=>(c.titulo||'').toLowerCase().includes(ql)||(c.orgao||'').toLowerCase().includes(ql)||(c.conteudo||'').toLowerCase().includes(ql)||(c.cargo||'').toLowerCase().includes(ql));
+    const body={query:q||'concursos públicos',n_resultados:limit};
+    if(area)body.area=area;if(status)body.status=status;
+    const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    data=d.resultados||d.concursos||d||[];
+    if(Array.isArray(data)&&data.length){
+      G('info').textContent=data.length+' resultado'+(data.length>1?'s':'')+' encontrado'+(data.length>1?'s':'');
+      G('grid').innerHTML=data.map(renderCard).join('');
+    } else {
+      data=[];G('grid').innerHTML='';G('empty-msg').style.display='block';G('info').textContent='';
     }
-    allData=data;
-    G('rcount').textContent=`${data.length} concurso${data.length!==1?'s':''} encontrado${data.length!==1?'s':''}`;
-    if(!data.length){
-      G('grid').innerHTML='<div class="empty-grid"><i class="fas fa-search"></i><div>Nenhum concurso encontrado</div><div style="font-size:.8rem;margin-top:6px">Tente outros termos ou remova os filtros</div></div>';
-      return;
-    }
-    G('grid').innerHTML=data.map((c,i)=>`
-      <div class="conc-card" style="animation:fadeIn .3s ease ${i*0.03}s both">
-        <div class="conc-title">${esc(c.titulo||'Concurso Público')}</div>
-        <div class="conc-tags">
-          ${c.orgao?`<span class="conc-tag badge-purple">${esc(c.orgao)}</span>`:''}
-          ${c.ano?`<span class="conc-tag badge-blue">${c.ano}</span>`:''}
-          ${c.cargo?`<span class="conc-tag badge-gray">${esc(c.cargo)}</span>`:''}
-          ${c.banca?`<span class="conc-tag badge-yellow">${esc(c.banca)}</span>`:''}
-        </div>
-        <div class="conc-body">${esc(c.conteudo||'Sem descrição disponível.')}</div>
-        <div class="conc-footer">
-          <button class="btn btn-primary btn-xs" onclick="chatSobre(${i})"><i class="fas fa-comments"></i> Chat</button>
-          <button class="btn btn-secondary btn-xs" onclick="verRAG(${i})"><i class="fas fa-search"></i> Busca RAG</button>
-        </div>
-      </div>`).join('');
-  }catch(e){
-    G('grid').innerHTML=`<div class="empty-grid" style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i><div>${e.message}</div><div style="font-size:.8rem;margin-top:6px">Verifique se a API está rodando em localhost:8000</div></div>`;
-  }
+  }catch(e){G('grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--danger);font-size:.82rem"><i class="fas fa-exclamation-circle"></i> Erro ao buscar: ${esc(e.message)}</div>`;}
 }
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function limpar(){G('qb').value='';G('f-area').value='';G('f-status').value='';buscar();}
 
-function chatSobre(i){
-  const c=allData[i];
-  const q=encodeURIComponent('Me conte detalhes sobre o concurso: '+(c.titulo||'')+(c.orgao?' do '+c.orgao:''));
-  window.location.href='/pages/chat.html?q='+q;
-}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+G('qb').addEventListener('keydown',e=>{if(e.key==='Enter')buscar();});
 
-async function verRAG(i){
-  const c=allData[i];
-  const q='Detalhes completos sobre '+c.titulo+' '+(c.orgao||'');
-  try{
-    const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:q,top_k:3})}).then(r=>r.json());
-    const resp=d.resposta||'Sem informações adicionais.';
-    const overlay=document.createElement('div');
-    overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px';
-    overlay.innerHTML=`<div style="background:white;border-radius:14px;padding:28px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <strong style="font-size:.95rem">${esc(c.titulo||'Detalhes')}</strong>
-        <button onclick="this.closest('.overlay-bd').remove()" style="border:none;background:none;cursor:pointer;font-size:1.2rem;color:#6b7280">✕</button>
-      </div>
-      <div style="font-size:.85rem;line-height:1.8;color:#374151;white-space:pre-wrap">${esc(resp)}</div>
-      <div style="margin-top:16px;display:flex;gap:8px">
-        <a href="/pages/chat.html?q=${encodeURIComponent('Detalhes: '+c.titulo)}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#5b21b6;color:white;border-radius:8px;text-decoration:none;font-size:.82rem;font-weight:600"><i class="fas fa-comments"></i> Chat sobre isso</a>
-        <button onclick="this.closest('div[style*=fixed]').remove()" style="padding:8px 16px;border:1px solid #e5e7eb;border-radius:8px;background:white;cursor:pointer;font-size:.82rem;font-family:inherit">Fechar</button>
-      </div>
-    </div>`;
-    overlay.classList.add('overlay-bd');
-    overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
-    document.body.appendChild(overlay);
-  }catch(e){toast(e.message,false);}
-}
+const qp=new URLSearchParams(location.search).get('q');
+if(qp)G('qb').value=qp;
 
-async function init(){
-  // Status
-  try{const d=await fetch(API+'/status').then(r=>r.json());G('sdot').className='status-dot online';G('stxt').textContent='Online';if(d.total_concursos)G('total-badge').textContent=d.total_concursos;}
-  catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
-  // Filtros
-  try{const d=await fetch(API+'/orgaos').then(r=>r.json());(d.orgaos||[]).forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;G('qorg').appendChild(op);});}catch(e){}
-  try{const d=await fetch(API+'/anos').then(r=>r.json());(d.anos||[]).sort((a,b)=>b-a).forEach(a=>{const op=document.createElement('option');op.value=a;op.textContent=a;G('qano').appendChild(op);});}catch(e){}
-  // URL param
-  const params=new URLSearchParams(location.search);
-  if(params.get('q'))G('qb').value=params.get('q');
-  buscar();
-}
-
-// Animação de entrada nos cards
-const style=document.createElement('style');
-style.textContent='@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}';
-document.head.appendChild(style);
-
-init();
+initLayout({active:'concursos',title:'Concursos'});
+buscar();
 </script>
 </body></html>
