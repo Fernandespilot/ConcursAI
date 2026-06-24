@@ -2,207 +2,297 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Ferramentas — ConcursAI</title>
+<title>Ferramentas IA — ConcursAI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
-<style>
-.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.ra{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:.8rem;line-height:1.75;color:var(--text-2);word-break:break-word;display:none;margin-top:10px;max-height:220px;overflow-y:auto}
-.ra.show{display:block}
-.ra.loading{display:block;color:var(--text-3)}
-</style>
 </head>
 <body>
-<div class="page-header">
-  <div class="page-title"><i class="fas fa-magic"></i>Ferramentas IA</div>
-  <div class="page-subtitle">Geração de resumos, flashcards, análise de banca e planejamento de estudos</div>
-</div>
-<div class="page-body">
-  <div class="tools-grid">
+<div class="app">
 
-    <!-- Resumo -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-file-alt"></i>Resumo de Conteúdo</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Tópico ou texto</label>
-          <textarea class="form-control" id="res-txt" rows="3" placeholder="Ex: Princípios da Administração Pública..."></textarea>
-        </div>
-        <select class="form-control" id="res-nivel">
-          <option value="completo">Resumo completo</option>
-          <option value="topicos">Por tópicos</option>
-          <option value="breve">Breve (5 linhas)</option>
-        </select>
-        <button class="btn btn-primary" onclick="gerarResumo()"><i class="fas fa-magic"></i> Gerar resumo</button>
-        <div id="res-r" class="ra"></div>
+  <aside class="sidebar">
+    <a href="/pages/home" class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      ConcursAI
+    </a>
+    <div class="nav-section">Principal</div>
+    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
+    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <div class="nav-section">IA &amp; Busca</div>
+    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
+    <a href="/pages/concursos" class="nav-link"><i class="fas fa-search"></i> Concursos</a>
+    <a href="/pages/ferramentas" class="nav-link active"><i class="fas fa-magic"></i> Ferramentas</a>
+    <div class="nav-section">Documentos</div>
+    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
+    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
+    <div class="nav-section">Sistema</div>
+    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
+    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
+    <div class="sidebar-bottom">
+      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
+      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
+      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="api-status">
+        <span class="status-dot" id="sdot"></span>
+        <span id="stxt">verificando...</span>
       </div>
     </div>
+  </aside>
 
-    <!-- Flashcards -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-layer-group"></i>Flashcards</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Tema para flashcards</label>
-          <input type="text" class="form-control" id="fc-tema" placeholder="Ex: Direito Constitucional">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Quantidade</label>
-            <input type="number" class="form-control" id="fc-qtd" value="5" min="1" max="20">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Nível</label>
-            <select class="form-control" id="fc-nivel">
-              <option value="basico">Básico</option>
-              <option value="intermediario" selected>Intermediário</option>
-              <option value="avancado">Avançado</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="gerarFlashcards()"><i class="fas fa-layer-group"></i> Gerar flashcards</button>
-        <div id="fc-r" class="ra"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><i class="fas fa-magic"></i> Ferramentas IA</div>
+      <div class="topbar-right">
+        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
       </div>
     </div>
+    <div class="page-header">
+      <div class="page-title"><i class="fas fa-magic"></i> Ferramentas IA</div>
+      <div class="page-subtitle">Geração de resumos, flashcards, análise de banca e simulados</div>
+    </div>
+    <div class="content">
+      <div class="content-inner">
 
-    <!-- Análise de banca -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i>Análise de Banca</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Banca organizadora</label>
-          <select class="form-control" id="banca-nome">
-            <option value="CEBRASPE">CEBRASPE / CESPE</option>
-            <option value="FCC">FCC</option>
-            <option value="FGV">FGV</option>
-            <option value="VUNESP">VUNESP</option>
-            <option value="IBFC">IBFC</option>
-            <option value="IADES">IADES</option>
-          </select>
+        <div class="grid-2">
+
+          <!-- 1. Resumo -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-file-alt"></i> Resumo de Conteúdo</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group">
+                <label class="form-label">Tópico / Conteúdo</label>
+                <textarea class="form-control" id="r-texto" rows="3" placeholder="Ex: Direito Administrativo — Atos Administrativos..."></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nível</label>
+                <select class="form-control" id="r-nivel">
+                  <option value="basico">Básico</option>
+                  <option value="intermediario" selected>Intermediário</option>
+                  <option value="avancado">Avançado</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="gerarResumo()"><i class="fas fa-magic"></i> Gerar Resumo</button>
+              <div class="ra" id="ra-resumo"></div>
+            </div>
+          </div>
+
+          <!-- 2. Flashcards -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-clone"></i> Flashcards</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group">
+                <label class="form-label">Tópico</label>
+                <input type="text" class="form-control" id="fc-topico" placeholder="Ex: Princípios da Administração Pública">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Quantidade</label>
+                  <input type="number" class="form-control" id="fc-qtd" value="5" min="3" max="20">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Dificuldade</label>
+                  <select class="form-control" id="fc-dif">
+                    <option value="facil">Fácil</option>
+                    <option value="medio" selected>Médio</option>
+                    <option value="dificil">Difícil</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="gerarFlashcards()"><i class="fas fa-clone"></i> Gerar Flashcards</button>
+              <div class="ra" id="ra-flash"></div>
+            </div>
+          </div>
+
+          <!-- 3. Análise de Banca -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-building"></i> Análise de Banca</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group">
+                <label class="form-label">Banca</label>
+                <select class="form-control" id="ab-banca">
+                  <option value="CESPE/CEBRASPE">CESPE/CEBRASPE</option>
+                  <option value="FCC">FCC</option>
+                  <option value="VUNESP">VUNESP</option>
+                  <option value="FGV">FGV</option>
+                  <option value="IBFC">IBFC</option>
+                  <option value="AOCP">AOCP</option>
+                  <option value="INSTITUTO AOCP">INSTITUTO AOCP</option>
+                  <option value="QUADRIX">QUADRIX</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cargo / Área</label>
+                <input type="text" class="form-control" id="ab-cargo" placeholder="Ex: Analista de TI, Auditor...">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="analisarBanca()"><i class="fas fa-search"></i> Analisar Banca</button>
+              <div class="ra" id="ra-banca"></div>
+            </div>
+          </div>
+
+          <!-- 4. Plano de Estudos -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-calendar-alt"></i> Plano de Estudos</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group">
+                <label class="form-label">Concurso / Cargo</label>
+                <input type="text" class="form-control" id="pe-cargo" placeholder="Ex: Analista Judiciário TRF">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Semanas disponíveis</label>
+                  <input type="number" class="form-control" id="pe-semanas" value="12" min="4" max="52">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Horas/dia</label>
+                  <input type="number" class="form-control" id="pe-horas" value="3" min="1" max="12">
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="gerarPlano()"><i class="fas fa-calendar-alt"></i> Gerar Plano</button>
+              <div class="ra" id="ra-plano"></div>
+            </div>
+          </div>
+
+          <!-- 5. Questões Simulado -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-question-circle"></i> Questões Simulado</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group">
+                <label class="form-label">Disciplina / Tópico</label>
+                <input type="text" class="form-control" id="qs-topico" placeholder="Ex: Raciocínio Lógico — Silogismos">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Quantidade</label>
+                  <input type="number" class="form-control" id="qs-qtd" value="5" min="1" max="20">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Estilo</label>
+                  <select class="form-control" id="qs-estilo">
+                    <option value="cespe">CESPE (C/E)</option>
+                    <option value="multipla" selected>Múltipla escolha</option>
+                    <option value="dissertativa">Dissertativa</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="gerarQuestoes()"><i class="fas fa-question-circle"></i> Gerar Questões</button>
+              <div class="ra" id="ra-quest"></div>
+            </div>
+          </div>
+
+          <!-- 6. Comparar Bancas -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-balance-scale"></i> Comparar Bancas</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Banca A</label>
+                  <select class="form-control" id="cb-a">
+                    <option value="CESPE/CEBRASPE" selected>CESPE/CEBRASPE</option>
+                    <option value="FCC">FCC</option>
+                    <option value="VUNESP">VUNESP</option>
+                    <option value="FGV">FGV</option>
+                    <option value="IBFC">IBFC</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Banca B</label>
+                  <select class="form-control" id="cb-b">
+                    <option value="CESPE/CEBRASPE">CESPE/CEBRASPE</option>
+                    <option value="FCC" selected>FCC</option>
+                    <option value="VUNESP">VUNESP</option>
+                    <option value="FGV">FGV</option>
+                    <option value="IBFC">IBFC</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="compararBancas()"><i class="fas fa-balance-scale"></i> Comparar</button>
+              <div class="ra" id="ra-comp"></div>
+            </div>
+          </div>
+
         </div>
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Cargo pretendido</label>
-          <input type="text" class="form-control" id="banca-cargo" placeholder="Ex: Analista de TI">
-        </div>
-        <button class="btn btn-primary" onclick="analisarBanca()"><i class="fas fa-chart-pie"></i> Analisar</button>
-        <div id="banca-r" class="ra"></div>
       </div>
     </div>
-
-    <!-- Planejamento -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-calendar-alt"></i>Plano de Estudos</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Cargo / concurso</label>
-          <input type="text" class="form-control" id="plan-cargo" placeholder="Ex: Analista Judiciário TRF">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Meses disponíveis</label>
-            <input type="number" class="form-control" id="plan-meses" value="6" min="1" max="24">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Horas/dia</label>
-            <input type="number" class="form-control" id="plan-horas" value="3" min="1" max="12">
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="gerarPlano()"><i class="fas fa-calendar-alt"></i> Gerar plano</button>
-        <div id="plan-r" class="ra"></div>
-      </div>
-    </div>
-
-    <!-- Simulado -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-clipboard-question"></i>Questões Simulado</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Matéria</label>
-          <input type="text" class="form-control" id="sim-materia" placeholder="Ex: Língua Portuguesa">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Quantidade</label>
-            <input type="number" class="form-control" id="sim-qtd" value="5" min="1" max="10">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Nível</label>
-            <select class="form-control" id="sim-nivel">
-              <option value="facil">Fácil</option>
-              <option value="medio" selected>Médio</option>
-              <option value="dificil">Difícil</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="gerarSimulado()"><i class="fas fa-clipboard-question"></i> Gerar questões</button>
-        <div id="sim-r" class="ra"></div>
-      </div>
-    </div>
-
-    <!-- Comparar bancas -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-balance-scale"></i>Comparar Bancas</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <p style="font-size:.78rem;color:var(--text-3);margin:0">Compare perfil e estilo de duas bancas organizadoras.</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Banca A</label>
-            <select class="form-control" id="cmp-a">
-              <option>CEBRASPE</option><option>FCC</option><option>FGV</option><option>VUNESP</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Banca B</label>
-            <select class="form-control" id="cmp-b">
-              <option>FCC</option><option>CEBRASPE</option><option>FGV</option><option>VUNESP</option>
-            </select>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="compararBancas()"><i class="fas fa-balance-scale"></i> Comparar</button>
-        <div id="cmp-r" class="ra"></div>
-      </div>
-    </div>
-
+    <footer class="footer">
+      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
+      <span>Trabalho de Conclusão de Curso · 2024</span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </footer>
   </div>
 </div>
-<footer class="footer"><div class="footer-inner">
-  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
-  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
-  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
-</div></footer>
 <div class="toast" id="toast"></div>
-<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-function show(id,txt){
-  const el=G(id);el.classList.add('show');el.classList.remove('loading');
-  el.innerHTML=String(typeof txt==='object'?JSON.stringify(txt,null,2):txt)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
 }
-function loading(id,m='Processando com IA...'){
-  const el=G(id);el.classList.add('loading','show');
-  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="margin-right:5px;color:var(--primary)"></i>${m}`;
+function show(el,html){el.innerHTML=html;el.classList.add('show');el.classList.remove('loading');}
+function loading(el,msg='Gerando com IA...'){
+  el.classList.add('loading','show');
+  el.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span> ${esc(msg)}</span>`;
 }
-async function call(endpoint,body,rid){
-  loading(rid);
+async function call(endpoint,body,raEl,loadMsg){
+  loading(raEl,loadMsg);
   try{
-    const d=await fetch(API+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-    show(rid,d.resultado||d.resposta||d.response||d.plano||d.flashcards||d.questoes||d.comparacao||JSON.stringify(d));
-    toast('Concluído!');
-  }catch(e){show(rid,'Erro: '+e.message);toast(e.message,false);}
+    const r=await fetch(API+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();
+    const txt=d.resultado||d.resposta||d.response||d.content||JSON.stringify(d,null,2);
+    show(raEl,`<div style="white-space:pre-wrap;font-size:.82rem;line-height:1.55;color:var(--text-2)">${esc(txt)}</div>`);
+  }catch(e){
+    show(raEl,`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`);
+    toast('Erro na operação',false);
+  }
 }
-
-function gerarResumo(){call('/ferramentas/resumo',{texto:G('res-txt').value,nivel:G('res-nivel').value},'res-r');}
-function gerarFlashcards(){call('/ferramentas/flashcards',{tema:G('fc-tema').value,quantidade:parseInt(G('fc-qtd').value),nivel:G('fc-nivel').value},'fc-r');}
-function analisarBanca(){call('/ferramentas/analise-banca',{banca:G('banca-nome').value,cargo:G('banca-cargo').value},'banca-r');}
-function gerarPlano(){call('/ferramentas/plano-estudos',{cargo:G('plan-cargo').value,meses:parseInt(G('plan-meses').value),horas_dia:parseInt(G('plan-horas').value)},'plan-r');}
-function gerarSimulado(){call('/ferramentas/simulado',{materia:G('sim-materia').value,quantidade:parseInt(G('sim-qtd').value),nivel:G('sim-nivel').value},'sim-r');}
-function compararBancas(){call('/ferramentas/comparar-bancas',{banca_a:G('cmp-a').value,banca_b:G('cmp-b').value},'cmp-r');}
-
-initLayout({active:'ferramentas',title:'Ferramentas IA'});
+async function gerarResumo(){
+  const texto=G('r-texto').value.trim();
+  if(!texto)return toast('Informe o tópico',false);
+  await call('/ferramentas/resumo',{texto,nivel:G('r-nivel').value},G('ra-resumo'),'Gerando resumo...');
+}
+async function gerarFlashcards(){
+  const topico=G('fc-topico').value.trim();
+  if(!topico)return toast('Informe o tópico',false);
+  await call('/ferramentas/flashcards',{topico,quantidade:parseInt(G('fc-qtd').value),dificuldade:G('fc-dif').value},G('ra-flash'),'Gerando flashcards...');
+}
+async function analisarBanca(){
+  await call('/ferramentas/analise-banca',{banca:G('ab-banca').value,cargo:G('ab-cargo').value},G('ra-banca'),'Analisando banca...');
+}
+async function gerarPlano(){
+  const cargo=G('pe-cargo').value.trim();
+  if(!cargo)return toast('Informe o cargo',false);
+  await call('/ferramentas/plano-estudos',{cargo,semanas:parseInt(G('pe-semanas').value),horas_dia:parseInt(G('pe-horas').value)},G('ra-plano'),'Gerando plano...');
+}
+async function gerarQuestoes(){
+  const topico=G('qs-topico').value.trim();
+  if(!topico)return toast('Informe o tópico',false);
+  await call('/ferramentas/questoes',{topico,quantidade:parseInt(G('qs-qtd').value),estilo:G('qs-estilo').value},G('ra-quest'),'Gerando questões...');
+}
+async function compararBancas(){
+  const a=G('cb-a').value,b=G('cb-b').value;
+  if(a===b)return toast('Selecione bancas diferentes',false);
+  await call('/ferramentas/comparar-bancas',{banca_a:a,banca_b:b},G('ra-comp'),'Comparando bancas...');
+}
+checkAPI();
 </script>
-</body></html>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</body>
+</html>

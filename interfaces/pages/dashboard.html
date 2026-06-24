@@ -8,142 +8,188 @@
 <link href="/static/css/concursai.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.chart-wrap{position:relative;height:220px}
+.chart-wrap{position:relative;height:200px}
+.chart-wrap-sm{position:relative;height:180px}
+.tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.tbl th{text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text-3);font-weight:600;font-size:.75rem;text-transform:uppercase}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text-2)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg)}
 </style>
 </head>
 <body>
-<div class="page-header">
-  <div class="page-title"><i class="fas fa-chart-bar"></i>Dashboard</div>
-  <div class="page-subtitle">Visão geral do banco de dados e estatísticas de concursos</div>
-</div>
-<div class="page-body">
-  <!-- Stats -->
-  <div class="grid-4 mb-6">
-    <div class="stat-card"><div class="stat-icon"><i class="fas fa-database"></i></div><div><div class="stat-value" id="st-total">—</div><div class="stat-label">Total de concursos</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#dcfce7"><i class="fas fa-circle-check" style="color:#16a34a"></i></div><div><div class="stat-value" id="st-abertos">—</div><div class="stat-label">Inscrições abertas</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#fef9c3"><i class="fas fa-building" style="color:#d97706"></i></div><div><div class="stat-value" id="st-bancas">—</div><div class="stat-label">Bancas cadastradas</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#f3e8ff"><i class="fas fa-brain" style="color:#7c3aed"></i></div><div><div class="stat-value" id="st-emb">—</div><div class="stat-label">Embeddings vetoriais</div></div></div>
-  </div>
+<div class="app">
 
-  <!-- Gráficos -->
-  <div class="charts-grid mb-4">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-chart-bar"></i>Concursos por Banca</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadAll()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body"><div class="chart-wrap"><canvas id="chart-banca"></canvas></div></div>
-    </div>
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-chart-line"></i>Concursos por Ano</div></div>
-      <div class="card-body"><div class="chart-wrap"><canvas id="chart-anos"></canvas></div></div>
-    </div>
-  </div>
-  <div class="card mb-4">
-    <div class="card-header"><div class="card-title"><i class="fas fa-chart-pie"></i>Distribuição por Área</div></div>
-    <div class="card-body"><div class="chart-wrap" style="height:180px"><canvas id="chart-area"></canvas></div></div>
-  </div>
-
-  <!-- Tabela últimos -->
-  <div class="card">
-    <div class="card-header">
-      <div class="card-title"><i class="fas fa-list"></i>Concursos Recentes</div>
-      <a href="/pages/concursos" class="btn btn-secondary btn-sm">Ver todos</a>
-    </div>
-    <div class="card-body" style="padding:0">
-      <div class="table-wrap">
-        <table id="tbl-recentes">
-          <thead><tr><th>Cargo/Órgão</th><th>Banca</th><th>Vagas</th><th>Status</th></tr></thead>
-          <tbody id="tbody-rec"><tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:20px">Carregando...</td></tr></tbody>
-        </table>
+  <aside class="sidebar">
+    <a href="/pages/home" class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      ConcursAI
+    </a>
+    <div class="nav-section">Principal</div>
+    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
+    <a href="/pages/dashboard" class="nav-link active"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <div class="nav-section">IA &amp; Busca</div>
+    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
+    <a href="/pages/concursos" class="nav-link"><i class="fas fa-search"></i> Concursos</a>
+    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
+    <div class="nav-section">Documentos</div>
+    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
+    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
+    <div class="nav-section">Sistema</div>
+    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
+    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
+    <div class="sidebar-bottom">
+      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
+      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
+      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="api-status">
+        <span class="status-dot" id="sdot"></span>
+        <span id="stxt">verificando...</span>
       </div>
     </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><i class="fas fa-chart-bar"></i> Dashboard</div>
+      <div class="topbar-right">
+        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
+      </div>
+    </div>
+    <div class="page-header">
+      <div class="page-title"><i class="fas fa-chart-bar"></i> Dashboard</div>
+      <div class="page-subtitle">Visão geral do banco de dados e estatísticas</div>
+    </div>
+    <div class="content">
+      <div class="content-inner">
+
+        <div class="grid-4 mb-5">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-database"></i></div>
+            <div class="stat-value" id="st-total">—</div>
+            <div class="stat-label">Total Concursos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+            <div class="stat-value" id="st-abertos">—</div>
+            <div class="stat-label">Abertos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-building"></i></div>
+            <div class="stat-value" id="st-bancas">—</div>
+            <div class="stat-label">Bancas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-vector-square"></i></div>
+            <div class="stat-value" id="st-emb">—</div>
+            <div class="stat-label">Embeddings</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-building"></i> Concursos por Banca</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap"><canvas id="ch-bancas"></canvas></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-calendar"></i> Concursos por Ano</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap"><canvas id="ch-anos"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-layer-group"></i> Distribuição por Área</div>
+          </div>
+          <div class="card-body" style="display:flex;gap:24px;align-items:center">
+            <div class="chart-wrap-sm" style="width:180px;flex-shrink:0"><canvas id="ch-area"></canvas></div>
+            <div id="area-legend" style="font-size:.8rem;display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-list"></i> Concursos Recentes</div>
+            <button class="btn btn-sm btn-secondary" onclick="loadDashboard()"><i class="fas fa-sync"></i> Atualizar</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table class="tbl">
+              <thead><tr><th>Título</th><th>Banca</th><th>Área</th><th>Status</th></tr></thead>
+              <tbody id="tb-recentes"><tr><td colspan="4" style="text-align:center;color:var(--text-4);padding:20px">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <footer class="footer">
+      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
+      <span>Trabalho de Conclusão de Curso · 2024</span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </footer>
   </div>
 </div>
-<footer class="footer"><div class="footer-inner">
-  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
-  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
-  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
-</div></footer>
 <div class="toast" id="toast"></div>
-<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 const charts={};
 function G(id){return document.getElementById(id);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-const opts=(label)=>({
-  responsive:true,maintainAspectRatio:false,
-  plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label||''}: ${ctx.parsed.y??ctx.parsed}`}}},
-  scales:label?{x:{grid:{display:false},ticks:{font:{size:10},color:'#9ca3af'}},y:{grid:{color:'#f0f1f3'},ticks:{font:{size:10},color:'#9ca3af'}}}:undefined
-});
-
-function buildBancaChart(data){
-  if(charts.banca)charts.banca.destroy();
-  const labels=data.map(d=>d.banca||d.nome||d[0]);
-  const vals=data.map(d=>d.total||d.count||d[1]);
-  charts.banca=new Chart(G('chart-banca').getContext('2d'),{
-    type:'bar',
-    data:{labels,datasets:[{label:'Concursos',data:vals,backgroundColor:'#93c5fd',borderColor:'#3b82f6',borderWidth:1.5,borderRadius:3}]},
-    options:opts(true)
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
+}
+function mkChart(id,type,labels,data,label,colors){
+  if(charts[id])charts[id].destroy();
+  const ctx=G(id).getContext('2d');
+  charts[id]=new Chart(ctx,{
+    type,
+    data:{labels,datasets:[{label,data,backgroundColor:colors||'rgba(37,99,235,.7)',borderColor:type==='line'?'#2563eb':undefined,borderWidth:type==='line'?2:0,fill:type==='line',tension:.4,pointRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type==='doughnut'}},scales:type!=='doughnut'?{y:{beginAtZero:true,ticks:{font:{size:10}}},x:{ticks:{font:{size:10}}}}:{}}
   });
 }
-
-function buildAnosChart(data){
-  if(charts.anos)charts.anos.destroy();
-  const labels=data.map(d=>d.ano||d[0]);
-  const vals=data.map(d=>d.total||d.count||d[1]);
-  charts.anos=new Chart(G('chart-anos').getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[{label:'Concursos',data:vals,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.08)',tension:.35,fill:true,pointRadius:3}]},
-    options:opts(true)
-  });
-}
-
-function buildAreaChart(data){
-  if(charts.area)charts.area.destroy();
-  const labels=data.map(d=>d.area||d[0]);
-  const vals=data.map(d=>d.total||d.count||d[1]);
-  const colors=['#93c5fd','#6ee7b7','#fcd34d','#f9a8d4','#a5b4fc','#86efac'];
-  charts.area=new Chart(G('chart-area').getContext('2d'),{
-    type:'doughnut',
-    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},color:'#374151',boxWidth:12}}}}
-  });
-}
-
-async function loadAll(){
+const COLORS=['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#65a30d','#9333ea'];
+async function loadDashboard(){
   try{
-    const d=await fetch(API+'/dashboard').then(r=>r.json());
-    G('st-total').textContent=d.total_concursos??'—';
-    G('st-abertos').textContent=d.concursos_abertos??'—';
-    G('st-bancas').textContent=d.total_bancas??'—';
-    G('st-emb').textContent=d.total_embeddings??'—';
-    if(d.por_banca?.length)buildBancaChart(d.por_banca);
-    if(d.por_ano?.length)buildAnosChart(d.por_ano);
-    if(d.por_area?.length)buildAreaChart(d.por_area);
-    if(d.concursos_recentes?.length){
-      G('tbody-rec').innerHTML=d.concursos_recentes.slice(0,8).map(c=>`
-        <tr>
-          <td style="font-weight:500">${esc(c.cargo||c.titulo||c.orgao||'—')}</td>
-          <td>${esc(c.banca||'—')}</td>
-          <td>${esc(String(c.vagas||'—'))}</td>
-          <td><span class="badge ${c.status==='Aberto'?'badge-green':'badge-gray'}">${esc(c.status||'—')}</span></td>
-        </tr>`).join('');
-    }
+    const r=await fetch(API+'/dashboard',{signal:AbortSignal.timeout(8000)});
+    const d=await r.json();
+    G('st-total').textContent=d.total??'—';
+    G('st-abertos').textContent=d.abertos??'—';
+    G('st-bancas').textContent=d.bancas_count??Object.keys(d.por_banca||{}).length||'—';
+    G('st-emb').textContent=d.embeddings??'—';
+    const pb=d.por_banca||{};
+    mkChart('ch-bancas','bar',Object.keys(pb),Object.values(pb),'Concursos',Object.keys(pb).map((_,i)=>COLORS[i%COLORS.length]));
+    const pa=d.por_ano||{};
+    mkChart('ch-anos','line',Object.keys(pa),Object.values(pa),'Concursos');
+    const parea=d.por_area||{};
+    mkChart('ch-area','doughnut',Object.keys(parea),Object.values(parea),'Área',Object.keys(parea).map((_,i)=>COLORS[i%COLORS.length]));
+    const leg=G('area-legend');
+    leg.innerHTML=Object.entries(parea).map(([k,v],i)=>`<div style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:50%;background:${COLORS[i%COLORS.length]};flex-shrink:0"></span><span style="color:var(--text-2)">${k} <span style="color:var(--text-4)">(${v})</span></span></div>`).join('');
+    const rec=d.recentes||[];
+    G('tb-recentes').innerHTML=rec.length?rec.map(c=>`<tr><td>${c.titulo||c.title||'—'}</td><td>${c.banca||'—'}</td><td>${c.area||'—'}</td><td><span class="badge-${c.status==='aberto'?'green':'gray'}">${c.status||'—'}</span></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--text-4);padding:16px">Nenhum dado</td></tr>';
   }catch(e){
-    // fallback demo
-    buildBancaChart([{banca:'CEBRASPE',total:45},{banca:'FCC',total:32},{banca:'FGV',total:28},{banca:'VUNESP',total:19},{banca:'IBFC',total:15}]);
-    buildAnosChart([{ano:'2020',total:38},{ano:'2021',total:52},{ano:'2022',total:67},{ano:'2023',total:81},{ano:'2024',total:94}]);
-    buildAreaChart([{area:'Federal',total:45},{area:'Estadual',total:32},{area:'Municipal',total:28},{area:'Tribunais',total:19},{area:'Polícia',total:15}]);
-    G('tbody-rec').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-3);padding:16px;font-size:.8rem">API indisponível — exibindo dados de demonstração</td></tr>';
+    G('st-total').textContent='67';G('st-abertos').textContent='12';G('st-bancas').textContent='8';G('st-emb').textContent='—';
+    mkChart('ch-bancas','bar',['CESPE','FCC','VUNESP','FGV','IBFC'],[22,18,12,10,5],'Concursos',COLORS);
+    mkChart('ch-anos','line',['2020','2021','2022','2023','2024'],[8,12,15,20,12],'Concursos');
+    mkChart('ch-area','doughnut',['TI','Direito','Adm','Saúde','Eng'],[20,18,15,10,4],'Área',COLORS);
+    G('area-legend').innerHTML='<span style="color:var(--text-4);font-size:.78rem">Dados de demonstração</span>';
+    G('tb-recentes').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-4);padding:16px">API indisponível — dados de demonstração</td></tr>';
   }
 }
-
-initLayout({active:'dashboard',title:'Dashboard'});
-loadAll();
-setInterval(loadAll,60000);
+checkAPI();
+loadDashboard();
 </script>
-</body></html>
+</body>
+</html>

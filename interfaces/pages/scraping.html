@@ -7,223 +7,289 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.full{grid-column:1/-1}
-.ra{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:.8rem;line-height:1.75;color:var(--text-2);word-break:break-word;display:none;margin-top:10px;max-height:220px;overflow-y:auto}
-.ra.show{display:block}
-.ra.loading{display:block;color:var(--text-3)}
-.fonte-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;cursor:pointer;transition:border-color .1s}
-.fonte-item:hover{border-color:var(--primary);background:var(--primary-light)}
-.fonte-item input{accent-color:var(--primary)}
-.prog{height:4px;background:var(--border);border-radius:2px;margin-top:8px;display:none}
-.prog.show{display:block}
-.prog-fill{height:100%;background:var(--primary);border-radius:2px;width:0%;transition:width .4s}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem}
-.stat-row:last-child{border-bottom:none}
+.status-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.status-row:last-child{border-bottom:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div class="page-header">
-  <div class="page-title"><i class="fas fa-spider"></i>Scraping de Concursos</div>
-  <div class="page-subtitle">Coleta automática de editais, provas e dados de bancas organizadoras</div>
-</div>
-<div class="page-body">
-  <!-- Stats -->
-  <div class="grid-4 mb-6">
-    <div class="stat-card"><div class="stat-icon"><i class="fas fa-database"></i></div><div><div class="stat-value" id="st-total">—</div><div class="stat-label">Concursos coletados</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#dcfce7"><i class="fas fa-file-pdf" style="color:#16a34a"></i></div><div><div class="stat-value" id="st-pdfs">—</div><div class="stat-label">PDFs indexados</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#fef9c3"><i class="fas fa-clock" style="color:#d97706"></i></div><div><div class="stat-value" id="st-ultima" style="font-size:.85rem">—</div><div class="stat-label">Última coleta</div></div></div>
-    <div class="stat-card"><div class="stat-icon" style="background:#f3e8ff"><i class="fas fa-building" style="color:#7c3aed"></i></div><div><div class="stat-value" id="st-bancas">—</div><div class="stat-label">Bancas</div></div></div>
+<div class="app">
+
+  <aside class="sidebar">
+    <a href="/pages/home" class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      ConcursAI
+    </a>
+    <div class="nav-section">Principal</div>
+    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
+    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <div class="nav-section">IA &amp; Busca</div>
+    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
+    <a href="/pages/concursos" class="nav-link"><i class="fas fa-search"></i> Concursos</a>
+    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
+    <div class="nav-section">Documentos</div>
+    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
+    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
+    <div class="nav-section">Sistema</div>
+    <a href="/pages/scraping" class="nav-link active"><i class="fas fa-spider"></i> Scraping</a>
+    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
+    <div class="sidebar-bottom">
+      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
+      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
+      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="api-status">
+        <span class="status-dot" id="sdot"></span>
+        <span id="stxt">verificando...</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><i class="fas fa-spider"></i> Scraping</div>
+      <div class="topbar-right">
+        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
+      </div>
+    </div>
+    <div class="page-header">
+      <div class="page-title"><i class="fas fa-spider"></i> Scraping</div>
+      <div class="page-subtitle">Coleta automática de editais, provas e dados de bancas</div>
+    </div>
+    <div class="content">
+      <div class="content-inner">
+
+        <div class="grid-4 mb-5">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-database"></i></div>
+            <div class="stat-value" id="sc-total">—</div>
+            <div class="stat-label">Concursos</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-file-pdf"></i></div>
+            <div class="stat-value" id="sc-pdfs">—</div>
+            <div class="stat-label">PDFs Coletados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-value" id="sc-ultima">—</div>
+            <div class="stat-label">Última Coleta</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-circle" id="sc-status-dot" style="color:var(--text-4)"></i></div>
+            <div class="stat-value" id="sc-status">—</div>
+            <div class="stat-label">Status</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+
+          <!-- Coletar concursos -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-download"></i> Coletar Concursos</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Fonte</label>
+                  <select class="form-control" id="cc-fonte">
+                    <option value="todas">Todas as fontes</option>
+                    <option value="pci">PCI Concursos</option>
+                    <option value="questoes">Questões de Concursos</option>
+                    <option value="estrategia">Estratégia Concursos</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Limite</label>
+                  <input type="number" class="form-control" id="cc-limit" value="20" min="5" max="200">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Área (opcional)</label>
+                <input type="text" class="form-control" id="cc-area" placeholder="Ex: TI, Direito, Administração...">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="coletarConcursos()"><i class="fas fa-spider"></i> Iniciar Scraping</button>
+              <div class="ra" id="ra-cc"></div>
+            </div>
+          </div>
+
+          <!-- Status do scraper -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-info-circle"></i> Status do Scraper</div>
+              <button class="btn btn-sm btn-secondary" onclick="loadStatus()"><i class="fas fa-sync"></i></button>
+            </div>
+            <div class="card-body" id="status-body">
+              <div style="color:var(--text-4);font-size:.82rem;text-align:center;padding:20px">Carregando status...</div>
+            </div>
+          </div>
+
+          <!-- Coletar PDFs -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-file-pdf"></i> Coleta de PDFs</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <p style="font-size:.82rem;color:var(--text-3);margin:0">Baixa PDFs de editais e gabaritos vinculados aos concursos coletados.</p>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Tipo</label>
+                  <select class="form-control" id="pdf-tipo">
+                    <option value="edital">Editais</option>
+                    <option value="gabarito">Gabaritos</option>
+                    <option value="prova">Provas</option>
+                    <option value="todos">Todos</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Limite</label>
+                  <input type="number" class="form-control" id="pdf-limit" value="10" min="1" max="100">
+                </div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="coletarPDFs()"><i class="fas fa-download"></i> Coletar PDFs</button>
+              <div class="ra" id="ra-pdf"></div>
+            </div>
+          </div>
+
+          <!-- Busca RAG -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-search"></i> Busca RAG</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:8px">
+                <input type="text" class="form-control" id="rag-q" placeholder="Buscar nos dados coletados..." style="flex:1" onkeydown="if(event.key==='Enter')buscarRAG()">
+                <button class="btn btn-primary btn-sm" onclick="buscarRAG()"><i class="fas fa-search"></i></button>
+              </div>
+              <div class="ra" id="ra-rag"></div>
+            </div>
+          </div>
+
+          <!-- Log -->
+          <div class="card col-2">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-terminal"></i> Log de Operações</div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-secondary" onclick="loadLog()"><i class="fas fa-sync"></i></button>
+                <button class="btn btn-sm btn-secondary" onclick="G('log-box').textContent=''"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="log-box" id="log-box">— Log vazio —</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <footer class="footer">
+      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
+      <span>Trabalho de Conclusão de Curso · 2024</span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </footer>
   </div>
-
-  <div class="two-col">
-    <!-- Coletar concursos -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-download"></i>Coletar Concursos</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Fontes</label>
-          <div style="display:flex;flex-direction:column;gap:5px">
-            <label class="fonte-item"><input type="checkbox" id="src-pc" checked> PCI Concursos</label>
-            <label class="fonte-item"><input type="checkbox" id="src-qc" checked> QConcursos</label>
-            <label class="fonte-item"><input type="checkbox" id="src-gc"> Gran Cursos</label>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Área</label>
-            <select class="form-control" id="sc-area">
-              <option value="">Todas</option>
-              <option value="federal">Federal</option>
-              <option value="estadual">Estadual</option>
-              <option value="municipal">Municipal</option>
-              <option value="tribunal">Tribunal</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin:0">
-            <label class="form-label">Limite</label>
-            <input type="number" class="form-control" id="sc-limite" value="50" min="1" max="500">
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="coletarConcursos()"><i class="fas fa-spider"></i> Iniciar coleta</button>
-        <div class="prog" id="prog-col"><div class="prog-fill" id="prog-col-fill"></div></div>
-        <div id="col-r" class="ra"></div>
-      </div>
-    </div>
-
-    <!-- Status do scraper -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-heartbeat"></i>Status do Scraper</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadStatus()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body" id="status-box">
-        <p style="font-size:.78rem;color:var(--text-3)">Clique em atualizar.</p>
-      </div>
-    </div>
-
-    <!-- Coleta de PDFs -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-file-pdf"></i>Coleta de PDFs</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-        <div class="form-group" style="margin:0">
-          <label class="form-label">Tipo de documento</label>
-          <select class="form-control" id="pdf-tipo">
-            <option value="">Todos</option>
-            <option value="edital">Edital</option>
-            <option value="prova">Prova</option>
-            <option value="gabarito">Gabarito</option>
-          </select>
-        </div>
-        <button class="btn btn-primary" onclick="coletarPDFs()"><i class="fas fa-download"></i> Coletar PDFs</button>
-        <button class="btn btn-secondary" onclick="listarPDFs()"><i class="fas fa-list"></i> Listar PDFs</button>
-        <div class="prog" id="prog-pdf"><div class="prog-fill" id="prog-pdf-fill"></div></div>
-        <div id="pdf-r" class="ra"></div>
-      </div>
-    </div>
-
-    <!-- Busca RAG -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-search"></i>Busca Semântica (RAG)</div></div>
-      <div class="card-body">
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-          <input type="text" class="form-control" id="rag-q" placeholder="Buscar na base vetorial..." style="flex:1" onkeydown="if(event.key==='Enter')buscarRAG()">
-          <input type="number" class="form-control" id="rag-k" value="5" min="1" max="20" style="width:64px">
-          <button class="btn btn-primary" onclick="buscarRAG()"><i class="fas fa-search"></i></button>
-        </div>
-        <div id="rag-r" class="ra"></div>
-      </div>
-    </div>
-
-    <!-- Log (full) -->
-    <div class="card full">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-terminal"></i>Log de Operações</div>
-        <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="G('log-box').innerHTML=''"><i class="fas fa-trash"></i> Limpar</button>
-      </div>
-      <div class="card-body" style="padding:12px">
-        <div class="log-box" id="log-box">Aguardando operações...</div>
-      </div>
-    </div>
-  </div>
 </div>
-<footer class="footer"><div class="footer-inner">
-  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
-  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
-  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
-</div></footer>
 <div class="toast" id="toast"></div>
-<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function show(id,txt){
-  const el=G(id);el.classList.add('show');el.classList.remove('loading');
-  el.innerHTML=String(typeof txt==='object'?JSON.stringify(txt,null,2):txt)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
 }
-function loading(id,m='Processando...'){
-  const el=G(id);el.classList.add('loading','show');
-  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="margin-right:5px;color:var(--primary)"></i>${m}`;
+function show(el,html){el.innerHTML=html;el.classList.add('show');el.classList.remove('loading');}
+function loading(el,msg){
+  el.classList.add('loading','show');
+  el.innerHTML=`<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>${esc(msg)}</span>`;
 }
-function log(msg,type='info'){
-  const lb=G('log-box'),t=new Date().toLocaleTimeString('pt-BR');
-  const cl=type==='err'?'color:#f87171':type==='ok'?'color:#4ade80':'color:#94a3b8';
-  lb.innerHTML+=`\n<span style="${cl}">[${t}]</span> ${esc(msg)}`;
-  lb.scrollTop=lb.scrollHeight;
+function log(msg){
+  const b=G('log-box');
+  const ts=new Date().toLocaleTimeString('pt-BR');
+  b.textContent=(b.textContent==='— Log vazio —'?'':(b.textContent+'\n'))+'['+ts+'] '+msg;
+  b.scrollTop=b.scrollHeight;
 }
-function prog(id,pct){
-  const bar=G(id),fill=G(id+'-fill');
-  if(pct>=0){bar.classList.add('show');fill.style.width=pct+'%';}
-  else{bar.classList.remove('show');fill.style.width='0%';}
-}
-
 async function loadStats(){
   try{
-    const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    G('st-total').textContent=d.total_concursos??d.total??'—';
-    G('st-pdfs').textContent=d.pdfs_coletados??d.pdfs??'—';
-    G('st-bancas').textContent=d.bancas_monitoradas??d.bancas??'—';
-    G('st-ultima').textContent=d.ultima_coleta?new Date(d.ultima_coleta).toLocaleDateString('pt-BR'):'—';
-  }catch(e){log('Estatísticas indisponíveis','err');}
+    const r=await fetch(API+'/scraping/stats',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    G('sc-total').textContent=d.total_concursos??d.total??'—';
+    G('sc-pdfs').textContent=d.total_pdfs??d.pdfs??'—';
+    G('sc-ultima').textContent=d.ultima_coleta??d.ultima??'—';
+    G('sc-status').textContent=d.status??'OK';
+    G('sc-status-dot').style.color=d.status==='erro'?'#ef4444':'#22c55e';
+  }catch(e){console.warn('stats',e);}
 }
-
 async function loadStatus(){
-  G('status-box').innerHTML='<p style="font-size:.78rem;color:var(--text-3)">Verificando...</p>';
   try{
-    const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    const rows=[['Status',d.status||'ativo'],['Concursos',d.total_concursos??'—'],['PDFs',d.pdfs_coletados??'—'],['Bancas',d.bancas_monitoradas??'—'],['Última coleta',d.ultima_coleta||'—']];
-    G('status-box').innerHTML=rows.map(([l,v])=>`<div class="stat-row"><span style="color:var(--text-3)">${l}</span><span style="font-weight:600">${esc(String(v))}</span></div>`).join('');
-    log('Status verificado','ok');
-  }catch(e){G('status-box').innerHTML='<p style="font-size:.78rem;color:var(--danger)">Scraper indisponível</p>';log(e.message,'err');}
+    const r=await fetch(API+'/scraping/status',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    const fontes=d.fontes||d.scrapers||[];
+    G('status-body').innerHTML=fontes.length
+      ?fontes.map(f=>`<div class="status-row"><span style="color:var(--text-2)">${esc(f.nome||f.name||f)}</span><span class="badge-${f.ativo||f.online?'green':'red'}">${f.ativo||f.online?'Ativo':'Inativo'}</span></div>`).join('')
+      :`<div style="font-size:.82rem;color:var(--text-3)">${esc(JSON.stringify(d,null,2))}</div>`;
+  }catch(e){G('status-body').innerHTML='<div style="color:#dc2626;font-size:.82rem">Erro ao carregar status.</div>';}
 }
-
 async function coletarConcursos(){
-  const area=G('sc-area').value,limite=parseInt(G('sc-limite').value);
-  loading('col-r','Coletando...');prog('prog-col',30);log('Coleta iniciada (limite='+limite+')...');
+  const ra=G('ra-cc');
+  loading(ra,'Executando scraping...');
+  log('Iniciando coleta de concursos...');
   try{
-    const body={limite};if(area)body.area=area;
-    const d=await fetch(API+'/scraping/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-    prog('prog-col',100);setTimeout(()=>prog('prog-col',-1),1200);
-    show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('Coleta iniciada!');log(d.mensagem||'ok','ok');loadStats();
-  }catch(e){prog('prog-col',-1);show('col-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
+    const body={fonte:G('cc-fonte').value,limite:parseInt(G('cc-limit').value),area:G('cc-area').value||undefined};
+    const r=await fetch(API+'/scraping/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(180000)});
+    const d=await r.json();
+    const msg=d.mensagem||d.message||JSON.stringify(d);
+    show(ra,`<div style="font-size:.82rem;color:var(--text-2)">${esc(msg)}</div>`);
+    log('Coleta concluída: '+msg);
+    toast('Coleta concluída!');
+    loadStats();
+  }catch(e){show(ra,`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`);log('ERRO: '+e.message);toast('Erro no scraping',false);}
 }
-
 async function coletarPDFs(){
-  const tipo=G('pdf-tipo').value;
-  loading('pdf-r','Coletando PDFs...');prog('prog-pdf',20);log('Coletando PDFs (tipo='+(tipo||'todos')+')...');
+  const ra=G('ra-pdf');
+  loading(ra,'Coletando PDFs...');
+  log('Iniciando coleta de PDFs...');
   try{
-    const url=tipo?`${API}/scraping/pdfs?tipo=${tipo}`:API+'/scraping/pdfs';
-    const d=await fetch(url,{method:'POST'}).then(r=>r.json());
-    prog('prog-pdf',100);setTimeout(()=>prog('prog-pdf',-1),1200);
-    show('pdf-r',d.mensagem||d.message||JSON.stringify(d));toast('Concluído!');log(d.mensagem||'ok','ok');loadStats();
-  }catch(e){prog('prog-pdf',-1);show('pdf-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
+    const body={tipo:G('pdf-tipo').value,limite:parseInt(G('pdf-limit').value)};
+    const r=await fetch(API+'/scraping/pdfs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
+    const d=await r.json();
+    const msg=d.mensagem||d.message||JSON.stringify(d);
+    show(ra,`<div style="font-size:.82rem;color:var(--text-2)">${esc(msg)}</div>`);
+    log('PDFs coletados: '+msg);
+    toast('PDFs coletados!');
+  }catch(e){show(ra,`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`);log('ERRO PDF: '+e.message);toast('Erro',false);}
 }
-
-async function listarPDFs(){
-  loading('pdf-r','Carregando lista...');
-  try{
-    const d=await fetch(API+'/scraping/pdfs').then(r=>r.json());
-    const list=d.pdfs||d||[];
-    show('pdf-r',list.length?list.map(p=>esc(p.nome||p.filename||p)).join('\n'):'Nenhum PDF encontrado.');
-    log(list.length+' PDFs encontrados','ok');
-  }catch(e){show('pdf-r','Erro: '+e.message);log(e.message,'err');}
-}
-
 async function buscarRAG(){
-  const q=G('rag-q').value.trim(),k=parseInt(G('rag-k').value)||5;
-  if(!q){toast('Digite uma busca',false);return;}
-  loading('rag-r','Buscando...');log('RAG: '+q);
+  const q=G('rag-q').value.trim();
+  if(!q)return toast('Digite um termo de busca',false);
+  const ra=G('ra-rag');
+  loading(ra,'Buscando...');
   try{
-    const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,n_resultados:k})}).then(r=>r.json());
-    show('rag-r',d.resposta||d.resultado||d.answer||JSON.stringify(d));log('ok','ok');
-  }catch(e){show('rag-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
+    const r=await fetch(API+'/buscar?q='+encodeURIComponent(q)+'&limit=5',{signal:AbortSignal.timeout(15000)});
+    const d=await r.json();
+    const res=d.resultados||d.results||[];
+    show(ra,res.length
+      ?res.map(x=>`<div style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:5px;font-size:.79rem"><strong>${esc(x.titulo||x.title||'')}</strong><br><span style="color:var(--text-3)">${esc((x.trecho||x.texto||'').slice(0,180))}...</span></div>`).join('')
+      :'<div style="font-size:.82rem;color:var(--text-3)">Nenhum resultado.</div>');
+  }catch(e){show(ra,`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`);}
 }
-
-initLayout({active:'scraping',title:'Scraping'});
-loadStats();loadStatus();
+async function loadLog(){
+  try{
+    const r=await fetch(API+'/scraping/log',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    const lines=d.log||d.logs||d||[];
+    G('log-box').textContent=Array.isArray(lines)?lines.join('\n'):String(lines);
+    G('log-box').scrollTop=G('log-box').scrollHeight;
+  }catch(e){log('Erro ao carregar log: '+e.message);}
+}
+checkAPI();
+loadStats();
+loadStatus();
 </script>
-</body></html>
+</body>
+</html>

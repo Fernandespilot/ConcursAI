@@ -7,139 +7,203 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.chat-layout{display:flex;height:calc(100vh - 48px);overflow:hidden}
-.chat-cfg{width:220px;min-width:220px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column}
-.cfg-head{padding:11px 14px;border-bottom:1px solid var(--border);font-size:.79rem;font-weight:600;color:var(--text-2)}
-.cfg-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1}
-.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.chat-topbar{padding:9px 18px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px}
-.chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--text-3);gap:8px;padding:40px}
-.sug-btn{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:4px 11px;font-size:.73rem;cursor:pointer;color:var(--text-2);font-family:inherit;transition:all .1s}
-.sug-btn:hover{border-color:var(--primary);color:var(--primary)}
-.input-wrap{padding:11px 18px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
-.input-box{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;transition:border-color .1s,box-shadow .1s}
-.input-box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-.input-box textarea{flex:1;border:none;outline:none;font-size:.82rem;font-family:inherit;resize:none;min-height:20px;max-height:100px;line-height:1.6;background:transparent;color:var(--text)}
-.send-btn{background:var(--primary);color:#fff;border:none;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
-.send-btn:hover{background:var(--primary-hover)}
-.send-btn:disabled{background:var(--border);cursor:not-allowed}
-.msg-bubble code{background:rgba(0,0,0,.07);padding:1px 5px;border-radius:3px;font-family:'Courier New',monospace;font-size:.85em}
-.chat-msg.user .msg-bubble code{background:rgba(255,255,255,.2)}
+.cfg-label{font-size:.72rem;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.cfg-row{display:flex;flex-direction:column;gap:4px}
+.msg{display:flex;flex-direction:column;gap:3px;max-width:82%}
+.msg.user{align-self:flex-end;align-items:flex-end}
+.msg.ai{align-self:flex-start;align-items:flex-start}
+.bubble{padding:10px 13px;border-radius:12px;font-size:.85rem;line-height:1.55;word-break:break-word}
+.msg.user .bubble{background:var(--blue);color:#fff;border-bottom-right-radius:3px}
+.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px}
+.msg-meta{font-size:.68rem;color:var(--text-4)}
+.suggest-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.suggest-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:.78rem;color:var(--text-2);cursor:pointer;text-align:left;line-height:1.4;transition:border-color .15s}
+.suggest-btn:hover{border-color:var(--blue);color:var(--blue)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--text-4);text-align:center;padding:20px}
+.empty-state i{font-size:2rem;opacity:.4}
+.empty-state h3{font-size:.95rem;font-weight:600;color:var(--text-3);margin:0}
+.empty-state p{font-size:.8rem;margin:0}
+.spinner-sm{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div class="chat-layout">
-  <div class="chat-cfg">
-    <div class="cfg-head"><i class="fas fa-sliders-h" style="margin-right:6px;color:var(--primary)"></i>Configurações</div>
-    <div class="cfg-body">
-      <div class="form-group">
-        <label class="form-label">Provedor</label>
-        <select class="form-control" id="prov" onchange="onProvChange()">
-          <option value="backend">Backend (Groq)</option>
-          <option value="openai">OpenAI</option>
-          <option value="ollama">Ollama</option>
-        </select>
-      </div>
-      <div class="form-group" id="key-wrap" style="display:none">
-        <label class="form-label">API Key</label>
-        <input type="password" class="form-control" id="api-key" placeholder="sk-...">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Modo</label>
-        <select class="form-control" id="mode">
-          <option value="rag">RAG (base de dados)</option>
-          <option value="direto">Direto</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Temperatura — <span id="temp-val">0.7</span></label>
-        <input type="range" id="temp" min="0" max="1" step="0.1" value="0.7" style="width:100%;accent-color:var(--primary)" oninput="G('temp-val').textContent=this.value">
-      </div>
-      <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:auto" onclick="clearChat()"><i class="fas fa-rotate-left"></i> Nova conversa</button>
-      <div style="padding-top:10px;border-top:1px solid var(--border);font-size:.71rem;color:var(--text-3);line-height:1.7">
-        <strong style="color:var(--text-2);display:block;margin-bottom:2px">Pipeline RAG</strong>
-        ChromaDB → SentenceTransformers → Groq llama-3.3-70b
+<div class="app">
+
+  <aside class="sidebar">
+    <a href="/pages/home" class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      ConcursAI
+    </a>
+    <div class="nav-section">Principal</div>
+    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
+    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <div class="nav-section">IA &amp; Busca</div>
+    <a href="/pages/chat" class="nav-link active"><i class="fas fa-comments"></i> Chat IA</a>
+    <a href="/pages/concursos" class="nav-link"><i class="fas fa-search"></i> Concursos</a>
+    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
+    <div class="nav-section">Documentos</div>
+    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
+    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
+    <div class="nav-section">Sistema</div>
+    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
+    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
+    <div class="sidebar-bottom">
+      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
+      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
+      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="api-status">
+        <span class="status-dot" id="sdot"></span>
+        <span id="stxt">verificando...</span>
       </div>
     </div>
-  </div>
+  </aside>
 
-  <div class="chat-main">
-    <div class="chat-topbar">
-      <span style="font-size:.82rem;font-weight:600;color:var(--text)"><i class="fas fa-comments" style="color:var(--primary);margin-right:6px"></i>Chat IA</span>
-      <span id="msg-count" style="font-size:.71rem;color:var(--text-3)">0 mensagens</span>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><i class="fas fa-comments"></i> Chat IA</div>
+      <div class="topbar-right">
+        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
+      </div>
     </div>
+    <div class="page-header">
+      <div class="page-title"><i class="fas fa-comments"></i> Chat IA</div>
+      <div class="page-subtitle">Converse com a IA sobre concursos e editais</div>
+    </div>
+    <div class="content">
+      <div style="display:flex;height:100%;overflow:hidden">
 
-    <div class="msgs" id="msgs">
-      <div class="chat-empty" id="empty">
-        <div style="font-size:1.6rem;opacity:.18"><i class="fas fa-comments"></i></div>
-        <div style="font-size:.87rem;font-weight:600;color:var(--text-2)">Como posso ajudar?</div>
-        <div style="font-size:.77rem;color:var(--text-3);max-width:260px;line-height:1.7">Pergunte sobre concursos, editais, bancas ou conteúdo de provas.</div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:6px">
-          <button class="sug-btn" onclick="suggest(this)">Concursos abertos em TI</button>
-          <button class="sug-btn" onclick="suggest(this)">Estilo de prova da CEBRASPE</button>
-          <button class="sug-btn" onclick="suggest(this)">Diferença entre lei e decreto</button>
-          <button class="sug-btn" onclick="suggest(this)">Concursos federais 2024</button>
+        <!-- Config panel -->
+        <div style="width:210px;min-width:210px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;padding:14px;gap:10px;overflow-y:auto">
+          <div class="cfg-row">
+            <div class="cfg-label">Provedor</div>
+            <select class="form-control" id="cfg-prov" onchange="onProvChange()">
+              <option value="backend">Backend (padrão)</option>
+              <option value="openai">OpenAI</option>
+              <option value="ollama">Ollama</option>
+            </select>
+          </div>
+          <div class="cfg-row" id="row-key" style="display:none">
+            <div class="cfg-label">API Key</div>
+            <input type="password" class="form-control" id="cfg-key" placeholder="sk-...">
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">Modo RAG</div>
+            <select class="form-control" id="cfg-modo">
+              <option value="rag">RAG (concursos)</option>
+              <option value="direto">Direto (sem RAG)</option>
+            </select>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-label">Temperatura: <span id="temp-val">0.7</span></div>
+            <input type="range" min="0" max="1" step="0.1" value="0.7" id="cfg-temp" oninput="G('temp-val').textContent=this.value" style="width:100%">
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="clearChat()" style="margin-top:auto"><i class="fas fa-trash"></i> Limpar chat</button>
         </div>
-      </div>
-    </div>
 
-    <div class="input-wrap">
-      <div class="input-box">
-        <textarea id="ci" placeholder="Sua pergunta... (Enter para enviar)" rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';G('cc').textContent=this.value.length"></textarea>
-        <button class="send-btn" id="sbtn" onclick="send()"><i class="fas fa-paper-plane" style="font-size:.7rem"></i></button>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:3px;font-size:.69rem;color:var(--text-3)">
-        <span>Shift+Enter = nova linha</span><span id="cc">0</span>
+        <!-- Chat area -->
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+          <div id="msgs" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px">
+            <div class="empty-state" id="empty">
+              <i class="fas fa-comments"></i>
+              <h3>Como posso ajudar?</h3>
+              <p>Faça uma pergunta sobre concursos, editais ou estratégias de estudo.</p>
+              <div class="suggest-grid">
+                <button class="suggest-btn" onclick="suggest('Quais concursos estão abertos para área de TI?')">Concursos abertos para TI</button>
+                <button class="suggest-btn" onclick="suggest('Como estudar para CESPE/CEBRASPE?')">Como estudar para CESPE?</button>
+                <button class="suggest-btn" onclick="suggest('Quais as principais bancas do Brasil?')">Principais bancas</button>
+                <button class="suggest-btn" onclick="suggest('Me explique o que é RAG aplicado a concursos')">O que é RAG?</button>
+              </div>
+            </div>
+          </div>
+          <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:8px;align-items:flex-end">
+            <textarea id="inp" class="form-control" placeholder="Digite sua pergunta... (Enter para enviar, Shift+Enter para nova linha)" rows="1" style="flex:1;resize:none;min-height:36px;max-height:120px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+            <button class="btn btn-primary" id="send-btn" onclick="send()" style="height:36px;padding:0 14px"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+
       </div>
     </div>
+    <footer class="footer">
+      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
+      <span>Trabalho de Conclusão de Curso · 2024</span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </footer>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
-let n=0;
 function G(id){return document.getElementById(id);}
-function fmt(t){
-  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/`([^`]+)`/g,'<code>$1</code>')
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(s){
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px;font-size:.85em">$1</code>')
     .replace(/\n/g,'<br>');
 }
-function addMsg(role,html){
-  const el=G('empty');if(el)el.style.display='none';
-  n++;G('msg-count').textContent=n+' mensagem'+(n>1?'s':'');
+function onProvChange(){
+  const p=G('cfg-prov').value;
+  G('row-key').style.display=(p==='openai')?'flex':'none';
+}
+function ts(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+function addMsg(role,text,loading=false){
+  const empty=G('empty');
+  if(empty)empty.remove();
   const d=document.createElement('div');
-  d.className='chat-msg'+(role==='user'?' user':'');
-  d.innerHTML=`<div class="msg-avatar ${role==='user'?'user':'ai'}">${role==='user'?'<i class="fas fa-user" style="font-size:.58rem"></i>':'AI'}</div><div class="msg-bubble">${html}</div>`;
+  d.className='msg '+role;
+  d.innerHTML=loading
+    ?`<div class="bubble"><span class="spinner-sm"></span> <span style="color:var(--text-3);font-size:.82rem">Pensando...</span></div>`
+    :`<div class="bubble">${role==='ai'?fmt(text):esc(text)}</div><div class="msg-meta">${ts()}</div>`;
   G('msgs').appendChild(d);
   G('msgs').scrollTop=G('msgs').scrollHeight;
-  return d.querySelector('.msg-bubble');
+  return d;
 }
 async function send(){
-  const ci=G('ci'),q=ci.value.trim();if(!q)return;
-  ci.value='';ci.style.height='auto';G('cc').textContent=0;G('sbtn').disabled=true;
-  addMsg('user',fmt(q));
-  const bubble=addMsg('ai','<span style="color:var(--text-3);font-style:italic"><i class="fas fa-circle-notch fa-spin" style="font-size:.72rem;margin-right:4px"></i>Pensando...</span>');
+  const inp=G('inp');
+  const q=inp.value.trim();
+  if(!q)return;
+  inp.value='';
+  G('send-btn').disabled=true;
+  addMsg('user',q);
+  const thinking=addMsg('ai','',true);
   try{
-    const body={pergunta:q,query:q,temperatura:parseFloat(G('temp').value),modo:G('mode').value};
-    if(G('prov').value!=='backend')body.api_key=G('api-key').value;
-    const d=await fetch(API+'/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-    bubble.innerHTML=fmt(d.resposta||d.response||d.answer||d.message||JSON.stringify(d));
-  }catch(e){bubble.innerHTML=`<span style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i> ${e.message}</span>`;}
-  G('sbtn').disabled=false;G('msgs').scrollTop=G('msgs').scrollHeight;
+    const prov=G('cfg-prov').value;
+    const modo=G('cfg-modo').value;
+    const temp=parseFloat(G('cfg-temp').value);
+    const key=G('cfg-key').value;
+    const body={pergunta:q,temperatura:temp,modo};
+    if(prov==='openai'&&key)body.api_key=key;
+    if(prov==='ollama')body.provedor='ollama';
+    const ep=modo==='rag'?'/chat':'/chat/direto';
+    const r=await fetch(API+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();
+    const resp=d.resposta||d.response||d.answer||d.message||JSON.stringify(d);
+    thinking.innerHTML=`<div class="bubble">${fmt(resp)}</div><div class="msg-meta">${ts()}${d.modelo?' · '+d.modelo:''}</div>`;
+  }catch(e){
+    thinking.innerHTML=`<div class="bubble" style="border-color:#fca5a5;background:#fef2f2;color:#dc2626">Erro: ${esc(e.message)}</div><div class="msg-meta">${ts()}</div>`;
+  }
+  G('send-btn').disabled=false;
+  G('msgs').scrollTop=G('msgs').scrollHeight;
 }
-function suggest(b){G('ci').value=b.textContent;send();}
-function clearChat(){n=0;G('msgs').innerHTML='';G('msg-count').textContent='0 mensagens';location.reload();}
-function onProvChange(){G('key-wrap').style.display=G('prov').value==='openai'?'block':'none';}
-
-const qp=new URLSearchParams(location.search).get('q');
-if(qp){G('ci').value=qp;setTimeout(send,400);}
-
-initLayout({active:'chat',title:'Chat IA'});
+function suggest(q){G('inp').value=q;send();}
+function clearChat(){
+  G('msgs').innerHTML=`<div class="empty-state" id="empty"><i class="fas fa-comments"></i><h3>Como posso ajudar?</h3><p>Faça uma pergunta sobre concursos, editais ou estratégias de estudo.</p><div class="suggest-grid"><button class="suggest-btn" onclick="suggest('Quais concursos estão abertos para área de TI?')">Concursos abertos para TI</button><button class="suggest-btn" onclick="suggest('Como estudar para CESPE/CEBRASPE?')">Como estudar para CESPE?</button><button class="suggest-btn" onclick="suggest('Quais as principais bancas do Brasil?')">Principais bancas</button><button class="suggest-btn" onclick="suggest('Me explique o que é RAG aplicado a concursos')">O que é RAG?</button></div></div>`;
+}
+checkAPI();
+const params=new URLSearchParams(location.search);
+const pq=params.get('q');
+if(pq){G('inp').value=pq;setTimeout(send,400);}
 </script>
-</body></html>
+</body>
+</html>

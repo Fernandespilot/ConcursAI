@@ -7,220 +7,283 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.full{grid-column:1/-1}
-.ra{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:.8rem;line-height:1.75;color:var(--text-2);word-break:break-word;display:none;margin-top:10px;max-height:200px;overflow-y:auto}
-.ra.show{display:block}
-.ra.loading{display:block;color:var(--text-3)}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.8rem}
-.stat-row:last-child{border-bottom:none}
-.health-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:var(--radius-sm);background:var(--bg);margin-bottom:5px;font-size:.8rem}
-.health-row:last-child{margin-bottom:0}
-.btn-danger-soft{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
-.btn-danger-soft:hover{background:#fecaca}
+.health-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.health-row:last-child{border-bottom:none}
+.health-label{color:var(--text-3);font-weight:500}
+.health-val{font-weight:600;color:var(--text)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--r);padding:24px;max-width:440px;width:90%}
+.modal-title{font-size:1rem;font-weight:700;margin:0 0 8px}
+.modal-desc{font-size:.83rem;color:var(--text-3);margin:0 0 18px;line-height:1.5}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div class="page-header">
-  <div class="page-title"><i class="fas fa-shield-alt"></i>Administração</div>
-  <div class="page-subtitle">Gerenciamento de banco de dados, embeddings e configurações do sistema</div>
-</div>
-<div class="page-body">
-  <!-- Health (full) -->
-  <div class="card mb-6">
-    <div class="card-header">
-      <div class="card-title"><i class="fas fa-heartbeat"></i>Saúde do Sistema</div>
-      <button class="btn btn-secondary btn-sm" onclick="loadHealth()"><i class="fas fa-sync"></i> Verificar</button>
-    </div>
-    <div class="card-body" id="health-box">
-      <p style="font-size:.78rem;color:var(--text-3)">Clique em Verificar para checar o estado do sistema.</p>
-    </div>
-  </div>
+<div class="app">
 
-  <div class="two-col">
-    <!-- Estatísticas -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-database"></i>Banco de Dados</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadStats()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body" id="stats-box">
-        <p style="font-size:.78rem;color:var(--text-3)">Carregando...</p>
-      </div>
-    </div>
-
-    <!-- Embeddings -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-brain"></i>Embeddings (ChromaDB)</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
-        <p style="font-size:.78rem;color:var(--text-3);margin:0">Gerencia os vetores semânticos do pipeline RAG.</p>
-        <button class="btn btn-secondary" onclick="statusEmb()"><i class="fas fa-info-circle"></i> Status da coleção</button>
-        <button class="btn btn-primary" onclick="reindexar()"><i class="fas fa-redo"></i> Reindexar coleção</button>
-        <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:9px 11px;font-size:.75rem;color:#92400e">
-          <i class="fas fa-exclamation-triangle"></i> A reindexação pode levar vários minutos.
-        </div>
-        <div id="emb-r" class="ra"></div>
+  <aside class="sidebar">
+    <a href="/pages/home" class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      ConcursAI
+    </a>
+    <div class="nav-section">Principal</div>
+    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
+    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <div class="nav-section">IA &amp; Busca</div>
+    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
+    <a href="/pages/concursos" class="nav-link"><i class="fas fa-search"></i> Concursos</a>
+    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
+    <div class="nav-section">Documentos</div>
+    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
+    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
+    <div class="nav-section">Sistema</div>
+    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
+    <a href="/pages/admin" class="nav-link active"><i class="fas fa-shield-alt"></i> Admin</a>
+    <div class="sidebar-bottom">
+      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
+      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
+      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="api-status">
+        <span class="status-dot" id="sdot"></span>
+        <span id="stxt">verificando...</span>
       </div>
     </div>
+  </aside>
 
-    <!-- Manutenção -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-tools"></i>Manutenção de Dados</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:7px">
-        <button class="btn btn-secondary" onclick="limparDupl()"><i class="fas fa-copy"></i> Remover duplicatas</button>
-        <button class="btn btn-secondary" onclick="validarDados()"><i class="fas fa-check-circle"></i> Validar dados</button>
-        <button class="btn btn-secondary" onclick="exportarDados()"><i class="fas fa-download"></i> Exportar CSV</button>
-        <button class="btn btn-danger-soft" onclick="confirmarLimpar()"><i class="fas fa-trash-alt"></i> Limpar banco de dados</button>
-        <div id="manut-r" class="ra"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><i class="fas fa-shield-alt"></i> Admin</div>
+      <div class="topbar-right">
+        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
       </div>
     </div>
+    <div class="page-header">
+      <div class="page-title"><i class="fas fa-shield-alt"></i> Admin</div>
+      <div class="page-subtitle">Gerenciamento do banco de dados, embeddings e sistema</div>
+    </div>
+    <div class="content">
+      <div class="content-inner">
 
-    <!-- Configurações -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-cog"></i>Configurações da API</div></div>
-      <div class="card-body">
-        <div class="form-group">
-          <label class="form-label">Modelo LLM</label>
-          <select class="form-control" id="cfg-modelo">
-            <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
-            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
-            <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Máx. resultados RAG</label>
-            <input type="number" class="form-control" id="cfg-rag" value="5" min="1" max="20">
+        <!-- Health card -->
+        <div class="card mb-5">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-heartbeat"></i> Saúde do Sistema</div>
+            <button class="btn btn-sm btn-secondary" onclick="loadHealth()"><i class="fas fa-sync"></i> Atualizar</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">Timeout (s)</label>
-            <input type="number" class="form-control" id="cfg-timeout" value="30" min="5" max="120">
+          <div class="card-body" id="health-body">
+            <div style="color:var(--text-4);font-size:.82rem;text-align:center;padding:16px">Carregando...</div>
           </div>
         </div>
-        <button class="btn btn-primary" style="width:100%" onclick="salvarCfg()"><i class="fas fa-save"></i> Salvar</button>
-        <div id="cfg-r" class="ra"></div>
-      </div>
-    </div>
 
-    <!-- Coleta admin -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-download"></i>Coleta Administrativa</div></div>
-      <div class="card-body" style="display:flex;flex-direction:column;gap:7px">
-        <button class="btn btn-primary" onclick="coletarTudo()"><i class="fas fa-spider"></i> Coletar tudo agora</button>
-        <button class="btn btn-secondary" onclick="processarCSV()"><i class="fas fa-file-csv"></i> Processar CSV existente</button>
-        <button class="btn btn-secondary" onclick="carregarEmb()"><i class="fas fa-upload"></i> Carregar embeddings</button>
-        <div id="col-r" class="ra"></div>
-      </div>
-    </div>
+        <div class="grid-2">
 
-    <!-- Log (full) -->
-    <div class="card full">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-terminal"></i>Log do Sistema</div>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-secondary btn-sm" onclick="loadLog()"><i class="fas fa-sync"></i></button>
-          <button class="btn btn-sm btn-danger-soft" onclick="G('log-box').innerHTML=''"><i class="fas fa-trash"></i></button>
+          <!-- Banco de dados stats -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-database"></i> Banco de Dados</div>
+              <button class="btn btn-sm btn-secondary" onclick="loadStats()"><i class="fas fa-sync"></i></button>
+            </div>
+            <div class="card-body" id="db-stats">
+              <div style="color:var(--text-4);font-size:.82rem;text-align:center;padding:16px">Carregando...</div>
+            </div>
+          </div>
+
+          <!-- Embeddings -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-vector-square"></i> Embeddings</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-secondary btn-sm" onclick="statusEmb()"><i class="fas fa-info-circle"></i> Status dos Embeddings</button>
+              <button class="btn btn-primary btn-sm" onclick="reindexar()"><i class="fas fa-redo"></i> Reindexar Tudo</button>
+              <button class="btn btn-secondary btn-sm" onclick="carregarEmb()"><i class="fas fa-upload"></i> Carregar de CSV</button>
+              <div class="ra" id="ra-emb"></div>
+            </div>
+          </div>
+
+          <!-- Manutenção -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-tools"></i> Manutenção</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-secondary btn-sm" onclick="limparDupl()"><i class="fas fa-copy"></i> Remover Duplicatas</button>
+              <button class="btn btn-secondary btn-sm" onclick="validarDados()"><i class="fas fa-check-circle"></i> Validar Dados</button>
+              <button class="btn btn-secondary btn-sm" onclick="exportarDados()"><i class="fas fa-download"></i> Exportar Dados (JSON)</button>
+              <button class="btn btn-sm" style="background:#fef2f2;color:#dc2626;border:1px solid #fca5a5" onclick="confirmAction('limpar-banco','Limpar todo o banco de dados? Esta ação não pode ser desfeita.',limparBanco)">
+                <i class="fas fa-trash"></i> Limpar Banco
+              </button>
+              <div class="ra" id="ra-manut"></div>
+            </div>
+          </div>
+
+          <!-- Configuração -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-cog"></i> Configuração</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+              <div class="form-group">
+                <label class="form-label">Modelo de Embeddings</label>
+                <select class="form-control" id="cfg-model">
+                  <option value="text-embedding-ada-002">text-embedding-ada-002</option>
+                  <option value="text-embedding-3-small">text-embedding-3-small</option>
+                  <option value="text-embedding-3-large">text-embedding-3-large</option>
+                  <option value="all-MiniLM-L6-v2">all-MiniLM-L6-v2 (local)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Chunk Size</label>
+                <input type="number" class="form-control" id="cfg-chunk" value="512" min="128" max="2048">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Top-K RAG</label>
+                <input type="number" class="form-control" id="cfg-topk" value="5" min="1" max="20">
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="salvarCfg()"><i class="fas fa-save"></i> Salvar Configuração</button>
+              <div class="ra" id="ra-cfg"></div>
+            </div>
+          </div>
+
+          <!-- Coleta admin -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-spider"></i> Coleta Completa</div>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+              <p style="font-size:.8rem;color:var(--text-3);margin:0">Executa coleta completa: scraping + PDF + indexação de embeddings.</p>
+              <button class="btn btn-primary btn-sm" onclick="confirmAction('coletar-tudo','Iniciar coleta completa? Pode levar vários minutos.',coletarTudo)"><i class="fas fa-play"></i> Executar Tudo</button>
+              <button class="btn btn-secondary btn-sm" onclick="processarCSV()"><i class="fas fa-file-csv"></i> Processar CSV</button>
+              <div class="ra" id="ra-admin"></div>
+            </div>
+          </div>
+
+          <!-- Log -->
+          <div class="card col-2">
+            <div class="card-header">
+              <div class="card-title"><i class="fas fa-terminal"></i> Log do Sistema</div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-secondary" onclick="loadLog()"><i class="fas fa-sync"></i></button>
+                <button class="btn btn-sm btn-secondary" onclick="G('log-box').textContent=''"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="log-box" id="log-box">— Log vazio —</div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <div class="card-body" style="padding:12px">
-        <div class="log-box" id="log-box">Aguardando...</div>
-      </div>
+    </div>
+    <footer class="footer">
+      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
+      <span>Trabalho de Conclusão de Curso · 2024</span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </footer>
+  </div>
+</div>
+
+<!-- Confirmation modal -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="cm-title">Confirmar ação</div>
+    <div class="modal-desc" id="cm-desc"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary btn-sm" onclick="G('confirm-modal').classList.remove('show')">Cancelar</button>
+      <button class="btn btn-sm" id="cm-ok" style="background:#dc2626;color:#fff;border:none">Confirmar</button>
     </div>
   </div>
 </div>
 
-<!-- Modal confirmação -->
-<div id="modal-wrap" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center">
-  <div style="background:var(--surface);border-radius:var(--radius);padding:24px 28px;max-width:400px;width:90%;border:1px solid var(--border)">
-    <div style="font-size:.95rem;font-weight:700;margin-bottom:8px;color:var(--danger)"><i class="fas fa-exclamation-triangle"></i> Confirmar limpeza</div>
-    <p style="font-size:.8rem;color:var(--text-2);margin-bottom:18px;line-height:1.7">Esta ação irá <strong>remover todos os concursos</strong> do banco. Não pode ser desfeita.</p>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn btn-secondary" onclick="G('modal-wrap').style.display='none'">Cancelar</button>
-      <button class="btn" style="background:var(--danger);color:#fff;border-color:var(--danger)" onclick="limparBanco()"><i class="fas fa-trash-alt"></i> Limpar</button>
-    </div>
-  </div>
-</div>
-
-<footer class="footer"><div class="footer-inner">
-  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
-  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
-  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
-</div></footer>
 <div class="toast" id="toast"></div>
-<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function show(id,txt){
-  const el=G(id);el.classList.add('show');el.classList.remove('loading');
-  el.innerHTML=String(typeof txt==='object'?JSON.stringify(txt,null,2):txt)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
 }
-function loading(id,m='Processando...'){
-  const el=G(id);el.classList.add('loading','show');
-  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="margin-right:5px;color:var(--primary)"></i>${m}`;
+function show(el,html){el.innerHTML=html;el.classList.add('show');el.classList.remove('loading');}
+function loading(el,msg){
+  el.classList.add('loading','show');
+  el.innerHTML=`<span style="display:inline-flex;align-items:center;gap:8px"><span style="width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block"></span>${esc(msg)}</span>`;
 }
-function log(msg,type='info'){
-  const lb=G('log-box'),t=new Date().toLocaleTimeString('pt-BR');
-  const cl=type==='err'?'color:#f87171':type==='ok'?'color:#4ade80':'color:#94a3b8';
-  lb.innerHTML+=`\n<span style="${cl}">[${t}]</span> ${esc(msg)}`;
-  lb.scrollTop=lb.scrollHeight;
+function log(msg){
+  const b=G('log-box');
+  const ts=new Date().toLocaleTimeString('pt-BR');
+  if(b.textContent==='— Log vazio —')b.textContent='';
+  b.textContent+='\n['+ts+'] '+msg;
+  b.scrollTop=b.scrollHeight;
 }
-
+function confirmAction(id,desc,fn){
+  G('cm-title').textContent='Confirmar Ação';
+  G('cm-desc').textContent=desc;
+  G('cm-ok').onclick=()=>{G('confirm-modal').classList.remove('show');fn();};
+  G('confirm-modal').classList.add('show');
+}
 async function loadHealth(){
-  G('health-box').innerHTML='<p style="font-size:.78rem;color:var(--text-3)">Verificando...</p>';
   try{
-    const d=await fetch(API+'/health').then(r=>r.json());
-    const items=[
-      {label:'API FastAPI',ok:true,detail:'Respondendo'},
-      {label:'ChromaDB',ok:!!(d.chromadb?.connected||d.embeddings?.disponivel),detail:d.chromadb?.collection||''},
-      {label:'Groq LLM',ok:!!(d.groq?.disponivel||d.llm?.disponivel),detail:d.groq?.modelo||''},
-      {label:'Scraper',ok:!!(d.scraper?.disponivel),detail:d.scraper?.total_concursos!=null?d.scraper.total_concursos+' concursos':''},
-    ];
-    G('health-box').innerHTML=items.map(i=>`
-      <div class="health-row">
-        <span style="font-weight:500">${esc(i.label)}${i.detail?`<span style="font-weight:400;color:var(--text-3);font-size:.75rem;margin-left:6px">${esc(i.detail)}</span>`:''}</span>
-        <span class="badge ${i.ok?'badge-success':'badge-danger'}">${i.ok?'OK':'Falha'}</span>
-      </div>`).join('');
-    log('Health check ok','ok');
-  }catch(e){
-    G('health-box').innerHTML='<div class="health-row"><span>API</span><span class="badge badge-danger">Offline</span></div>';
-    log('Health falhou: '+e.message,'err');
-  }
+    const r=await fetch(API+'/health',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    G('health-body').innerHTML=Object.entries(d).map(([k,v])=>`<div class="health-row"><span class="health-label">${esc(k)}</span><span class="health-val">${esc(String(v))}</span></div>`).join('');
+  }catch(e){G('health-body').innerHTML=`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`;}
 }
-
 async function loadStats(){
   try{
-    const d=await fetch(API+'/admin/estatisticas').then(r=>r.json());
-    const rows=[['Total concursos',d.total_concursos??'—'],['Abertos',d.concursos_abertos??'—'],['Bancas',d.total_bancas??'—'],['PDFs',d.pdfs_indexados??'—'],['Embeddings',d.total_embeddings??'—'],['Última coleta',d.ultima_coleta??'—']];
-    G('stats-box').innerHTML=rows.map(([l,v])=>`<div class="stat-row"><span style="color:var(--text-3)">${l}</span><span style="font-weight:600">${esc(String(v))}</span></div>`).join('');
-  }catch(e){G('stats-box').innerHTML='<p style="font-size:.78rem;color:var(--danger)">API indisponível</p>';}
+    const r=await fetch(API+'/admin/stats',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    G('db-stats').innerHTML=Object.entries(d).map(([k,v])=>`<div class="health-row"><span class="health-label">${esc(k)}</span><span class="health-val">${esc(String(v))}</span></div>`).join('');
+  }catch(e){G('db-stats').innerHTML=`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`;}
 }
-
-async function statusEmb(){loading('emb-r','Verificando...');try{const d=await fetch(API+'/embeddings/status').then(r=>r.json());show('emb-r',JSON.stringify(d,null,2));log('Embeddings ok','ok');}catch(e){show('emb-r','Erro: '+e.message);log(e.message,'err');}}
-async function reindexar(){loading('emb-r','Reindexando...');log('Reindexação iniciada...');try{const d=await fetch(API+'/admin/reindexar',{method:'POST'}).then(r=>r.json());show('emb-r',d.mensagem||d.message||JSON.stringify(d));toast('Reindexação iniciada!');log(d.mensagem||'ok','ok');}catch(e){show('emb-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}}
-async function limparDupl(){loading('manut-r','Removendo duplicatas...');try{const d=await fetch(API+'/admin/limpar-duplicatas',{method:'POST'}).then(r=>r.json());show('manut-r',d.mensagem||d.message||JSON.stringify(d));toast('Concluído!');loadStats();}catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}}
-async function validarDados(){loading('manut-r','Validando...');try{const d=await fetch(API+'/admin/validar').then(r=>r.json());show('manut-r',JSON.stringify(d,null,2));toast('Validado!');}catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}}
-async function exportarDados(){toast('Exportando...');try{const r=await fetch(API+'/admin/exportar-csv');if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='concursos_export.csv';a.click();URL.revokeObjectURL(u);toast('CSV exportado!');log('Exportado','ok');}catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}}
-function confirmarLimpar(){G('modal-wrap').style.display='flex';}
-async function limparBanco(){G('modal-wrap').style.display='none';loading('manut-r','Limpando...');try{const d=await fetch(API+'/admin/limpar-banco',{method:'DELETE'}).then(r=>r.json());show('manut-r',d.mensagem||d.message||JSON.stringify(d));toast('Banco limpo!');loadStats();}catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}}
-async function salvarCfg(){loading('cfg-r','Salvando...');try{const d=await fetch(API+'/admin/configuracoes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({modelo_llm:G('cfg-modelo').value,max_resultados_rag:parseInt(G('cfg-rag').value),timeout_resposta:parseInt(G('cfg-timeout').value)})}).then(r=>r.json());show('cfg-r',d.mensagem||d.message||JSON.stringify(d));toast('Salvo!');}catch(e){show('cfg-r','Erro: '+e.message);toast(e.message,false);}}
-async function coletarTudo(){loading('col-r','Iniciando coleta...');log('Coleta iniciada...');try{const d=await fetch(API+'/scraping/coletar',{method:'POST'}).then(r=>r.json());show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('Coleta iniciada!');loadStats();}catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}}
-async function processarCSV(){loading('col-r','Processando CSV...');try{const d=await fetch(API+'/admin/processar-csv',{method:'POST'}).then(r=>r.json());show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('CSV processado!');loadStats();}catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}}
-async function carregarEmb(){loading('col-r','Carregando embeddings...');try{const d=await fetch(API+'/admin/carregar-embeddings',{method:'POST'}).then(r=>r.json());show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('Embeddings carregados!');}catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}}
-
+async function apiAction(endpoint,body,raEl,loadMsg,successMsg){
+  loading(raEl,loadMsg);
+  log(loadMsg);
+  try{
+    const r=await fetch(API+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(120000)});
+    const d=await r.json();
+    const msg=d.mensagem||d.message||d.resultado||JSON.stringify(d);
+    show(raEl,`<div style="font-size:.82rem;color:var(--text-2)">${esc(msg)}</div>`);
+    log((successMsg||'Concluído')+': '+msg);
+    toast(successMsg||'Operação concluída!');
+  }catch(e){show(raEl,`<div style="color:#dc2626;font-size:.82rem">Erro: ${esc(e.message)}</div>`);log('ERRO: '+e.message);toast('Erro na operação',false);}
+}
+function statusEmb(){apiAction('/admin/embeddings/status',null,G('ra-emb'),'Verificando embeddings...','Status OK');}
+function reindexar(){apiAction('/admin/embeddings/reindexar',{},G('ra-emb'),'Reindexando...','Reindexação concluída');}
+function carregarEmb(){apiAction('/admin/embeddings/carregar-csv',{},G('ra-emb'),'Carregando de CSV...','CSV carregado');}
+function limparDupl(){apiAction('/admin/manutencao/duplicatas',{},G('ra-manut'),'Removendo duplicatas...','Duplicatas removidas');}
+function validarDados(){apiAction('/admin/manutencao/validar',{},G('ra-manut'),'Validando dados...','Validação concluída');}
+function exportarDados(){
+  log('Iniciando exportação...');
+  window.open(API+'/admin/exportar','_blank');
+  toast('Download iniciado!');
+}
+function limparBanco(){apiAction('/admin/banco/limpar',{},G('ra-manut'),'Limpando banco...','Banco limpo');}
+function salvarCfg(){
+  const body={modelo_embeddings:G('cfg-model').value,chunk_size:parseInt(G('cfg-chunk').value),top_k:parseInt(G('cfg-topk').value)};
+  apiAction('/admin/config',body,G('ra-cfg'),'Salvando configuração...','Configuração salva');
+}
+function coletarTudo(){apiAction('/admin/coletar-tudo',{},G('ra-admin'),'Executando coleta completa...','Coleta completa concluída');}
+function processarCSV(){apiAction('/admin/processar-csv',{},G('ra-admin'),'Processando CSV...','CSV processado');}
 async function loadLog(){
   try{
-    const d=await fetch(API+'/health').then(r=>r.json());
-    G('log-box').innerHTML=`<span style="color:#4ade80">[ok]</span> API em ${API}\n<span style="color:#94a3b8">[info]</span> ChromaDB: ${d.chromadb?.connected?'conectado':'—'}\n<span style="color:#94a3b8">[info]</span> LLM: ${d.groq?.disponivel?'disponível':'—'}\n<span style="color:#4ade80">[ok]</span> Atualizado em ${new Date().toLocaleString()}`;
-  }catch(e){log('Falha: '+e.message,'err');}
+    const r=await fetch(API+'/admin/log',{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    const lines=d.log||d.logs||d||[];
+    G('log-box').textContent=Array.isArray(lines)?lines.join('\n'):String(lines);
+    G('log-box').scrollTop=G('log-box').scrollHeight;
+  }catch(e){log('Erro ao carregar log: '+e.message);}
 }
-
-G('modal-wrap').addEventListener('click',e=>{if(e.target===G('modal-wrap'))G('modal-wrap').style.display='none';});
-
-initLayout({active:'admin',title:'Admin'});
-loadHealth();loadStats();loadLog();
+checkAPI();
+loadHealth();
+loadStats();
 </script>
-</body></html>
+</body>
+</html>

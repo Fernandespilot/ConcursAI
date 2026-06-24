@@ -7,146 +7,228 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.search-bar{display:flex;gap:8px;margin-bottom:16px}
-.search-bar input{flex:1}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.filters select{font-size:.78rem}
-.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.c-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:15px;cursor:pointer;transition:border-color .12s}
-.c-card:hover{border-color:var(--primary)}
-.c-title{font-size:.84rem;font-weight:600;color:var(--text);margin-bottom:4px;line-height:1.4}
-.c-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.c-desc{font-size:.76rem;color:var(--text-3);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.c-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:200;align-items:center;justify-content:center}
-.overlay.open{display:flex}
-.modal{background:var(--surface);border-radius:var(--radius);width:90%;max-width:520px;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.12)}
-.modal-head{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-body{padding:18px;font-size:.82rem;color:var(--text-2);line-height:1.8}
-.modal-body strong{color:var(--text)}
+.search-row{display:flex;gap:8px;margin-bottom:12px}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filter-row select{min-width:130px}
+.info-bar{font-size:.8rem;color:var(--text-3);margin-bottom:14px;min-height:18px}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.r-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s,border-color .15s}
+.r-card:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(37,99,235,.1)}
+.r-card-title{font-weight:600;font-size:.88rem;color:var(--text);line-height:1.35}
+.r-card-badges{display:flex;gap:5px;flex-wrap:wrap}
+.r-card-desc{font-size:.78rem;color:var(--text-3);line-height:1.45;flex:1}
+.r-card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:.75rem;color:var(--text-4)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--r);padding:24px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-3)}
+.modal-close:hover{color:var(--text)}
+.modal-title{font-size:1rem;font-weight:700;margin:0 0 12px;padding-right:24px}
+.modal-row{display:flex;gap:8px;margin-bottom:8px;font-size:.83rem}
+.modal-row .lbl{font-weight:600;color:var(--text-3);min-width:80px}
+.modal-row .val{color:var(--text-2)}
+.empty-results{text-align:center;padding:40px 20px;color:var(--text-4)}
+.empty-results i{font-size:2rem;display:block;margin-bottom:10px;opacity:.4}
 </style>
 </head>
 <body>
-<div class="page-header">
-  <div class="page-title"><i class="fas fa-search"></i>Busca de Concursos</div>
-  <div class="page-subtitle">Busca semântica por RAG na base de concursos coletados</div>
-</div>
-<div class="page-body">
-  <div class="search-bar">
-    <input type="text" class="form-control" id="qb" placeholder="Ex: concursos de TI no governo federal...">
-    <button class="btn btn-primary" onclick="buscar()"><i class="fas fa-search"></i> Buscar</button>
-  </div>
-  <div class="filters">
-    <select class="form-control" id="f-area" style="width:auto">
-      <option value="">Todas as áreas</option>
-      <option value="federal">Federal</option>
-      <option value="estadual">Estadual</option>
-      <option value="municipal">Municipal</option>
-      <option value="tribunal">Tribunal</option>
-      <option value="policia">Polícia</option>
-    </select>
-    <select class="form-control" id="f-status" style="width:auto">
-      <option value="">Todos os status</option>
-      <option value="Aberto">Inscrições abertas</option>
-      <option value="Previsto">Previsto</option>
-      <option value="Encerrado">Encerrado</option>
-    </select>
-    <select class="form-control" id="f-limit" style="width:auto">
-      <option value="10">10 resultados</option>
-      <option value="20" selected>20 resultados</option>
-      <option value="50">50 resultados</option>
-    </select>
-    <button class="btn btn-secondary btn-sm" onclick="limpar()"><i class="fas fa-times"></i> Limpar</button>
-  </div>
-  <div id="info" style="font-size:.77rem;color:var(--text-3);margin-bottom:10px"></div>
-  <div class="results-grid" id="grid"></div>
-  <div id="empty-msg" style="display:none;text-align:center;padding:40px;color:var(--text-3)">
-    <i class="fas fa-search" style="font-size:1.8rem;opacity:.2;display:block;margin-bottom:10px"></i>
-    Nenhum resultado encontrado. Tente outros termos.
+<div class="app">
+
+  <aside class="sidebar">
+    <a href="/pages/home" class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      ConcursAI
+    </a>
+    <div class="nav-section">Principal</div>
+    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
+    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <div class="nav-section">IA &amp; Busca</div>
+    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
+    <a href="/pages/concursos" class="nav-link active"><i class="fas fa-search"></i> Concursos</a>
+    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
+    <div class="nav-section">Documentos</div>
+    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
+    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
+    <div class="nav-section">Sistema</div>
+    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
+    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
+    <div class="sidebar-bottom">
+      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
+      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
+      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
+      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
+      <div class="api-status">
+        <span class="status-dot" id="sdot"></span>
+        <span id="stxt">verificando...</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><i class="fas fa-search"></i> Concursos</div>
+      <div class="topbar-right">
+        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
+      </div>
+    </div>
+    <div class="page-header">
+      <div class="page-title"><i class="fas fa-search"></i> Concursos</div>
+      <div class="page-subtitle">Busca semântica por RAG na base de concursos</div>
+    </div>
+    <div class="content">
+      <div class="content-inner">
+
+        <div class="search-row">
+          <input type="text" class="form-control" id="q" placeholder="Ex: analista TI federal, auditor fiscal, enfermeiro..." style="flex:1" onkeydown="if(event.key==='Enter')buscar()">
+          <button class="btn btn-primary" onclick="buscar()"><i class="fas fa-search"></i> Buscar</button>
+        </div>
+
+        <div class="filter-row">
+          <select class="form-control" id="f-area">
+            <option value="">Todas as áreas</option>
+            <option>TI / Tecnologia</option>
+            <option>Direito / Jurídico</option>
+            <option>Administração</option>
+            <option>Saúde</option>
+            <option>Engenharia</option>
+            <option>Educação</option>
+            <option>Fiscal / Tributário</option>
+            <option>Policial / Segurança</option>
+          </select>
+          <select class="form-control" id="f-status">
+            <option value="">Qualquer status</option>
+            <option value="aberto">Aberto</option>
+            <option value="encerrado">Encerrado</option>
+          </select>
+          <select class="form-control" id="f-limit">
+            <option value="10">10 resultados</option>
+            <option value="20" selected>20 resultados</option>
+            <option value="50">50 resultados</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="clearFilters()"><i class="fas fa-times"></i> Limpar</button>
+        </div>
+
+        <div class="info-bar" id="info-bar"></div>
+        <div class="results-grid" id="results"></div>
+
+      </div>
+    </div>
+    <footer class="footer">
+      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
+      <span>Trabalho de Conclusão de Curso · 2024</span>
+      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
+    </footer>
   </div>
 </div>
 
 <!-- Modal -->
-<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-head">
-      <span id="m-title" style="font-weight:600;font-size:.88rem"></span>
-      <button class="btn btn-secondary btn-xs" onclick="closeModal()"><i class="fas fa-times"></i></button>
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-title" id="m-title"></div>
+    <div id="m-body"></div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <a id="m-chat-btn" href="#" class="btn btn-primary btn-sm"><i class="fas fa-comments"></i> Perguntar no Chat</a>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">Fechar</button>
     </div>
-    <div class="modal-body" id="m-body"></div>
   </div>
 </div>
 
-<footer class="footer"><div class="footer-inner">
-  <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
-  <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
-  <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
-</div></footer>
 <div class="toast" id="toast"></div>
-<script src="/static/js/layout.js"></script>
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-let data=[];
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
+}
+
+let _lastResults=[];
+
+function statusBadge(s){
+  return s==='aberto'?'<span class="badge-green">Aberto</span>':'<span class="badge-gray">Encerrado</span>';
+}
 
 function renderCard(c,i){
-  const status=c.status||'—';
-  const sc={'Aberto':'badge-green','Previsto':'badge-blue','Encerrado':'badge-gray'};
-  return `<div class="c-card" onclick="openModal(${i})">
-    <div class="c-title">${esc(c.cargo||c.titulo||c.orgao||'Concurso')}</div>
-    <div class="c-meta">
-      <span class="badge ${sc[status]||'badge-gray'}">${esc(status)}</span>
-      ${c.banca?`<span class="badge badge-blue">${esc(c.banca)}</span>`:''}
-      ${c.area?`<span class="badge badge-gray">${esc(c.area)}</span>`:''}
+  return `<div class="r-card" onclick="openModal(${i})">
+    <div class="r-card-title">${esc(c.titulo||c.title||'Sem título')}</div>
+    <div class="r-card-badges">
+      ${c.banca?`<span class="badge-blue">${esc(c.banca)}</span>`:''}
+      ${c.area?`<span class="badge-purple">${esc(c.area)}</span>`:''}
+      ${statusBadge(c.status)}
     </div>
-    <div class="c-desc">${esc(c.descricao||c.conteudo||'')}</div>
-    <div class="c-footer">
-      <span style="font-size:.73rem;color:var(--text-3)">${c.vagas?'<i class="fas fa-users" style="margin-right:3px"></i>'+esc(String(c.vagas))+' vagas':''}</span>
-      <button class="btn btn-secondary btn-xs" onclick="event.stopPropagation();verChat(${i})"><i class="fas fa-comments"></i> Perguntar</button>
+    <div class="r-card-desc">${esc((c.descricao||c.description||'').slice(0,130))}${(c.descricao||c.description||'').length>130?'…':''}</div>
+    <div class="r-card-foot">
+      <span>${c.ano?'Ano: '+c.ano:''}</span>
+      <button class="btn btn-xs btn-primary" onclick="event.stopPropagation();askChat(${i})"><i class="fas fa-comments"></i> Perguntar</button>
     </div>
   </div>`;
 }
 
-function openModal(i){
-  const c=data[i];
-  G('m-title').textContent=c.cargo||c.titulo||c.orgao||'Detalhes';
-  const rows=[['Órgão',c.orgao],['Banca',c.banca],['Vagas',c.vagas],['Salário',c.salario||c.remuneracao],['Status',c.status],['Área',c.area],['Edital',c.edital],['Data',c.data_publicacao||c.data]].filter(([,v])=>v);
-  G('m-body').innerHTML=rows.map(([k,v])=>`<div style="display:flex;gap:8px;margin-bottom:8px"><strong style="min-width:70px;color:var(--text-3)">${esc(k)}</strong><span>${esc(String(v))}</span></div>`).join('')
-    +(c.descricao?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);color:var(--text-2);font-size:.8rem;line-height:1.7">${esc(c.descricao)}</div>`:'');
-  G('overlay').classList.add('open');
-}
-function closeModal(){G('overlay').classList.remove('open');}
-function verChat(i){const c=data[i];location.href='/pages/chat?q='+encodeURIComponent('Me fale sobre: '+(c.cargo||c.titulo||c.orgao||'este concurso'));}
-
 async function buscar(){
-  const q=G('qb').value.trim(),area=G('f-area').value,status=G('f-status').value,limit=parseInt(G('f-limit').value);
-  G('grid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-3)"><i class="fas fa-circle-notch fa-spin"></i> Buscando...</div>';
-  G('empty-msg').style.display='none';
+  const q=G('q').value.trim();
+  const area=G('f-area').value;
+  const status=G('f-status').value;
+  const limit=G('f-limit').value;
+  const res=G('results');
+  const info=G('info-bar');
+  res.innerHTML='<div class="empty-results"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+  info.textContent='';
   try{
-    const body={query:q||'concursos públicos',n_resultados:limit};
-    if(area)body.area=area;if(status)body.status=status;
-    const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-    data=d.resultados||d.concursos||d||[];
-    if(Array.isArray(data)&&data.length){
-      G('info').textContent=data.length+' resultado'+(data.length>1?'s':'')+' encontrado'+(data.length>1?'s':'');
-      G('grid').innerHTML=data.map(renderCard).join('');
-    } else {
-      data=[];G('grid').innerHTML='';G('empty-msg').style.display='block';G('info').textContent='';
-    }
-  }catch(e){G('grid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--danger);font-size:.82rem"><i class="fas fa-exclamation-circle"></i> Erro ao buscar: ${esc(e.message)}</div>`;}
+    const params=new URLSearchParams({limit});
+    if(q)params.set('q',q);
+    if(area)params.set('area',area);
+    if(status)params.set('status',status);
+    const r=await fetch(API+'/concursos/buscar?'+params,{signal:AbortSignal.timeout(15000)});
+    const d=await r.json();
+    _lastResults=d.resultados||d.results||d||[];
+    if(!Array.isArray(_lastResults))_lastResults=[];
+    info.textContent=`${_lastResults.length} resultado(s) encontrado(s)${q?' para "'+q+'"':''}`;
+    res.innerHTML=_lastResults.length
+      ?_lastResults.map((c,i)=>renderCard(c,i)).join('')
+      :'<div class="empty-results"><i class="fas fa-search"></i><span>Nenhum concurso encontrado. Tente outros termos.</span></div>';
+  }catch(e){
+    res.innerHTML='<div class="empty-results"><i class="fas fa-exclamation-triangle"></i><span>Erro ao buscar: '+esc(e.message)+'</span></div>';
+    toast('Erro ao buscar concursos',false);
+  }
 }
 
-function limpar(){G('qb').value='';G('f-area').value='';G('f-status').value='';buscar();}
+function clearFilters(){
+  G('q').value='';G('f-area').value='';G('f-status').value='';G('f-limit').value='20';
+  G('results').innerHTML='';G('info-bar').textContent='';
+}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-G('qb').addEventListener('keydown',e=>{if(e.key==='Enter')buscar();});
+function openModal(i){
+  const c=_lastResults[i];
+  if(!c)return;
+  G('m-title').textContent=c.titulo||c.title||'Concurso';
+  G('m-body').innerHTML=`
+    <div class="modal-row"><span class="lbl">Banca</span><span class="val">${esc(c.banca||'—')}</span></div>
+    <div class="modal-row"><span class="lbl">Área</span><span class="val">${esc(c.area||'—')}</span></div>
+    <div class="modal-row"><span class="lbl">Status</span><span class="val">${statusBadge(c.status)}</span></div>
+    <div class="modal-row"><span class="lbl">Ano</span><span class="val">${esc(c.ano||'—')}</span></div>
+    <div class="modal-row"><span class="lbl">Órgão</span><span class="val">${esc(c.orgao||c.organ||'—')}</span></div>
+    <div style="margin-top:10px;font-size:.82rem;color:var(--text-2);line-height:1.55">${esc(c.descricao||c.description||'Sem descrição disponível.')}</div>
+  `;
+  G('m-chat-btn').href='/pages/chat?q='+encodeURIComponent('Me fale sobre o concurso: '+(c.titulo||c.title||''));
+  G('modal').classList.add('show');
+}
+function closeModal(){G('modal').classList.remove('show');}
+function askChat(i){
+  const c=_lastResults[i];
+  if(!c)return;
+  location.href='/pages/chat?q='+encodeURIComponent('Me fale sobre o concurso: '+(c.titulo||c.title||''));
+}
 
-const qp=new URLSearchParams(location.search).get('q');
-if(qp)G('qb').value=qp;
-
-initLayout({active:'concursos',title:'Concursos'});
-buscar();
+checkAPI();
+const pq=new URLSearchParams(location.search).get('q');
+if(pq){G('q').value=pq;buscar();}
+else buscar();
 </script>
-</body></html>
+</body>
+</html>
