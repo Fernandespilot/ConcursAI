@@ -7,15 +7,21 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.scr-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.scr-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .scr-full{grid-column:1/-1}
-.src-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
-.src-on{background:#d1fae5;color:#065f46}
-.src-off{background:#fee2e2;color:#991b1b}
-.src-pend{background:#fef3c7;color:#92400e}
-.log-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.fonte-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--gray-100)}
-.fonte-item:last-child{border-bottom:none}
+.result-area{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;font-size:.82rem;line-height:1.8;color:var(--gray-700);word-break:break-word;display:none;margin-top:12px;max-height:260px;overflow-y:auto}
+.result-area.show{display:block}
+.result-area.loading{display:block;color:var(--gray-400)}
+.pdf-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-radius:var(--radius-sm);background:var(--gray-50);border:1px solid var(--gray-100);margin-bottom:6px;font-size:.82rem}
+.pdf-item:last-child{margin-bottom:0}
+.pdf-name{font-weight:500;color:var(--gray-700);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-actions{display:flex;gap:6px;flex-shrink:0;margin-left:10px}
+.prog-bar{height:6px;background:var(--gray-200);border-radius:3px;margin-top:8px;overflow:hidden;display:none}
+.prog-bar.show{display:block}
+.prog-fill{height:100%;background:var(--primary);border-radius:3px;transition:width .4s ease;width:0%}
+.fonte-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);cursor:pointer;font-size:.83rem;transition:all .15s}
+.fonte-btn:hover{background:var(--gray-50);border-color:var(--primary)}
+.fonte-btn input[type=checkbox]{accent-color:var(--primary)}
 </style>
 </head>
 <body>
@@ -34,198 +40,300 @@
   </div>
   <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
 </nav>
-<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Scraping</span></div>
+<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Scraping de Concursos</span></div>
 <div class="page-header">
-  <div class="page-title"><i class="fas fa-spider" style="color:#7c3aed"></i> Coleta de Dados (Scraping)</div>
-  <div class="page-subtitle">Monitoramento e controle dos scrapers de concursos públicos</div>
+  <div class="page-title"><i class="fas fa-spider" style="color:#7c3aed"></i> Scraping de Concursos</div>
+  <div class="page-subtitle">Coleta automática de editais, provas e dados de bancas organizadoras</div>
 </div>
+
 <div class="page-body">
-  <div class="scr-layout">
-    <!-- Status dos scrapers -->
-    <div class="card scr-full">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-heartbeat"></i>Status dos Scrapers</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadStatus()"><i class="fas fa-sync"></i> Atualizar</button>
-      </div>
-      <div class="card-body" id="scr-status" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando status...</p>
-      </div>
-    </div>
+  <!-- Mini estatísticas -->
+  <div class="grid-4 mb-6">
+    <div class="stat-card"><div class="stat-icon" style="background:#ede9fe"><i class="fas fa-database" style="color:#7c3aed"></i></div><div class="stat-info"><div class="stat-value" id="st-total">—</div><div class="stat-label">Concursos coletados</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#d1fae5"><i class="fas fa-file-pdf" style="color:#059669"></i></div><div class="stat-info"><div class="stat-value" id="st-pdfs">—</div><div class="stat-label">PDFs indexados</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#dbeafe"><i class="fas fa-clock" style="color:#2563eb"></i></div><div class="stat-info"><div class="stat-value" id="st-ultima">—</div><div class="stat-label">Última coleta</div></div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:#fef3c7"><i class="fas fa-building" style="color:#d97706"></i></div><div class="stat-info"><div class="stat-value" id="st-bancas">—</div><div class="stat-label">Bancas monitoradas</div></div></div>
+  </div>
 
-    <!-- Coleta manual geral -->
+  <div class="scr-grid">
+    <!-- Coleta de concursos -->
     <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-play-circle"></i>Coleta Manual</div></div>
-      <div class="card-body">
-        <p style="font-size:.82rem;color:var(--gray-500);margin-bottom:14px">Inicia uma coleta completa em todas as fontes cadastradas.</p>
-        <button class="btn btn-primary" style="width:100%;margin-bottom:10px" onclick="coletarGeral()"><i class="fas fa-spider"></i> Iniciar Coleta Geral</button>
-        <button class="btn btn-secondary" style="width:100%" onclick="coletarBancas()"><i class="fas fa-university"></i> Coletar Bancas (Cebraspe/FGV)</button>
-        <div id="col-g-r" class="result-box" style="display:none;margin-top:12px"></div>
-      </div>
-    </div>
-
-    <!-- PCI Concursos -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-globe"></i>PCI Concursos</div></div>
-      <div class="card-body">
-        <div class="form-group"><label class="form-label">Páginas a coletar</label>
-          <input type="number" class="form-control" id="pci-pag" value="3" min="1" max="20">
+      <div class="card-header"><div class="card-title"><i class="fas fa-download"></i>Coletar Concursos</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Fontes de dados</label>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label class="fonte-btn"><input type="checkbox" id="src-pc" checked> PCI Concursos</label>
+            <label class="fonte-btn"><input type="checkbox" id="src-qc" checked> QConcursos</label>
+            <label class="fonte-btn"><input type="checkbox" id="src-gc"> Gran Cursos</label>
+          </div>
         </div>
-        <div class="form-group"><label class="form-label">Categoria</label>
-          <select class="form-control" id="pci-cat">
-            <option value="">Todas</option>
-            <option value="federal">Federal</option>
-            <option value="estadual">Estadual</option>
-            <option value="municipal">Municipal</option>
+        <div class="form-row" style="margin:0">
+          <div class="form-group">
+            <label class="form-label">Área</label>
+            <select class="form-control" id="sc-area">
+              <option value="">Todas</option>
+              <option value="federal">Federal</option>
+              <option value="estadual">Estadual</option>
+              <option value="municipal">Municipal</option>
+              <option value="policia">Polícia</option>
+              <option value="tribunal">Tribunal</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Limite</label>
+            <input type="number" class="form-control" id="sc-limite" value="50" min="1" max="500">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="coletarConcursos()"><i class="fas fa-spider"></i> Iniciar coleta</button>
+        <div class="prog-bar" id="prog-col"><div class="prog-fill" id="prog-col-fill"></div></div>
+        <div id="col-r" class="result-area"></div>
+      </div>
+    </div>
+
+    <!-- Coleta de PDFs -->
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-file-pdf"></i>Coleta de PDFs</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <p style="font-size:.83rem;color:var(--gray-500);margin:0">Baixa e indexa editais e provas em PDF das bancas monitoradas.</p>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Tipo de documento</label>
+          <select class="form-control" id="pdf-tipo">
+            <option value="">Todos</option>
+            <option value="edital">Edital</option>
+            <option value="prova">Prova</option>
+            <option value="gabarito">Gabarito</option>
           </select>
         </div>
-        <button class="btn btn-primary" style="width:100%" onclick="coletarPCI()"><i class="fas fa-download"></i> Coletar PCI</button>
-        <div id="pci-r" class="result-box" style="display:none;margin-top:12px"></div>
+        <button class="btn btn-primary" onclick="coletarPDFs()"><i class="fas fa-download"></i> Coletar PDFs</button>
+        <button class="btn btn-secondary" onclick="listarPDFs()"><i class="fas fa-list"></i> Listar PDFs coletados</button>
+        <div class="prog-bar" id="prog-pdf"><div class="prog-fill" id="prog-pdf-fill"></div></div>
+        <div id="pdf-r" class="result-area"></div>
       </div>
     </div>
 
-    <!-- Agendador -->
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-clock"></i>Agendador</div></div>
+    <!-- Lista de PDFs coletados (full) -->
+    <div class="card scr-full" id="pdf-list-card" style="display:none">
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-folder-open"></i>PDFs Coletados</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" class="form-control" id="pdf-filtro" placeholder="Filtrar..." style="width:200px;font-size:.82rem" oninput="filtrarPDFs()">
+          <button class="btn btn-secondary btn-sm" onclick="listarPDFs()"><i class="fas fa-sync"></i></button>
+        </div>
+      </div>
+      <div class="card-body" id="pdf-list-body">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando lista...</p>
+      </div>
+    </div>
+
+    <!-- Busca RAG -->
+    <div class="card scr-full">
+      <div class="card-header"><div class="card-title"><i class="fas fa-search"></i>Busca Semântica (RAG)</div></div>
       <div class="card-body">
-        <div id="agend-status" style="margin-bottom:12px;font-size:.82rem;color:var(--gray-500)">Carregando...</div>
-        <div class="form-group"><label class="form-label">Intervalo (horas)</label>
-          <input type="number" class="form-control" id="ag-int" value="6" min="1" max="168">
+        <div class="form-row" style="margin-bottom:10px">
+          <input type="text" class="form-control" id="rag-q" placeholder="Ex: concursos de TI com salário acima de R$ 5.000" style="flex:1" onkeydown="if(event.key==='Enter')buscarRAG()">
+          <input type="number" class="form-control" id="rag-k" value="5" min="1" max="20" style="width:80px">
+          <button class="btn btn-primary" onclick="buscarRAG()"><i class="fas fa-search"></i> Buscar</button>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" style="flex:1" onclick="iniciarAgend()"><i class="fas fa-play"></i> Iniciar</button>
-          <button class="btn btn-sm" style="flex:1;background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="pararAgend()"><i class="fas fa-stop"></i> Parar</button>
-        </div>
-        <div id="ag-r" class="result-box" style="display:none;margin-top:12px"></div>
+        <div id="rag-r" class="result-area"></div>
       </div>
     </div>
 
-    <!-- API Brasil -->
+    <!-- Histórico de coletas -->
     <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-flag"></i>API Brasil</div></div>
-      <div class="card-body">
-        <div class="form-group"><label class="form-label">CNPJ para validar</label>
-          <input type="text" class="form-control" id="cnpj-v" placeholder="XX.XXX.XXX/XXXX-XX">
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="validarCNPJ()"><i class="fas fa-check"></i> Validar CNPJ</button>
-        <div id="cnpj-r" class="result-box" style="display:none;margin-top:10px"></div>
-        <hr style="margin:14px 0;border-color:var(--gray-100)">
-        <button class="btn btn-secondary" style="width:100%" onclick="testarApiBrasil()"><i class="fas fa-vial"></i> Testar API Brasil</button>
-        <div id="api-b-r" class="result-box" style="display:none;margin-top:10px"></div>
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-history"></i>Histórico de Coletas</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadHistorico()"><i class="fas fa-sync"></i></button>
+      </div>
+      <div class="card-body" id="hist-box">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando histórico...</p>
       </div>
     </div>
 
-    <!-- Fontes de dados -->
+    <!-- Status do scraper -->
     <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-database"></i>Fontes de Dados</div></div>
-      <div class="card-body" id="fontes-list" style="min-height:80px">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando fontes...</p>
+      <div class="card-header">
+        <div class="card-title"><i class="fas fa-heartbeat"></i>Status do Scraper</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadStatus()"><i class="fas fa-sync"></i> Verificar</button>
+      </div>
+      <div class="card-body" id="status-box">
+        <p style="font-size:.82rem;color:var(--gray-400)">Clique em Verificar para checar o scraper.</p>
       </div>
     </div>
 
-    <!-- Log de atividade -->
+    <!-- Log -->
     <div class="card scr-full">
       <div class="card-header">
-        <div class="card-title"><i class="fas fa-terminal"></i>Log de Atividade</div>
-        <div class="log-controls">
-          <button class="btn btn-secondary btn-sm" onclick="loadLog()"><i class="fas fa-sync"></i> Atualizar</button>
-          <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="G('log-box').textContent=''"><i class="fas fa-trash"></i> Limpar</button>
-        </div>
+        <div class="card-title"><i class="fas fa-terminal"></i>Log de Operações</div>
+        <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="G('log-box').innerHTML=''"><i class="fas fa-trash"></i> Limpar</button>
       </div>
-      <div class="card-body"><div class="log-box" id="log-box">Clique em Atualizar para carregar o log...</div></div>
+      <div class="card-body"><div class="log-box" id="log-box">Aguardando operações...</div></div>
     </div>
   </div>
 </div>
+
 <footer class="footer"><div class="footer-inner">
   <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
   <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
   <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
+
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-function show(id,txt){const el=G(id);el.style.display='block';el.classList.remove('loading');el.textContent=typeof txt==='object'?JSON.stringify(txt,null,2):txt;}
-function loading(id){const el=G(id);el.style.display='block';el.classList.add('loading');el.textContent='Processando...';}
-function logLine(msg){const lb=G('log-box');lb.textContent+='\n'+new Date().toLocaleTimeString()+' '+msg;lb.scrollTop=lb.scrollHeight;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function show(id,txt){
+  const el=G(id);el.classList.add('show');el.classList.remove('loading');
+  el.innerHTML=String(typeof txt==='object'?JSON.stringify(txt,null,2):txt)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+}
+function loading(id,m='Processando...'){
+  const el=G(id);el.classList.add('loading');el.classList.remove('show');
+  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="color:var(--primary)"></i> ${m}`;
+}
+function log(msg,type='info'){
+  const lb=G('log-box'),t=new Date().toLocaleTimeString('pt-BR');
+  const cl=type==='err'?'color:#dc2626':type==='ok'?'color:#10b981':'color:var(--gray-500)';
+  lb.innerHTML+=`\n<span style="${cl}">[${t}]</span> ${esc(msg)}`;
+  lb.scrollTop=lb.scrollHeight;
+}
+function prog(id,pct){
+  const bar=G(id),fill=G(id+'-fill');
+  if(pct>=0){bar.classList.add('show');fill.style.width=pct+'%';}
+  else{bar.classList.remove('show');fill.style.width='0%';}
+}
+
+let allPDFs=[];
+
+async function loadStats(){
+  try{
+    const d=await fetch(API+'/scraping/status').then(r=>r.json());
+    G('st-total').textContent=d.total_concursos??d.total??'—';
+    G('st-pdfs').textContent=d.pdfs_coletados??d.pdfs??'—';
+    G('st-bancas').textContent=d.bancas_monitoradas??d.bancas??'—';
+    G('st-ultima').textContent=d.ultima_coleta?new Date(d.ultima_coleta).toLocaleDateString('pt-BR'):'—';
+  }catch(e){log('Falha ao carregar estatísticas: '+e.message,'err');}
+}
 
 async function loadStatus(){
-  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    const scrapers=d.scrapers||{pci:{status:'desconhecido'},cebraspe:{status:'desconhecido'},fgv:{status:'desconhecido'}};
-    G('scr-status').innerHTML=Object.entries(scrapers).map(([nome,info])=>`
-      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px">
-        <div style="font-weight:700;font-size:.85rem;margin-bottom:6px;text-transform:capitalize">${nome}</div>
-        <div class="src-badge ${info.status==='ativo'||info.status==='ok'?'src-on':info.status==='coletando'?'src-pend':'src-off'}">${info.status||'desconhecido'}</div>
-        <div style="font-size:.72rem;color:var(--gray-400);margin-top:6px">${info.ultima_coleta||info.ultima_execucao||'Nunca executado'}</div>
-        <div style="font-size:.72rem;color:var(--gray-400)">${info.total_coletados!=null?info.total_coletados+' registros':''}</div>
-      </div>`).join('');
-  }catch(e){G('scr-status').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+  G('status-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Verificando...</p>';
+  try{
+    const d=await fetch(API+'/scraping/status').then(r=>r.json());
+    const rows=[
+      ['Status',d.status||'ativo'],
+      ['Concursos coletados',d.total_concursos??d.total??'—'],
+      ['PDFs baixados',d.pdfs_coletados??d.pdfs??'—'],
+      ['Bancas monitoradas',d.bancas_monitoradas??d.bancas??'—'],
+      ['Última coleta',d.ultima_coleta||'—'],
+    ];
+    G('status-box').innerHTML=rows.map(([l,v])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:.82rem"><span style="color:var(--gray-600)">${l}</span><span style="font-weight:600;color:var(--gray-800)">${esc(String(v))}</span></div>`).join('');
+    log('Status do scraper verificado','ok');
+  }catch(e){
+    G('status-box').innerHTML='<p style="font-size:.82rem;color:#dc2626">Scraper indisponível</p>';
+    log(e.message,'err');
+  }
 }
 
-async function coletarGeral(){
-  loading('col-g-r');logLine('Iniciando coleta geral...');
-  try{const d=await fetch(API+'/scraping/coletar',{method:'POST'}).then(r=>r.json());
-    show('col-g-r',d.mensagem||JSON.stringify(d));toast('Coleta iniciada!');logLine('Coleta geral: '+(d.mensagem||'ok'));
-  }catch(e){show('col-g-r','Erro: '+e.message);logLine('ERRO: '+e.message);toast(e.message,false);}
+async function coletarConcursos(){
+  const area=G('sc-area').value,limite=parseInt(G('sc-limite').value);
+  loading('col-r','Coletando concursos...');prog('prog-col',30);log('Iniciando coleta de concursos (limite='+limite+')...');
+  try{
+    const body={limite};if(area)body.area=area;
+    const d=await fetch(API+'/scraping/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
+    prog('prog-col',100);setTimeout(()=>prog('prog-col',-1),1000);
+    show('col-r',d.mensagem||d.message||JSON.stringify(d));
+    toast('Coleta concluída!');log(d.mensagem||'Coleta ok','ok');loadStats();
+  }catch(e){prog('prog-col',-1);show('col-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
-async function coletarBancas(){
-  loading('col-g-r');logLine('Coletando bancas (Cebraspe/FGV)...');
-  try{const d=await fetch(API+'/scraping/coletar-todas',{method:'POST'}).then(r=>r.json());
-    show('col-g-r',JSON.stringify(d,null,2));toast('Coleta de bancas iniciada!');
-  }catch(e){show('col-g-r','Erro: '+e.message);toast(e.message,false);}
+
+async function coletarPDFs(){
+  const tipo=G('pdf-tipo').value;
+  loading('pdf-r','Coletando PDFs...');prog('prog-pdf',20);log('Coletando PDFs (tipo='+（tipo||'todos')+'...)');
+  try{
+    const url=tipo?`${API}/scraping/pdfs?tipo=${tipo}`:API+'/scraping/pdfs';
+    const d=await fetch(url,{method:'POST'}).then(r=>r.json());
+    prog('prog-pdf',100);setTimeout(()=>prog('prog-pdf',-1),1000);
+    show('pdf-r',d.mensagem||d.message||JSON.stringify(d));
+    toast('PDFs coletados!');log(d.mensagem||'ok','ok');loadStats();listarPDFs();
+  }catch(e){prog('prog-pdf',-1);show('pdf-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
-async function coletarPCI(){
-  const pag=G('pci-pag').value||3,cat=G('pci-cat').value;
-  loading('pci-r');logLine('Coletando PCI ('+pag+' pgs)...');
-  try{const body={max_paginas:parseInt(pag)};if(cat)body.categoria=cat;
-    const d=await fetch(API+'/scraping/pci/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-    show('pci-r',d.mensagem||JSON.stringify(d));toast('PCI coletado!');logLine('PCI: '+(d.total_concursos||0)+' itens');
-  }catch(e){show('pci-r','Erro: '+e.message);toast(e.message,false);}
+
+async function listarPDFs(){
+  G('pdf-list-card').style.display='block';
+  G('pdf-list-body').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Carregando...</p>';
+  try{
+    const d=await fetch(API+'/scraping/pdfs').then(r=>r.json());
+    allPDFs=d.pdfs||d||[];
+    renderPDFs(allPDFs);log('PDFs carregados: '+allPDFs.length,'ok');
+  }catch(e){G('pdf-list-body').innerHTML='<p style="font-size:.82rem;color:#dc2626">Erro ao carregar PDFs: '+esc(e.message)+'</p>';log(e.message,'err');}
 }
-async function iniciarAgend(){
-  const int=G('ag-int').value||6;loading('ag-r');
-  try{const d=await fetch(API+'/admin/agendador/iniciar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intervalo_horas:parseInt(int)})}).then(r=>r.json());
-    show('ag-r',d.mensagem||JSON.stringify(d));toast('Agendador iniciado!');loadAgend();
-  }catch(e){show('ag-r','Erro: '+e.message);toast(e.message,false);}
+
+function filtrarPDFs(){
+  const q=G('pdf-filtro').value.toLowerCase();
+  renderPDFs(allPDFs.filter(p=>(p.nome||p.filename||p).toLowerCase().includes(q)));
 }
-async function pararAgend(){
-  try{const d=await fetch(API+'/admin/agendador/parar',{method:'POST'}).then(r=>r.json());toast(d.mensagem||'Agendador parado');loadAgend();}
-  catch(e){toast(e.message,false);}
+
+function renderPDFs(list){
+  if(!list.length){G('pdf-list-body').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Nenhum PDF encontrado.</p>';return;}
+  G('pdf-list-body').innerHTML=list.map(p=>{
+    const nome=esc(p.nome||p.filename||p);
+    const tamanho=p.tamanho?`<span class="badge badge-gray">${p.tamanho}</span>`:'';
+    const tipo=p.tipo?`<span class="badge badge-purple">${esc(p.tipo)}</span>`:'';
+    return `<div class="pdf-item">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;overflow:hidden">
+        <i class="fas fa-file-pdf" style="color:#dc2626;flex-shrink:0"></i>
+        <span class="pdf-name">${nome}</span>
+        ${tipo}${tamanho}
+      </div>
+      <div class="pdf-actions">
+        ${p.url?`<a href="${esc(p.url)}" target="_blank" class="btn btn-secondary btn-xs"><i class="fas fa-external-link-alt"></i></a>`:''}
+        <button class="btn btn-secondary btn-xs" onclick="analisarPDF('${esc(p.nome||p.filename||p)}')"><i class="fas fa-search"></i></button>
+      </div>
+    </div>`;
+  }).join('');
 }
-async function loadAgend(){
-  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    const ag=d.agendador||d;
-    G('agend-status').innerHTML=`<span class="src-badge ${ag.ativo?'src-on':'src-off'}">${ag.ativo?'Ativo':'Inativo'}</span> &nbsp; próx. execução: ${ag.proxima_execucao||'—'}`;
-  }catch(e){G('agend-status').textContent='Não disponível';}
+
+function analisarPDF(nome){
+  G('rag-q').value='Informações sobre: '+nome;buscarRAG();
 }
-async function validarCNPJ(){
-  const cnpj=G('cnpj-v').value.replace(/\D/g,'');if(!cnpj){toast('Digite um CNPJ',false);return;}
-  loading('cnpj-r');
-  try{const d=await fetch(API+'/api-brasil/concursos?limite=5').then(r=>r.json());show('cnpj-r','CNPJ lookup não disponível. Teste de conexão:\n'+JSON.stringify(d).substring(0,200));}
-  catch(e){show('cnpj-r','Erro: '+e.message);}
+
+async function buscarRAG(){
+  const q=G('rag-q').value.trim(),k=parseInt(G('rag-k').value)||5;
+  if(!q){toast('Digite uma pergunta',false);return;}
+  loading('rag-r','Buscando com RAG...');log('Busca RAG: '+q);
+  try{
+    const d=await fetch(API+'/buscar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,n_resultados:k})}).then(r=>r.json());
+    const resp=d.resposta||d.resultado||d.answer||JSON.stringify(d);
+    show('rag-r',resp);log('Busca concluída','ok');
+  }catch(e){show('rag-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
-async function testarApiBrasil(){
-  loading('api-b-r');
-  try{const d=await fetch(API+'/api-brasil/teste-conectividade').then(r=>r.json());show('api-b-r',JSON.stringify(d,null,2));toast('API Brasil OK!');}
-  catch(e){show('api-b-r','Erro: '+e.message);toast(e.message,false);}
+
+async function loadHistorico(){
+  G('hist-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Carregando...</p>';
+  try{
+    const d=await fetch(API+'/scraping/historico').then(r=>r.json());
+    const hist=d.historico||d||[];
+    if(!hist.length){G('hist-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Nenhum histórico disponível.</p>';return;}
+    G('hist-box').innerHTML=hist.slice(0,10).map(h=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--gray-100);font-size:.82rem">
+        <div>
+          <span style="font-weight:500;color:var(--gray-700)">${esc(h.tipo||h.operacao||'Coleta')}</span>
+          <span style="color:var(--gray-400);font-size:.76rem;margin-left:8px">${esc(h.data||h.timestamp||'—')}</span>
+        </div>
+        <span class="badge ${h.status==='ok'||h.sucesso?'badge-success':'badge-danger'}">${esc(h.resultado||h.total||'—')}</span>
+      </div>`).join('');
+  }catch(e){
+    G('hist-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Histórico indisponível.</p>';
+  }
 }
-async function loadFontes(){
-  try{const d=await fetch(API+'/admin/fontes-disponiveis').then(r=>r.json());
-    const fontes=Array.isArray(d)?d:(d.fontes||[{nome:'PCI Concursos',url:'pciconcursos.com.br',status:'ativo'},{nome:'Cebraspe',url:'cebraspe.org.br',status:'ativo'},{nome:'FGV',url:'fgv.br',status:'ativo'}]);
-    G('fontes-list').innerHTML=fontes.map(f=>`<div class="fonte-item"><div><strong style="font-size:.83rem">${f.nome||f.name||f}</strong><div style="font-size:.72rem;color:var(--gray-400)">${f.url||f.descricao||''}</div></div><span class="src-badge ${f.status!=='inativo'?'src-on':'src-off'}">${f.status||'ativo'}</span></div>`).join('');
-  }catch(e){G('fontes-list').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
-}
-async function loadLog(){
-  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    const msgs=['[INFO] Sistema de scraping ativo','[INFO] Fontes: PCI, Cebraspe, FGV','[INFO] Status: '+(d.status||'ok'),'[INFO] Última verificação: '+new Date().toLocaleString()];
-    G('log-box').textContent=msgs.join('\n');
-    G('log-box').scrollTop=G('log-box').scrollHeight;
-  }catch(e){logLine('[ERRO] Não foi possível carregar log: '+e.message);}
-}
+
 async function init(){
   try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}
   catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
-  loadStatus();loadAgend();loadFontes();
+  loadStats();loadStatus();loadHistorico();
 }
 init();
 </script>

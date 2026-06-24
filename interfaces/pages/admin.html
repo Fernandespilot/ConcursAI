@@ -7,21 +7,20 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-.adm-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .adm-full{grid-column:1/-1}
-.metric-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--gray-100);font-size:.82rem}
-.metric-row:last-child{border-bottom:none}
-.metric-label{color:var(--gray-500)}
-.metric-val{font-weight:600;color:var(--gray-800)}
-.health-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-.hc{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;text-align:center}
-.hc-icon{font-size:1.5rem;margin-bottom:6px}
-.hc-name{font-size:.72rem;color:var(--gray-500);margin-bottom:4px}
-.hc-status{font-size:.78rem;font-weight:700}
-.ok{color:#059669}.warn{color:#d97706}.err{color:#dc2626}
-.notif-item{padding:10px 0;border-bottom:1px solid var(--gray-100);display:flex;gap:10px;align-items:flex-start}
-.notif-item:last-child{border-bottom:none}
-.notif-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100);font-size:.83rem}
+.stat-row:last-child{border-bottom:none}
+.stat-row-label{color:var(--gray-600)}
+.stat-row-val{font-weight:700;color:var(--gray-800)}
+.result-area{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;font-size:.82rem;line-height:1.8;color:var(--gray-700);white-space:pre-wrap;word-break:break-word;display:none;margin-top:12px;max-height:200px;overflow-y:auto}
+.result-area.show{display:block}
+.result-area.loading{display:block;color:var(--gray-400);font-style:italic}
+.warn-box{background:#fef3c7;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:12px 14px;font-size:.82rem;color:#92400e;display:flex;gap:10px;align-items:flex-start;margin-bottom:4px}
+.health-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:var(--radius-sm);background:var(--gray-50);margin-bottom:6px}
+.health-item:last-child{margin-bottom:0}
+.btn-danger-soft{background:#fee2e2;color:#dc2626;border:1px solid #fecaca}
+.btn-danger-soft:hover{background:#fecaca}
 </style>
 </head>
 <body>
@@ -40,248 +39,268 @@
   </div>
   <div class="nav-right"><div class="status-pill"><span class="status-dot" id="sdot"></span><span id="stxt">...</span></div></div>
 </nav>
-<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Admin</span></div>
+<div class="breadcrumb"><a href="/pages/home.html">Início</a><span class="sep">/</span><span class="current">Administração</span></div>
 <div class="page-header">
-  <div class="page-title"><i class="fas fa-shield-alt" style="color:#7c3aed"></i> Administração do Sistema</div>
-  <div class="page-subtitle">Monitoramento, saúde, métricas e controle avançado do ConcursAI</div>
+  <div class="page-title"><i class="fas fa-shield-alt" style="color:#7c3aed"></i> Administração</div>
+  <div class="page-subtitle">Gerenciamento de banco de dados, embeddings, sistema e saúde da API</div>
 </div>
+
 <div class="page-body">
-  <!-- Saúde do sistema -->
   <div class="card adm-full mb-6">
     <div class="card-header">
       <div class="card-title"><i class="fas fa-heartbeat"></i>Saúde do Sistema</div>
-      <button class="btn btn-secondary btn-sm" onclick="loadSaude()"><i class="fas fa-sync"></i> Atualizar</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadHealth()"><i class="fas fa-sync"></i> Verificar</button>
     </div>
-    <div class="card-body"><div class="health-grid" id="health-grid">
-      <p style="font-size:.82rem;color:var(--gray-400)">Carregando...</p>
-    </div></div>
+    <div class="card-body" id="health-box">
+      <p style="font-size:.82rem;color:var(--gray-400)">Clique em Verificar para checar o estado do sistema.</p>
+    </div>
   </div>
 
-  <div class="adm-layout">
-    <!-- Métricas detalhadas -->
+  <div class="adm-grid">
     <div class="card">
       <div class="card-header">
-        <div class="card-title"><i class="fas fa-chart-line"></i>Métricas</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadMetricas()"><i class="fas fa-sync"></i></button>
+        <div class="card-title"><i class="fas fa-database"></i>Banco de Dados</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadStats()"><i class="fas fa-sync"></i></button>
       </div>
-      <div class="card-body" id="metricas-box">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando métricas...</p>
+      <div class="card-body" id="stats-box">
+        <p style="font-size:.82rem;color:var(--gray-400)">Carregando estatísticas...</p>
       </div>
     </div>
 
-    <!-- Notificações -->
     <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-bell"></i>Notificações</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadNotificacoes()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body" id="notif-box">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando notificações...</p>
+      <div class="card-header"><div class="card-title"><i class="fas fa-brain"></i>Embeddings (ChromaDB)</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+        <p style="font-size:.83rem;color:var(--gray-500);margin:0">Gerencia os embeddings vetoriais usados pelo sistema RAG.</p>
+        <button class="btn btn-secondary" onclick="statusEmb()"><i class="fas fa-info-circle"></i> Status da coleção</button>
+        <button class="btn btn-primary" onclick="reindexar()"><i class="fas fa-redo"></i> Reindexar coleção</button>
+        <div class="warn-box"><i class="fas fa-exclamation-triangle"></i><span>A reindexação recria todos os embeddings. Pode levar alguns minutos.</span></div>
+        <div id="emb-r" class="result-area"></div>
       </div>
     </div>
 
-    <!-- Coleta avançada -->
     <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-cog"></i>Coleta Avançada</div></div>
+      <div class="card-header"><div class="card-title"><i class="fas fa-tools"></i>Manutenção de Dados</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-secondary" onclick="limparDupl()"><i class="fas fa-copy"></i> Remover duplicatas</button>
+        <button class="btn btn-secondary" onclick="validarDados()"><i class="fas fa-check-circle"></i> Validar dados</button>
+        <button class="btn btn-secondary" onclick="exportarDados()"><i class="fas fa-download"></i> Exportar CSV</button>
+        <button class="btn btn-danger-soft" onclick="confirmarLimpar()"><i class="fas fa-trash-alt"></i> Limpar banco de dados</button>
+        <div id="manut-r" class="result-area"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fas fa-cog"></i>Configurações da API</div></div>
       <div class="card-body">
-        <div class="form-group"><label class="form-label">URL personalizada</label>
-          <input type="url" class="form-control" id="col-url" placeholder="https://...">
-        </div>
-        <div class="form-group"><label class="form-label">Tipo de fonte</label>
-          <select class="form-control" id="col-tipo">
-            <option value="concurso">Concurso</option>
-            <option value="edital">Edital</option>
-            <option value="prova">Prova</option>
+        <div class="form-group">
+          <label class="form-label">Modelo LLM ativo</label>
+          <select class="form-control" id="cfg-modelo">
+            <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+            <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">Seletor CSS (opcional)</label>
-          <input type="text" class="form-control" id="col-sel" placeholder=".concurso-item, #lista">
+        <div class="form-group">
+          <label class="form-label">Máx. resultados RAG</label>
+          <input type="number" class="form-control" id="cfg-rag" value="5" min="1" max="20">
         </div>
-        <button class="btn btn-primary" style="width:100%" onclick="coletarAvancado()"><i class="fas fa-spider"></i> Coletar URL</button>
-        <div id="col-adv-r" class="result-box" style="display:none;margin-top:12px"></div>
+        <div class="form-group">
+          <label class="form-label">Timeout de resposta (s)</label>
+          <input type="number" class="form-control" id="cfg-timeout" value="30" min="5" max="120">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="salvarCfg()"><i class="fas fa-save"></i> Salvar configurações</button>
+        <div id="cfg-r" class="result-area"></div>
       </div>
     </div>
 
-    <!-- Agendador admin -->
     <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fas fa-calendar-alt"></i>Agendador Avançado</div></div>
-      <div class="card-body">
-        <div class="form-group"><label class="form-label">Expressão Cron</label>
-          <input type="text" class="form-control" id="cron-expr" placeholder="0 */6 * * *" value="0 */6 * * *">
-          <div style="font-size:.72rem;color:var(--gray-400);margin-top:3px">A cada 6h: <code>0 */6 * * *</code> · Diário: <code>0 8 * * *</code></div>
-        </div>
-        <div class="form-group"><label class="form-label">Tarefa</label>
-          <select class="form-control" id="cron-task">
-            <option value="coleta_geral">Coleta Geral</option>
-            <option value="coleta_pci">Coleta PCI</option>
-            <option value="coleta_bancas">Coleta Bancas</option>
-            <option value="backup">Backup DB</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-primary btn-sm" style="flex:1" onclick="agendarTarefa()"><i class="fas fa-plus"></i> Agendar</button>
-          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="loadJobs()"><i class="fas fa-list"></i> Jobs</button>
-        </div>
-        <div id="cron-r" class="result-box" style="display:none;margin-top:10px"></div>
+      <div class="card-header"><div class="card-title"><i class="fas fa-download"></i>Coleta Administrativa</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-primary" onclick="coletarTudo()"><i class="fas fa-spider"></i> Coletar tudo agora</button>
+        <button class="btn btn-secondary" onclick="processarCSV()"><i class="fas fa-file-csv"></i> Processar CSV existente</button>
+        <button class="btn btn-secondary" onclick="carregarEmb()"><i class="fas fa-upload"></i> Carregar embeddings</button>
+        <div id="col-r" class="result-area"></div>
       </div>
     </div>
 
-    <!-- Gerenciar fontes -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-database"></i>Gerenciar Fontes</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadFontes()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body">
-        <div class="form-row" style="margin-bottom:10px">
-          <div class="form-group"><label class="form-label">Nome</label><input type="text" class="form-control" id="fn-nome" placeholder="PCI Concursos"></div>
-          <div class="form-group"><label class="form-label">URL</label><input type="url" class="form-control" id="fn-url" placeholder="https://..."></div>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="addFonte()"><i class="fas fa-plus"></i> Adicionar Fonte</button>
-        <div id="fontes-adm" style="margin-top:12px;font-size:.82rem;color:var(--gray-400)">Carregando fontes...</div>
-      </div>
-    </div>
-
-    <!-- Monitoramento de recursos -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title"><i class="fas fa-server"></i>Recursos do Servidor</div>
-        <button class="btn btn-secondary btn-sm" onclick="loadRecursos()"><i class="fas fa-sync"></i></button>
-      </div>
-      <div class="card-body" id="recursos-box">
-        <p style="font-size:.82rem;color:var(--gray-400)">Carregando recursos...</p>
-      </div>
-    </div>
-
-    <!-- Log do sistema -->
     <div class="card adm-full">
       <div class="card-header">
         <div class="card-title"><i class="fas fa-terminal"></i>Log do Sistema</div>
         <div style="display:flex;gap:8px">
-          <select id="log-nivel" style="border:1px solid var(--gray-200);border-radius:6px;padding:5px 8px;font-size:.78rem;font-family:inherit;outline:none">
-            <option value="all">Todos</option><option value="info">INFO</option><option value="warn">WARN</option><option value="error">ERROR</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="loadSysLog()"><i class="fas fa-sync"></i> Atualizar</button>
-          <button class="btn btn-sm" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca" onclick="G('sys-log').textContent=''"><i class="fas fa-trash"></i></button>
+          <button class="btn btn-secondary btn-sm" onclick="loadLog()"><i class="fas fa-sync"></i> Atualizar</button>
+          <button class="btn btn-sm btn-danger-soft" onclick="G('log-box').innerHTML=''"><i class="fas fa-trash"></i> Limpar</button>
         </div>
       </div>
-      <div class="card-body"><div class="log-box" id="sys-log">Clique em Atualizar para carregar o log do sistema...</div></div>
+      <div class="card-body"><div class="log-box" id="log-box">Aguardando...</div></div>
     </div>
   </div>
 </div>
+
+<div id="modal-wrap" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:var(--radius);padding:28px 32px;max-width:420px;width:90%">
+    <div style="font-size:1.1rem;font-weight:700;margin-bottom:8px;color:#dc2626"><i class="fas fa-exclamation-triangle"></i> Confirmar limpeza</div>
+    <p style="font-size:.88rem;color:var(--gray-600);margin-bottom:20px">Esta ação irá <strong>remover todos os concursos</strong> do banco de dados. Esta operação <strong>não pode ser desfeita</strong>. Deseja continuar?</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="G('modal-wrap').style.display='none'">Cancelar</button>
+      <button class="btn" style="background:#dc2626;color:white" onclick="limparBanco()"><i class="fas fa-trash-alt"></i> Limpar tudo</button>
+    </div>
+  </div>
+</div>
+
 <footer class="footer"><div class="footer-inner">
   <div class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</div>
   <div class="footer-info">Trabalho de Conclusão de Curso · 2024</div>
   <div class="footer-links"><a href="http://localhost:8000/docs" target="_blank">API Docs</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
+
 <script>
 const API='http://localhost:8000';
 function G(id){return document.getElementById(id);}
 function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
-function show(id,txt){const el=G(id);el.style.display='block';el.classList.remove('loading');el.textContent=typeof txt==='object'?JSON.stringify(txt,null,2):txt;}
-function loading(id){const el=G(id);el.style.display='block';el.classList.add('loading');el.textContent='Processando...';}
+function show(id,txt){
+  const el=G(id);el.classList.add('show');el.classList.remove('loading');
+  el.innerHTML=String(typeof txt==='object'?JSON.stringify(txt,null,2):txt)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+function loading(id,m='Processando...'){
+  const el=G(id);el.classList.add('loading');el.classList.remove('show');
+  el.innerHTML=`<i class="fas fa-circle-notch fa-spin" style="color:var(--primary)"></i> ${m}`;
+}
+function log(msg,type='info'){
+  const lb=G('log-box'),t=new Date().toLocaleTimeString('pt-BR');
+  const cl=type==='err'?'color:#dc2626':type==='ok'?'color:#10b981':'color:var(--gray-500)';
+  lb.innerHTML+=`\n<span style="${cl}">[${t}]</span> ${msg}`;
+  lb.scrollTop=lb.scrollHeight;
+}
 
-async function loadSaude(){
-  try{const d=await fetch(API+'/api/monitoring/health').then(r=>r.json());
-    const map={
-      'API': {ok:true,val:'online'},
-      'ChromaDB': {ok:d.chromadb!=='erro',val:d.chromadb||'ok'},
-      'LLM (Groq)': {ok:d.groq_api!=='indisponível',val:d.groq_api||'ok'},
-      'Embeddings': {ok:d.embeddings!=='erro',val:d.embeddings||'ok'},
-      'Scrapers': {ok:d.scrapers!=='erro',val:d.scrapers||'ok'},
-      'Dados CSV': {ok:d.dados_csv!=='erro',val:d.dados_csv||'ok'},
-    };
-    G('health-grid').innerHTML=Object.entries(map).map(([n,c])=>`<div class="hc"><div class="hc-icon">${c.ok?'✅':'⚠️'}</div><div class="hc-name">${n}</div><div class="hc-status ${c.ok?'ok':'warn'}">${c.val}</div></div>`).join('');
+async function loadHealth(){
+  G('health-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Verificando...</p>';
+  try{
+    const d=await fetch(API+'/health').then(r=>r.json());
+    const items=[
+      {label:'API',ok:true,detail:'FastAPI respondendo'},
+      {label:'ChromaDB',ok:!!(d.chromadb?.connected||d.embeddings?.disponivel),detail:d.chromadb?.collection||''},
+      {label:'Groq LLM',ok:!!(d.groq?.disponivel||d.llm?.disponivel),detail:d.groq?.modelo||d.llm?.modelo||''},
+      {label:'Scraper',ok:!!(d.scraper?.disponivel),detail:d.scraper?.total_concursos!=null?d.scraper.total_concursos+' concursos':''},
+    ];
+    G('health-box').innerHTML=items.map(i=>`
+      <div class="health-item">
+        <div style="font-size:.85rem;font-weight:600;color:var(--gray-700)">${i.label}${i.detail?`<span style="font-weight:400;color:var(--gray-400);font-size:.78rem;margin-left:8px">${i.detail}</span>`:''}</div>
+        <span class="${i.ok?'badge badge-success':'badge badge-danger'}">${i.ok?'OK':'Falha'}</span>
+      </div>`).join('');
+    log('Health check concluído','ok');
   }catch(e){
-    try{const s=await fetch(API+'/status').then(r=>r.json());
-      G('health-grid').innerHTML=`<div class="hc"><div class="hc-icon">✅</div><div class="hc-name">API</div><div class="hc-status ok">online</div></div><div class="hc"><div class="hc-icon">${s.chromadb?'✅':'⚠️'}</div><div class="hc-name">ChromaDB</div><div class="hc-status ${s.chromadb?'ok':'warn'}">${s.chromadb?'ok':'indisponível'}</div></div><div class="hc"><div class="hc-icon">${s.groq_api?'✅':'⚠️'}</div><div class="hc-name">Groq API</div><div class="hc-status ${s.groq_api?'ok':'warn'}">${s.groq_api||'—'}</div></div>`;
-    }catch(e2){G('health-grid').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+    G('health-box').innerHTML='<div class="health-item"><div style="font-size:.85rem;font-weight:600">API</div><span class="badge badge-danger">Offline</span></div>';
+    log('Health check falhou: '+e.message,'err');
   }
 }
 
-async function loadMetricas(){
-  try{const d=await fetch(API+'/api/monitoring/stats').then(r=>r.json());
-    const rows=Object.entries(d).filter(([k])=>typeof d[k]!=='object');
-    G('metricas-box').innerHTML=rows.map(([k,v])=>`<div class="metric-row"><span class="metric-label">${k.replace(/_/g,' ')}</span><span class="metric-val">${v}</span></div>`).join('')||'<p style="font-size:.82rem;color:var(--gray-400)">Sem métricas.</p>';
+async function loadStats(){
+  try{
+    const d=await fetch(API+'/admin/estatisticas').then(r=>r.json());
+    const rows=[
+      ['Total de concursos',d.total_concursos??d.concursos??'—'],
+      ['Concursos abertos',d.concursos_abertos??d.abertos??'—'],
+      ['Bancas cadastradas',d.total_bancas??d.bancas??'—'],
+      ['PDFs indexados',d.pdfs_indexados??d.pdfs??'—'],
+      ['Embeddings vetoriais',d.total_embeddings??d.embeddings??'—'],
+      ['Última coleta',d.ultima_coleta??d.ultima_atualizacao??'—'],
+    ];
+    G('stats-box').innerHTML=rows.map(([l,v])=>`<div class="stat-row"><span class="stat-row-label">${l}</span><span class="stat-row-val">${v}</span></div>`).join('');
   }catch(e){
-    try{const s=await fetch(API+'/status').then(r=>r.json());
-      G('metricas-box').innerHTML=Object.entries(s).filter(([k,v])=>typeof v!=='object').map(([k,v])=>`<div class="metric-row"><span class="metric-label">${k.replace(/_/g,' ')}</span><span class="metric-val">${v}</span></div>`).join('');
-    }catch(e2){G('metricas-box').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
+    G('stats-box').innerHTML='<div class="stat-row"><span class="stat-row-label">API</span><span class="badge badge-danger">Offline</span></div>';
   }
 }
 
-async function loadNotificacoes(){
-  try{const d=await fetch(API+'/api/notifications/stats').then(r=>r.json());
-    const notifs=d.recent_notifications||d.notificacoes||[];
-    if(!notifs.length){G('notif-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Nenhuma notificação recente.</p>';return;}
-    const icons={'info':'#dbeafe','success':'#d1fae5','warning':'#fef3c7','error':'#fee2e2'};
-    G('notif-box').innerHTML=notifs.map(n=>`<div class="notif-item"><div class="notif-icon" style="background:${icons[n.tipo||'info']||'#f3f4f6'}"><i class="fas fa-${n.tipo==='error'?'exclamation-circle':n.tipo==='success'?'check-circle':n.tipo==='warning'?'exclamation-triangle':'info-circle'}"></i></div><div><div style="font-size:.82rem;font-weight:600">${n.titulo||n.mensagem||n.message||''}</div><div style="font-size:.72rem;color:var(--gray-400)">${n.data||n.created_at||''}</div></div></div>`).join('');
-  }catch(e){G('notif-box').innerHTML='<p style="font-size:.82rem;color:var(--gray-400)">Sem notificações disponíveis.</p>';}
+async function statusEmb(){
+  loading('emb-r','Verificando embeddings...');
+  try{const d=await fetch(API+'/embeddings/status').then(r=>r.json());show('emb-r',JSON.stringify(d,null,2));log('Embeddings ok','ok');}
+  catch(e){show('emb-r','Erro: '+e.message);log(e.message,'err');}
 }
 
-async function coletarAvancado(){
-  const url=G('col-url').value.trim(),tipo=G('col-tipo').value;
-  if(!url){toast('Informe uma URL',false);return;}
-  loading('col-adv-r');
-  try{const body={url,tipo_coleta:tipo};
-    const d=await fetch(API+'/admin/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json());
-    show('col-adv-r',JSON.stringify(d,null,2));toast('Coleta iniciada!');
-  }catch(e){show('col-adv-r','Erro: '+e.message);toast(e.message,false);}
+async function reindexar(){
+  loading('emb-r','Reindexando... (pode levar minutos)');log('Reindexação iniciada...');
+  try{const d=await fetch(API+'/admin/reindexar',{method:'POST'}).then(r=>r.json());show('emb-r',d.mensagem||d.message||JSON.stringify(d));toast('Reindexação iniciada!');log(d.mensagem||'ok','ok');}
+  catch(e){show('emb-r','Erro: '+e.message);log(e.message,'err');toast(e.message,false);}
 }
 
-async function agendarTarefa(){
-  const int=6,task=G('cron-task').value;
-  loading('cron-r');
-  try{const d=await fetch(API+'/scraping/agendar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({intervalo_horas:int,tipo:task})}).then(r=>r.json());
-    show('cron-r',d.mensagem||JSON.stringify(d));toast('Tarefa agendada!');
-  }catch(e){show('cron-r','Erro: '+e.message);toast(e.message,false);}
-}
-async function loadJobs(){
-  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());show('cron-r',JSON.stringify(d,null,2));}
-  catch(e){show('cron-r','Erro: '+e.message);}
+async function limparDupl(){
+  loading('manut-r','Removendo duplicatas...');
+  try{const d=await fetch(API+'/admin/limpar-duplicatas',{method:'POST'}).then(r=>r.json());show('manut-r',d.mensagem||d.message||JSON.stringify(d));toast('Duplicatas removidas!');loadStats();}
+  catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}
 }
 
-async function loadFontes(){
-  try{const d=await fetch(API+'/admin/fontes-disponiveis').then(r=>r.json());
-    const f=Array.isArray(d)?d:(d.fontes||[]);
-    G('fontes-adm').innerHTML=f.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--gray-100)"><span style="font-size:.8rem">${x.nome||x.name||x}</span><span class="badge badge-green" style="font-size:.68rem">${x.status||'ativo'}</span></div>`).join('')||'Nenhuma fonte cadastrada.';
-  }catch(e){G('fontes-adm').textContent='Erro ao carregar fontes.';}
-}
-async function addFonte(){toast('Gerenciamento de fontes via API disponível em /admin/coletar',false);}
-async function remFonte(id){toast('Operação não suportada nesta versão',false);}
-
-async function loadRecursos(){
-  try{const d=await fetch(API+'/api/monitoring/metrics').then(r=>r.json());
-    G('recursos-box').innerHTML=[
-      ['Total Concursos',d.total_concursos??'—'],
-      ['Total Chunks',d.total_chunks??'—'],
-      ['Total Embeddings',d.total_embeddings??'—'],
-      ['Uptime',d.uptime??'—'],
-      ['Versão',d.versao??'—'],
-      ['ChromaDB Docs',d.chromadb_total??'—'],
-    ].map(([l,v])=>`<div class="metric-row"><span class="metric-label">${l}</span><span class="metric-val">${v}</span></div>`).join('');
-  }catch(e){
-    try{const s=await fetch(API+'/status').then(r=>r.json());
-      G('recursos-box').innerHTML=[['Total Concursos',s.total_concursos||'—'],['ChromaDB',s.chromadb_docs||'—'],['Versão',s.versao||'—']].map(([l,v])=>`<div class="metric-row"><span class="metric-label">${l}</span><span class="metric-val">${v}</span></div>`).join('');
-    }catch(e2){G('recursos-box').innerHTML='<p style="font-size:.78rem;color:var(--danger)">'+e.message+'</p>';}
-  }
+async function validarDados(){
+  loading('manut-r','Validando dados...');
+  try{const d=await fetch(API+'/admin/validar').then(r=>r.json());show('manut-r',JSON.stringify(d,null,2));toast('Validação concluída!');}
+  catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}
 }
 
-async function loadSysLog(){
-  try{const d=await fetch(API+'/scraping/status').then(r=>r.json());
-    const lines=['[INFO] Sistema iniciado','[INFO] API: online','[INFO] Status scraping: '+(d.status||'ok'),'[INFO] Última verificação: '+new Date().toLocaleString()];
-    G('sys-log').textContent=lines.join('\n');
-    G('sys-log').scrollTop=G('sys-log').scrollHeight;
-  }catch(e){G('sys-log').textContent='[ERRO] '+e.message;}
+async function exportarDados(){
+  toast('Iniciando exportação...');
+  try{
+    const resp=await fetch(API+'/admin/exportar-csv');
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const blob=await resp.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='concursos_export.csv';a.click();
+    URL.revokeObjectURL(url);toast('CSV exportado!');log('Exportação concluída','ok');
+  }catch(e){show('manut-r','Erro ao exportar: '+e.message);toast(e.message,false);}
 }
+
+function confirmarLimpar(){G('modal-wrap').style.display='flex';}
+
+async function limparBanco(){
+  G('modal-wrap').style.display='none';loading('manut-r','Limpando banco...');
+  try{const d=await fetch(API+'/admin/limpar-banco',{method:'DELETE'}).then(r=>r.json());show('manut-r',d.mensagem||d.message||JSON.stringify(d));toast('Banco limpo!');loadStats();}
+  catch(e){show('manut-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function salvarCfg(){
+  loading('cfg-r','Salvando...');
+  try{
+    const d=await fetch(API+'/admin/configuracoes',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({modelo_llm:G('cfg-modelo').value,max_resultados_rag:parseInt(G('cfg-rag').value),timeout_resposta:parseInt(G('cfg-timeout').value)})}).then(r=>r.json());
+    show('cfg-r',d.mensagem||d.message||JSON.stringify(d));toast('Configurações salvas!');
+  }catch(e){show('cfg-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function coletarTudo(){
+  loading('col-r','Iniciando coleta...');log('Coleta iniciada...');
+  try{const d=await fetch(API+'/scraping/coletar',{method:'POST'}).then(r=>r.json());show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('Coleta iniciada!');loadStats();}
+  catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function processarCSV(){
+  loading('col-r','Processando CSV...');log('Processando CSV...');
+  try{const d=await fetch(API+'/admin/processar-csv',{method:'POST'}).then(r=>r.json());show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('CSV processado!');loadStats();}
+  catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function carregarEmb(){
+  loading('col-r','Carregando embeddings...');
+  try{const d=await fetch(API+'/admin/carregar-embeddings',{method:'POST'}).then(r=>r.json());show('col-r',d.mensagem||d.message||JSON.stringify(d));toast('Embeddings carregados!');}
+  catch(e){show('col-r','Erro: '+e.message);toast(e.message,false);}
+}
+
+async function loadLog(){
+  try{
+    const d=await fetch(API+'/health').then(r=>r.json());
+    G('log-box').innerHTML=`<span style="color:#10b981">[ok]</span> API respondendo em ${API}
+<span style="color:var(--gray-500)">[info]</span> ChromaDB: ${d.chromadb?.connected?'conectado':'desconectado'}
+<span style="color:var(--gray-500)">[info]</span> LLM: ${d.groq?.disponivel?'disponível':'indisponível'}
+<span style="color:#10b981">[ok]</span> Log atualizado em ${new Date().toLocaleString()}`;
+  }catch(e){log('Falha ao carregar log: '+e.message,'err');}
+}
+
+G('modal-wrap').addEventListener('click',e=>{if(e.target===G('modal-wrap'))G('modal-wrap').style.display='none';});
 
 async function init(){
   try{await fetch(API+'/status');G('sdot').className='status-dot online';G('stxt').textContent='Online';}
   catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='Offline';}
-  loadSaude();loadMetricas();loadNotificacoes();loadRecursos();loadFontes();
+  loadHealth();loadStats();loadLog();
 }
 init();
-setInterval(loadSaude,30000);
 </script>
 </body></html>
