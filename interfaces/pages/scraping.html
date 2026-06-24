@@ -7,26 +7,21 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="/static/css/concursai.css" rel="stylesheet">
 <style>
-/* stat row horizontal */
-.stat-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.stat-h{background:var(--white);border-radius:var(--radius);border:1px solid var(--gray-200);padding:18px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm)}
-.stat-h-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stat-h-icon i{font-size:1.15rem}
-.stat-h-val{font-size:1.6rem;font-weight:800;color:var(--gray-900);line-height:1}
-.stat-h-label{font-size:.75rem;color:var(--gray-500);margin-top:3px}
-/* two-column page grid */
-.page-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.stat-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-h{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px 18px;display:flex;align-items:center;gap:12px}
+.stat-h-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-h-icon i{font-size:1rem}
+.stat-h-val{font-size:1.4rem;font-weight:700;color:var(--text);line-height:1}
+.stat-h-label{font-size:.72rem;color:var(--text-3);margin-top:3px}
+.page-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .col-full{grid-column:1/-1}
-/* result area */
-.ra{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:14px;font-size:.82rem;line-height:1.8;color:var(--gray-700);word-break:break-word;display:none;margin-top:12px;max-height:260px;overflow-y:auto}
+.ra{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;font-size:.8rem;line-height:1.75;color:var(--text-2);word-break:break-word;display:none;margin-top:10px;max-height:240px;overflow-y:auto}
 .ra.show{display:block}
-.ra.loading{display:block;color:var(--gray-500)}
-/* fonte checkbox */
-.fonte-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:.83rem;cursor:pointer;transition:border-color .15s}
-.fonte-item:hover{border-color:var(--primary);background:var(--gray-50)}
+.ra.loading{display:block;color:var(--text-3)}
+.fonte-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;cursor:pointer;transition:border-color .12s}
+.fonte-item:hover{border-color:var(--primary);background:var(--primary-light)}
 .fonte-item input{accent-color:var(--primary)}
-/* progress */
-.prog{height:5px;background:var(--gray-200);border-radius:3px;margin-top:10px;display:none}
+.prog{height:4px;background:var(--border);border-radius:2px;margin-top:8px;display:none}
 .prog.show{display:block}
 .prog-fill{height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width .4s}
 /* pdf list */
