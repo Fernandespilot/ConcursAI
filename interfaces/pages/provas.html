@@ -36,6 +36,7 @@
       <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
       <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
       <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
       <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
       <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
       <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
@@ -141,7 +142,7 @@ async function checkAPI(){
 }
 async function loadStats(){
   try{
-    const r=await fetch(API+'/provas/stats',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    const r=await fetch(API+'/api/provas/stats',{signal:AbortSignal.timeout(5000)});const d=await r.json();
     G('pv-total').textContent=d.total_pdfs??d.total??'0';
     G('pv-indexados').textContent=d.indexados??'0';
     G('pv-bancas').textContent=d.bancas??'0';
@@ -154,13 +155,13 @@ async function coletarProvas(){
   ra.innerHTML='<span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> Coletando provas...';
   try{
     const body={banca:G('cp-banca').value||undefined,limite:parseInt(G('cp-limit').value)};
-    const r=await fetch(API+'/provas/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
+    const r=await fetch(API+'/api/provas/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
     const d=await r.json();ra.textContent=d.mensagem||d.message||JSON.stringify(d);loadStats();
   }catch(e){ra.innerHTML='<span class="text-red-600">Erro: '+esc(e.message)+'</span>';}
 }
 async function listarPDFs(){
   try{
-    const r=await fetch(API+'/provas/listar',{signal:AbortSignal.timeout(10000)});const d=await r.json();
+    const r=await fetch(API+'/api/provas/listar',{signal:AbortSignal.timeout(10000)});const d=await r.json();
     const pdfs=d.pdfs||d.arquivos||d||[];
     G('tb-pdfs').innerHTML=Array.isArray(pdfs)&&pdfs.length?pdfs.map(p=>`<tr class="border-t border-line hover:bg-canvas"><td class="px-4 py-2 text-ink-2">${esc(p.nome||p.name||p)}</td><td class="px-4 py-2 text-ink-3">${esc(p.banca||'—')}</td><td class="px-4 py-2 text-ink-3">${esc(p.tamanho||p.size||'—')}</td></tr>`).join(''):'<tr><td colspan="3" class="text-center text-ink-4 py-6">Nenhum PDF encontrado</td></tr>';
   }catch(e){G('tb-pdfs').innerHTML='<tr><td colspan="3" class="text-red-600 px-4 py-3">Erro: '+esc(e.message)+'</td></tr>';}
@@ -170,14 +171,14 @@ async function buscarRAG(){
   const ra=G('ra-rag');ra.classList.remove('hidden');
   ra.innerHTML='<div class="text-ink-3 text-[13px]"><span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> Buscando nas provas...</div>';
   try{
-    const r=await fetch(API+'/provas/buscar?q='+encodeURIComponent(q)+'&limit=5',{signal:AbortSignal.timeout(15000)});const d=await r.json();
+    const r=await fetch(API+'/api/provas/buscar?q='+encodeURIComponent(q)+'&limit=5',{signal:AbortSignal.timeout(15000)});const d=await r.json();
     const res=d.resultados||d.results||[];
     ra.innerHTML=res.length?res.map(x=>`<div class="p-3 border border-line rounded-lg bg-canvas"><p class="text-[13px] font-semibold text-ink">${esc(x.titulo||x.fonte||'')}</p><p class="text-[12px] text-ink-3 mt-1">${esc((x.trecho||x.texto||'').slice(0,220))}...</p></div>`).join(''):'<p class="text-[13px] text-ink-3">Nenhum resultado encontrado.</p>';
   }catch(e){ra.innerHTML='<p class="text-red-600 text-[13px]">Erro: '+esc(e.message)+'</p>';}
 }
 async function loadBancaStats(){
   try{
-    const r=await fetch(API+'/provas/bancas',{signal:AbortSignal.timeout(8000)});const d=await r.json();
+    const r=await fetch(API+'/api/provas/bancas',{signal:AbortSignal.timeout(8000)});const d=await r.json();
     const bancas=d.bancas||d||[];
     G('tb-bancas').innerHTML=Array.isArray(bancas)&&bancas.length?bancas.map(b=>`<tr class="border-t border-line hover:bg-canvas"><td class="px-4 py-2 text-ink-2">${esc(b.banca||b.nome||b)}</td><td class="px-4 py-2 text-ink-3">${esc(b.provas??b.total??'—')}</td><td class="px-4 py-2 text-ink-3">${esc(b.questoes??'—')}</td></tr>`).join(''):'<tr><td colspan="3" class="text-center text-ink-4 py-6">Sem dados</td></tr>';
   }catch(e){G('tb-bancas').innerHTML='<tr><td colspan="3" class="text-center text-ink-4 py-6">Sem dados</td></tr>';}

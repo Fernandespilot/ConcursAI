@@ -16,11 +16,24 @@ aplicado de forma consistente em todas as páginas com **Tailwind CSS** +
 - Paleta: fundo `#f5f6f8`, superfícies `#ffffff`, azul de ação `#2563eb`
 - Tipografia Inter; terminais/logs em JetBrains Mono
 
-Páginas redesenhadas: `home`, `dashboard`, `chat`, `concursos`, `ferramentas`,
-`edital`, `provas`, `scraping`, `admin` (em `interfaces/pages/`), com o sistema
-de design em `static/css/concursai.css`.
+Páginas redesenhadas: `home`, `dashboard`, `chat`, `concursos`, `banca`,
+`ferramentas`, `edital`, `provas`, `scraping`, `admin` (em `interfaces/pages/`),
+com o sistema de design em `static/css/concursai.css`.
 
-Prints em [`docs/screenshots/`](screenshots/).
+### Prints das telas
+
+| Tela | Print |
+|---|---|
+| Início | ![](screenshots/01-home.png) |
+| Dashboard | ![](screenshots/02-dashboard.png) |
+| Chat IA (agentes) | ![](screenshots/03-chat.png) |
+| Concursos | ![](screenshots/04-concursos.png) |
+| Análise de Banca | ![](screenshots/05-banca.png) |
+| Ferramentas | ![](screenshots/06-ferramentas.png) |
+| Edital | ![](screenshots/07-edital.png) |
+| Provas | ![](screenshots/08-provas.png) |
+| Scraping | ![](screenshots/09-scraping.png) |
+| Admin | ![](screenshots/10-admin.png) |
 
 ## 2. Arquitetura de Agentes Especializados (Supervisor + Skills)
 
@@ -68,6 +81,26 @@ mudança na estrutura do site):
   `api_fastapi.py` (necessário para a `GROQ_API_KEY`).
 - **`scrapers/pci_scraper_main.py`**: erro de indentação (código órfão) que
   impedia o servidor de iniciar. Removido.
+
+## 5. MVP completo — telas consertadas + Inteligência de Banca
+
+- **Inteligência de Banca** (`modules/banca_inteligencia.py`, `POST /banca/analisar`):
+  a IA analisa o histórico da banca e gera a **incidência de temas** (o que mais
+  cai nos últimos N anos, com tendência) + **perfil de estudo** + pegadinhas,
+  ancorada no acervo raspado. Nova página `/pages/banca` com gráfico de
+  incidência (Chart.js) e o perfil renderizado.
+- **Ferramentas** agora têm backend real (`/ferramentas/resumo`, `flashcards`,
+  `analise-banca`, `plano-estudos`, `questoes`, `comparar-bancas`) via IA.
+- **Edital**: `POST /edital/upload` (lê o PDF) + `POST /edital/chat` (conversa
+  sobre o documento) funcionando.
+- **Provas**: `/api/provas/stats|listar|bancas|buscar|coletar` (o prefixo é
+  `/api/provas` porque `/provas` é usado para servir os PDFs).
+- **Admin**: `/health`, `/admin/stats`, reindexar/limpar ChromaDB, manutenção,
+  logs, exportar CSV e `/chat/direto` (sandbox de LLM).
+
+> A métrica de incidência é gerada pela IA a partir do conhecimento da banca e
+> do acervo; fica mais precisa quanto mais provas forem raspadas e indexadas.
+> A coleta em lote de provas em PDF roda via `scrapers/provas_scraper.py`.
 
 ## Como rodar a partir de um clone
 

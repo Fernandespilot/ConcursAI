@@ -219,6 +219,11 @@ def _chamar_llm(system_prompt: str, mensagem_usuario: str, temperatura: float = 
         return None
 
 
+def gerar(system_prompt: str, mensagem: str, temperatura: float = 0.5):
+    """Geração genérica com persona custom — reutilizada pelas ferramentas."""
+    return _chamar_llm(system_prompt, mensagem, temperatura)
+
+
 def responder(pergunta, agente_id=None, orgao="Todos", ano="Todos",
               cargo="Todos", contexto_extra=""):
     """Ponto de entrada do orquestrador.

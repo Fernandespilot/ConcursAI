@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Análise de Banca</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
+    .md h1,.md h2,.md h3{font-weight:600;margin:.6em 0 .3em} .md h2{font-size:15px} .md h3{font-size:14px}
+    .md ul{list-style:disc;padding-left:1.2em;margin:.4em 0} .md li{margin:.15em 0} .md p{margin:.4em 0} .md strong{font-weight:600}
+    .md table{width:100%;border-collapse:collapse;margin:.5em 0;font-size:12px} .md th,.md td{border:1px solid #e5e7eb;padding:5px 8px;text-align:left}
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">account_balance</span> Análise de Banca</div>
+      <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+
+        <div>
+          <h1 class="text-xl font-semibold text-ink">Estude a banca, não só a matéria</h1>
+          <p class="text-[13px] text-ink-3 mt-0.5">A IA analisa o histórico da banca e mostra o que mais cai, a tendência e como você deve estudar.</p>
+        </div>
+
+        <!-- Formulário -->
+        <section class="bg-surface border border-line rounded-xl p-5">
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div class="space-y-1">
+              <label class="text-[11px] font-medium text-ink-3">Banca</label>
+              <select id="banca" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none">
+                <option>CESPE/CEBRASPE</option><option>FCC</option><option>FGV</option><option>VUNESP</option><option>IBFC</option><option>AOCP</option><option>QUADRIX</option><option>INSTITUTO AOCP</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[11px] font-medium text-ink-3">Cargo / Área (opcional)</label>
+              <input id="cargo" type="text" placeholder="Ex: Analista de TI" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[11px] font-medium text-ink-3">Período</label>
+              <select id="anos" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none">
+                <option value="3">Últimos 3 anos</option><option value="5" selected>Últimos 5 anos</option><option value="10">Últimos 10 anos</option>
+              </select>
+            </div>
+            <button onclick="analisar()" class="bg-primary text-white py-2 rounded-lg text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">insights</span> Analisar Banca</button>
+          </div>
+        </section>
+
+        <!-- Estado inicial / loading -->
+        <div id="estado" class="text-center py-16 text-ink-4">
+          <span class="material-symbols-outlined text-[40px] opacity-40">account_balance</span>
+          <p class="mt-2 text-[13px]">Selecione uma banca e clique em <strong>Analisar Banca</strong>.</p>
+        </div>
+
+        <!-- Resultado -->
+        <div id="resultado" class="hidden space-y-5">
+          <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <!-- Incidência chart -->
+            <section class="lg:col-span-3 bg-surface border border-line rounded-xl p-5">
+              <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-1"><span class="material-symbols-outlined text-[18px] text-primary">bar_chart</span> Incidência de temas <span id="periodo-lbl" class="text-[11px] text-ink-4 font-normal"></span></h3>
+              <p class="text-[11px] text-ink-4 mb-3">O que mais cai nas provas dessa banca.</p>
+              <div class="h-72"><canvas id="ch-incid"></canvas></div>
+            </section>
+            <!-- Pegadinhas + fontes -->
+            <section class="lg:col-span-2 space-y-5">
+              <div class="bg-surface border border-line rounded-xl p-5">
+                <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-amber-600">warning</span> Pegadinhas típicas</h3>
+                <ul id="pegadinhas" class="space-y-2 text-[13px] text-ink-2"></ul>
+              </div>
+              <div class="bg-surface border border-line rounded-xl p-4 text-[12px] text-ink-3">
+                <div class="flex items-center justify-between"><span>Fonte da análise</span><span id="gerado" class="font-medium text-ink-2">—</span></div>
+                <div class="flex items-center justify-between mt-1"><span>Concursos no acervo</span><span id="ev-conc" class="font-medium text-ink-2">—</span></div>
+                <div class="flex items-center justify-between mt-1"><span>Provas em PDF</span><span id="ev-pdf" class="font-medium text-ink-2">—</span></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- Perfil de estudo -->
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">menu_book</span> Perfil de estudo recomendado</h3>
+            <div id="perfil" class="md text-[13px] text-ink-2 leading-relaxed"></div>
+          </section>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:8000';
+let chart=null;
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function md(s){
+  let h=esc(s)
+    .replace(/^### (.*)$/gm,'<h3>$1</h3>').replace(/^## (.*)$/gm,'<h2>$1</h2>').replace(/^# (.*)$/gm,'<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^\s*[-*] (.*)$/gm,'<li>$1</li>')
+    .replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>');
+  h=h.replace(/(<li>.*?<\/li>)(<br>)?/gs,m=>m.replace(/<br>/g,''));
+  return '<p>'+h.replace(/(<li>(?:(?!<\/li>).)*<\/li>)+/gs,m=>'<ul>'+m+'</ul>')+'</p>';
+}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+function corTendencia(t){return t==='subindo'?'#16a34a':(t==='caindo'?'#dc2626':'#2563eb');}
+async function analisar(){
+  const banca=G('banca').value, cargo=G('cargo').value.trim(), anos=parseInt(G('anos').value);
+  G('estado').classList.remove('hidden');
+  G('estado').innerHTML='<span class="spin material-symbols-outlined text-[32px] text-primary">progress_activity</span><p class="mt-2 text-[13px] text-ink-3">A IA está analisando a banca '+esc(banca)+'...</p>';
+  G('resultado').classList.add('hidden');
+  try{
+    const r=await fetch(API+'/banca/analisar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({banca,cargo,anos}),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();
+    render(d);
+  }catch(e){
+    G('estado').innerHTML='<p class="text-red-500 text-[13px]">Erro: '+esc(e.message)+'</p>';
+  }
+}
+function render(d){
+  G('estado').classList.add('hidden');
+  G('resultado').classList.remove('hidden');
+  G('periodo-lbl').textContent='· '+(d.periodo||'');
+  G('gerado').textContent=d.gerado_por||'—';
+  G('ev-conc').textContent=(d.fontes&&d.fontes.concursos_relacionados)??'0';
+  G('ev-pdf').textContent=(d.fontes&&d.fontes.provas_pdf)??'0';
+  // pegadinhas
+  G('pegadinhas').innerHTML=(d.pegadinhas&&d.pegadinhas.length)
+    ?d.pegadinhas.map(p=>`<li class="flex gap-2"><span class="material-symbols-outlined text-[16px] text-amber-500 shrink-0">priority_high</span><span>${esc(p)}</span></li>`).join('')
+    :'<li class="text-ink-4">Sem dados (configure a GROQ_API_KEY para a análise por IA).</li>';
+  // perfil
+  G('perfil').innerHTML=d.perfil_estudo?md(d.perfil_estudo):'<p class="text-ink-4">Perfil indisponível.</p>';
+  // chart
+  const inc=d.incidencia||[];
+  if(chart)chart.destroy();
+  if(inc.length){
+    chart=new Chart(G('ch-incid').getContext('2d'),{
+      type:'bar',
+      data:{labels:inc.map(i=>i.tema),datasets:[{data:inc.map(i=>i.percentual),backgroundColor:inc.map(i=>corTendencia(i.tendencia)),borderRadius:5}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.x+'% · '+(inc[c.dataIndex].tendencia)}}},
+        scales:{x:{beginAtZero:true,ticks:{callback:v=>v+'%',font:{size:10},color:'#9ca3af'},grid:{color:'#f1f1f1'}},y:{ticks:{font:{size:11},color:'#374151'},grid:{display:false}}}}
+    });
+  }else{
+    if(chart){chart.destroy();chart=null;}
+    G('ch-incid').getContext('2d').clearRect(0,0,2000,2000);
+  }
+}
+checkAPI();
+</script>
+</body></html>
