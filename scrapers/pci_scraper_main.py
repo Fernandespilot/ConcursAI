@@ -461,40 +461,7 @@ class PCIScraper:
         except Exception as e:
             logger.error(f"❌ Erro no scraping completo: {e}")
             return []
-                
-                # Seletor 2: Títulos de concursos em divs específicas
-                concurso_divs = soup.find_all('div', class_=re.compile(r'concurso|item-concurso'))
-                concurso_items.extend(concurso_divs)
-                
-                # Seletor 3: Buscar por padrões de texto que indicam concursos
-                all_links = soup.find_all('a')
-                for link in all_links:
-                    text = link.get_text(strip=True)
-                    # Filtrar apenas textos que parecem ser títulos de concurso
-                    if (len(text) > 20 and 
-                        any(keyword in text.lower() for keyword in ['concurso', 'edital', 'seleção', 'processo seletivo']) and
-                        not any(skip in text.lower() for skip in ['região', 'estado', 'cadastre-se', 'login', 'menu'])):
-                        concurso_items.append(link)
-                
-                logger.info(f"Encontrados {len(concurso_items)} elementos na página {page}")
-                
-                for item in concurso_items:
-                    try:
-                        concurso_data = self.extract_concurso_data(item, soup)
-                        if concurso_data and self.is_valid_concurso(concurso_data):
-                            concursos.append(concurso_data)
-                    except Exception as e:
-                        logger.warning(f"Erro ao extrair dados do item: {e}")
-                
-                # Pausa entre requisições
-                time.sleep(2)
-                
-            except Exception as e:
-                logger.error(f"Erro ao processar página {page}: {e}")
-                continue
-                
-        return concursos
-    
+
     def is_valid_concurso(self, concurso_data):
         """Valida se os dados extraídos representam um concurso real"""
         titulo = concurso_data.get('titulo', '').lower()

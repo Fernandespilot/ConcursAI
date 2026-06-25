@@ -1,212 +1,163 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Análise de Edital — ConcursAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="/static/css/concursai.css" rel="stylesheet">
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Análise de Edital</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-.msg{display:flex;flex-direction:column;gap:3px;max-width:85%}
-.msg.user{align-self:flex-end;align-items:flex-end}
-.msg.ai{align-self:flex-start;align-items:flex-start}
-.bubble{padding:9px 12px;border-radius:10px;font-size:.83rem;line-height:1.5;word-break:break-word}
-.msg.user .bubble{background:var(--blue);color:#fff;border-bottom-right-radius:3px}
-.msg.ai .bubble{background:var(--surface);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px}
-.msg-meta{font-size:.67rem;color:var(--text-4)}
-.sugg-btn{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 10px;font-size:.76rem;color:var(--text-2);cursor:pointer;text-align:left;transition:border-color .15s;width:100%}
-.sugg-btn:hover{border-color:var(--blue);color:var(--blue)}
-.spinner-sm{width:13px;height:13px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
-@keyframes spin{to{transform:rotate(360deg)}}
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
 </style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
 </head>
-<body>
-<div class="app">
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
 
-  <aside class="sidebar">
-    <a href="/pages/home" class="sidebar-brand">
-      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
-      ConcursAI
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
     </a>
-    <div class="nav-section">Principal</div>
-    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
-    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
-    <div class="nav-section">IA &amp; Busca</div>
-    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
-    <a href="/pages/concursos" class="nav-link"><i class="fas fa-search"></i> Concursos</a>
-    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
-    <div class="nav-section">Documentos</div>
-    <a href="/pages/edital" class="nav-link active"><i class="fas fa-file-pdf"></i> Edital</a>
-    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
-    <div class="nav-section">Sistema</div>
-    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
-    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
-    <div class="sidebar-bottom">
-      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
-      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
-      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
-      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
-      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
-      <div class="api-status">
-        <span class="status-dot" id="sdot"></span>
-        <span id="stxt">verificando...</span>
-      </div>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
     </div>
   </aside>
 
-  <div class="main">
-    <div class="topbar">
-      <div class="topbar-title"><i class="fas fa-file-pdf"></i> Análise de Edital</div>
-      <div class="topbar-right">
-        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
-        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
-      </div>
-    </div>
-    <div class="page-header">
-      <div class="page-title"><i class="fas fa-file-pdf"></i> Análise de Edital</div>
-      <div class="page-subtitle">Envie um edital PDF e converse com a IA sobre o conteúdo</div>
-    </div>
-    <div class="content">
-      <div class="content-inner">
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">description</span> Análise de Edital</div>
+      <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+    </header>
 
-        <div style="display:flex;gap:16px;min-height:500px">
+    <div class="flex-1 flex overflow-hidden">
 
-          <!-- Left panel -->
-          <div style="width:260px;min-width:260px;display:flex;flex-direction:column;gap:12px">
-
-            <div class="card">
-              <div class="card-header">
-                <div class="card-title"><i class="fas fa-upload"></i> Upload Edital</div>
-              </div>
-              <div class="card-body">
-                <div class="upload-area" id="drop-zone" ondragover="event.preventDefault();this.style.borderColor='var(--blue)'" ondragleave="this.style.borderColor=''" ondrop="onDrop(event)">
-                  <i class="fas fa-file-pdf" style="font-size:1.8rem;color:var(--text-4);display:block;margin-bottom:8px"></i>
-                  <div class="upload-title">Arraste o PDF aqui</div>
-                  <div class="upload-sub">ou clique para selecionar</div>
-                  <input type="file" id="file-inp" accept=".pdf" style="display:none" onchange="onFile(this.files[0])">
-                  <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="G('file-inp').click()"><i class="fas fa-folder-open"></i> Selecionar PDF</button>
-                </div>
-                <div id="file-info" style="display:none;margin-top:10px;padding:8px;background:var(--blue-light);border-radius:var(--r-sm);font-size:.78rem">
-                  <i class="fas fa-file-pdf" style="color:var(--blue)"></i> <span id="file-name"></span>
-                  <button class="btn btn-xs btn-primary" style="float:right" onclick="enviarPDF()"><i class="fas fa-upload"></i> Enviar</button>
-                </div>
-                <div id="upload-status" style="margin-top:8px;font-size:.78rem;color:var(--text-3)"></div>
-              </div>
+      <!-- Left panel -->
+      <section class="w-[280px] border-r border-line bg-surface flex flex-col shrink-0 overflow-y-auto">
+        <div class="p-4 space-y-4">
+          <div>
+            <label class="text-[10px] font-semibold text-ink-4 uppercase tracking-wider mb-2 block">Upload do Edital</label>
+            <div id="drop-zone" ondragover="event.preventDefault();this.classList.add('border-primary','bg-primary-light')" ondragleave="this.classList.remove('border-primary','bg-primary-light')" ondrop="onDrop(event)" class="border-2 border-dashed border-line rounded-xl p-6 text-center bg-canvas cursor-pointer hover:border-primary transition-colors">
+              <span class="material-symbols-outlined text-[36px] text-ink-4">picture_as_pdf</span>
+              <p class="text-[13px] font-medium text-ink-2 mt-1">Arraste o PDF aqui</p>
+              <p class="text-[11px] text-ink-4">ou clique para selecionar</p>
+              <input type="file" id="file-inp" accept=".pdf" class="hidden" onchange="onFile(this.files[0])"/>
+              <button onclick="G('file-inp').click()" class="mt-3 px-3 py-1.5 bg-surface border border-line rounded-lg text-[12px] text-ink-3 hover:bg-canvas transition-colors flex items-center gap-1.5 mx-auto"><span class="material-symbols-outlined text-[15px]">folder_open</span> Selecionar PDF</button>
             </div>
-
-            <div class="card" style="flex:1">
-              <div class="card-header">
-                <div class="card-title"><i class="fas fa-lightbulb"></i> Sugestões</div>
-              </div>
-              <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
-                <button class="sugg-btn" onclick="ask('Qual o cargo e requisitos deste edital?')">Cargo e requisitos</button>
-                <button class="sugg-btn" onclick="ask('Quais as datas importantes do concurso?')">Datas importantes</button>
-                <button class="sugg-btn" onclick="ask('Qual o conteúdo programático exigido?')">Conteúdo programático</button>
-                <button class="sugg-btn" onclick="ask('Quantas vagas e qual a remuneração?')">Vagas e salário</button>
-                <button class="sugg-btn" onclick="ask('Qual a forma de avaliação e etapas?')">Etapas do concurso</button>
-                <button class="sugg-btn" onclick="ask('Faça um resumo completo deste edital')">Resumo completo</button>
-              </div>
+            <div id="file-info" class="hidden mt-3 p-2.5 bg-primary-light rounded-lg text-[12px] flex items-center justify-between gap-2">
+              <span class="flex items-center gap-1.5 min-w-0"><span class="material-symbols-outlined text-[16px] text-primary">picture_as_pdf</span><span id="file-name" class="truncate text-ink-2"></span></span>
+              <button onclick="enviarPDF()" class="px-2.5 py-1 bg-primary text-white rounded-md text-[11px] font-medium hover:bg-primary-dark shrink-0">Enviar</button>
             </div>
-
+            <div id="upload-status" class="mt-2 text-[12px] text-ink-3"></div>
           </div>
 
-          <!-- Chat area -->
-          <div style="flex:1;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
-            <div style="padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg);font-size:.82rem;color:var(--text-3)">
-              <i class="fas fa-info-circle"></i> Envie um PDF de edital para começar a conversa
-            </div>
-            <div id="msgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:300px"></div>
-            <div style="padding:10px 12px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end">
-              <textarea id="inp" class="form-control" placeholder="Faça uma pergunta sobre o edital..." rows="1" style="flex:1;resize:none;min-height:34px;max-height:100px" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ask()}"></textarea>
-              <button class="btn btn-primary" onclick="ask()" style="height:34px;padding:0 12px"><i class="fas fa-paper-plane"></i></button>
+          <div>
+            <label class="text-[10px] font-semibold text-ink-4 uppercase tracking-wider mb-2 block">Sugestões de Perguntas</label>
+            <div class="space-y-1.5">
+              <button onclick="ask('Qual o cargo e requisitos deste edital?')" class="w-full text-left px-3 py-2 rounded-lg bg-canvas border border-line text-[12px] text-ink-2 hover:border-primary hover:text-primary transition-colors">Cargo e requisitos</button>
+              <button onclick="ask('Quais as datas importantes do concurso?')" class="w-full text-left px-3 py-2 rounded-lg bg-canvas border border-line text-[12px] text-ink-2 hover:border-primary hover:text-primary transition-colors">Datas importantes</button>
+              <button onclick="ask('Qual o conteúdo programático exigido?')" class="w-full text-left px-3 py-2 rounded-lg bg-canvas border border-line text-[12px] text-ink-2 hover:border-primary hover:text-primary transition-colors">Conteúdo programático</button>
+              <button onclick="ask('Quantas vagas e qual a remuneração?')" class="w-full text-left px-3 py-2 rounded-lg bg-canvas border border-line text-[12px] text-ink-2 hover:border-primary hover:text-primary transition-colors">Vagas e salário</button>
+              <button onclick="ask('Qual a forma de avaliação e etapas?')" class="w-full text-left px-3 py-2 rounded-lg bg-canvas border border-line text-[12px] text-ink-2 hover:border-primary hover:text-primary transition-colors">Etapas do concurso</button>
+              <button onclick="ask('Faça um resumo completo deste edital')" class="w-full text-left px-3 py-2 rounded-lg bg-canvas border border-line text-[12px] text-ink-2 hover:border-primary hover:text-primary transition-colors">Resumo completo</button>
             </div>
           </div>
-
         </div>
+      </section>
 
-      </div>
+      <!-- Chat area -->
+      <section class="flex-1 flex flex-col bg-canvas min-w-0">
+        <div class="px-5 py-3 border-b border-line bg-surface text-[12px] text-ink-3 flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">info</span> Envie um PDF de edital para começar a conversa</div>
+        <div id="msgs" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+        <div class="p-4 border-t border-line bg-surface">
+          <div class="max-w-3xl mx-auto flex items-end gap-2 bg-surface border-2 border-line focus-within:border-primary rounded-xl p-2 transition-all">
+            <textarea id="inp" rows="1" placeholder="Faça uma pergunta sobre o edital..." class="flex-1 bg-transparent border-none focus:ring-0 resize-none py-2.5 px-2 text-[14px] max-h-32 outline-none"></textarea>
+            <button onclick="ask()" class="bg-primary text-white p-2.5 rounded-lg hover:bg-primary-dark active:scale-90 transition-all"><span class="material-symbols-outlined">send</span></button>
+          </div>
+        </div>
+      </section>
+
     </div>
-    <footer class="footer">
-      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
-      <span>Trabalho de Conclusão de Curso · 2024</span>
-      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
-    </footer>
   </div>
 </div>
-<div class="toast" id="toast"></div>
+
 <script>
 const API='http://localhost:8000';
-let _sessaoId=null;
-let _fileObj=null;
+let _sessaoId=null,_fileObj=null;
 function G(id){return document.getElementById(id);}
-function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function fmt(s){return esc(s).replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code style="background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px">$1</code>');}
+function fmt(s){return esc(s).replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code class="bg-canvas px-1 rounded text-[12px]">$1</code>');}
+function ts(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
 async function checkAPI(){
   try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
-    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
-  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
 }
-function ts(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
-function addMsg(role,text,spin=false){
-  const d=document.createElement('div');
-  d.className='msg '+role;
-  d.innerHTML=spin
-    ?'<div class="bubble"><span class="spinner-sm"></span> <span style="color:var(--text-3);font-size:.8rem">Analisando...</span></div>'
-    :`<div class="bubble">${role==='ai'?fmt(text):esc(text)}</div><div class="msg-meta">${ts()}</div>`;
-  G('msgs').appendChild(d);
-  G('msgs').scrollTop=G('msgs').scrollHeight;
-  return d;
+function addMsg(role,html){
+  const wrap=document.createElement('div');
+  if(role==='user'){
+    wrap.className='flex gap-3 max-w-3xl mx-auto w-full flex-row-reverse';
+    wrap.innerHTML=`<div class="w-8 h-8 rounded-md bg-ink-2 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-[18px]">person</span></div><div class="bg-primary text-white p-3.5 rounded-xl rounded-tr-none text-[14px] leading-relaxed">${html}</div>`;
+  }else{
+    wrap.className='flex gap-3 max-w-3xl mx-auto w-full';
+    wrap.innerHTML=`<div class="w-8 h-8 rounded-md bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-[18px]">smart_toy</span></div><div class="bg-surface border border-line p-3.5 rounded-xl rounded-tl-none text-[14px] leading-relaxed text-ink min-w-0">${html}</div>`;
+  }
+  G('msgs').appendChild(wrap);G('msgs').scrollTop=G('msgs').scrollHeight;
+  return wrap.querySelector('div:last-child');
 }
-function onFile(f){
-  if(!f||!f.name.endsWith('.pdf'))return toast('Selecione um arquivo PDF',false);
-  _fileObj=f;
-  G('file-name').textContent=f.name;
-  G('file-info').style.display='block';
-}
-function onDrop(e){
-  e.preventDefault();
-  G('drop-zone').style.borderColor='';
-  const f=e.dataTransfer.files[0];
-  if(f)onFile(f);
-}
+function onFile(f){if(!f||!f.name.toLowerCase().endsWith('.pdf'))return;_fileObj=f;G('file-name').textContent=f.name;G('file-info').classList.remove('hidden');}
+function onDrop(e){e.preventDefault();G('drop-zone').classList.remove('border-primary','bg-primary-light');const f=e.dataTransfer.files[0];if(f)onFile(f);}
 async function enviarPDF(){
-  if(!_fileObj)return toast('Selecione um PDF primeiro',false);
-  G('upload-status').innerHTML='<span class="spinner-sm"></span> Enviando e processando...';
-  const fd=new FormData();
-  fd.append('file',_fileObj);
+  if(!_fileObj)return;
+  G('upload-status').innerHTML='<span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> Enviando e processando...';
+  const fd=new FormData();fd.append('file',_fileObj);
   try{
     const r=await fetch(API+'/edital/upload',{method:'POST',body:fd,signal:AbortSignal.timeout(60000)});
     const d=await r.json();
     _sessaoId=d.sessao_id||d.session_id||d.id||null;
-    G('upload-status').innerHTML='<span style="color:#22c55e"><i class="fas fa-check-circle"></i> Edital carregado! Agora faça suas perguntas.</span>';
-    toast('Edital processado com sucesso!');
+    G('upload-status').innerHTML='<span class="text-emerald-600 flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">check_circle</span> Edital carregado! Faça suas perguntas.</span>';
     addMsg('ai','Edital carregado com sucesso! Posso responder perguntas sobre o conteúdo deste documento. O que você gostaria de saber?');
-  }catch(e){
-    G('upload-status').innerHTML='<span style="color:#dc2626">Erro: '+esc(e.message)+'</span>';
-    toast('Erro ao enviar PDF',false);
-  }
+  }catch(e){G('upload-status').innerHTML='<span class="text-red-600">Erro: '+esc(e.message)+'</span>';}
 }
 async function ask(q){
-  const inp=G('inp');
-  const pergunta=q||inp.value.trim();
-  if(!pergunta)return;
-  if(!_sessaoId&&!q)return toast('Envie um edital PDF primeiro',false);
-  inp.value='';
-  addMsg('user',pergunta);
-  const thinking=addMsg('ai','',true);
+  const inp=G('inp');const pergunta=q||inp.value.trim();if(!pergunta)return;
+  if(!_sessaoId&&!q){G('upload-status').innerHTML='<span class="text-amber-600">Envie um edital PDF primeiro.</span>';return;}
+  inp.value='';addMsg('user',esc(pergunta));
+  const thinking=addMsg('ai','<span class="spin material-symbols-outlined text-[16px] text-primary align-middle">progress_activity</span> <span class="text-ink-3">Analisando...</span>');
   try{
-    const body={pergunta,sessao_id:_sessaoId};
-    const r=await fetch(API+'/edital/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(60000)});
+    const r=await fetch(API+'/edital/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta,sessao_id:_sessaoId}),signal:AbortSignal.timeout(60000)});
     const d=await r.json();
-    const resp=d.resposta||d.response||d.answer||JSON.stringify(d);
-    thinking.innerHTML=`<div class="bubble">${fmt(resp)}</div><div class="msg-meta">${ts()}</div>`;
-  }catch(e){
-    thinking.innerHTML=`<div class="bubble" style="border-color:#fca5a5;background:#fef2f2;color:#dc2626">Erro: ${esc(e.message)}</div><div class="msg-meta">${ts()}</div>`;
-  }
+    thinking.innerHTML=fmt(d.resposta||d.response||d.answer||JSON.stringify(d));
+  }catch(e){thinking.innerHTML='<span class="text-red-600">Erro: '+esc(e.message)+'</span>';}
   G('msgs').scrollTop=G('msgs').scrollHeight;
 }
+G('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();}});
 checkAPI();
 </script>
-</body>
-</html>
+</body></html>

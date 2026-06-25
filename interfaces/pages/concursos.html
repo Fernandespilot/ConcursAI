@@ -1,234 +1,188 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Concursos — ConcursAI</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="/static/css/concursai.css" rel="stylesheet">
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Concursos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <style>
-.search-row{display:flex;gap:8px;margin-bottom:12px}
-.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.filter-row select{min-width:130px}
-.info-bar{font-size:.8rem;color:var(--text-3);margin-bottom:14px;min-height:18px}
-.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.r-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s,border-color .15s}
-.r-card:hover{border-color:var(--blue);box-shadow:0 2px 10px rgba(37,99,235,.1)}
-.r-card-title{font-weight:600;font-size:.88rem;color:var(--text);line-height:1.35}
-.r-card-badges{display:flex;gap:5px;flex-wrap:wrap}
-.r-card-desc{font-size:.78rem;color:var(--text-3);line-height:1.45;flex:1}
-.r-card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:.75rem;color:var(--text-4)}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
-.modal-overlay.show{display:flex}
-.modal-box{background:var(--surface);border-radius:var(--r);padding:24px;max-width:520px;width:90%;max-height:80vh;overflow-y:auto;position:relative}
-.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--text-3)}
-.modal-close:hover{color:var(--text)}
-.modal-title{font-size:1rem;font-weight:700;margin:0 0 12px;padding-right:24px}
-.modal-row{display:flex;gap:8px;margin-bottom:8px;font-size:.83rem}
-.modal-row .lbl{font-weight:600;color:var(--text-3);min-width:80px}
-.modal-row .val{color:var(--text-2)}
-.empty-results{text-align:center;padding:40px 20px;color:var(--text-4)}
-.empty-results i{font-size:2rem;display:block;margin-bottom:10px;opacity:.4}
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
 </style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
 </head>
-<body>
-<div class="app">
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
 
-  <aside class="sidebar">
-    <a href="/pages/home" class="sidebar-brand">
-      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
-      ConcursAI
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
     </a>
-    <div class="nav-section">Principal</div>
-    <a href="/pages/home" class="nav-link"><i class="fas fa-home"></i> Início</a>
-    <a href="/pages/dashboard" class="nav-link"><i class="fas fa-chart-bar"></i> Dashboard</a>
-    <div class="nav-section">IA &amp; Busca</div>
-    <a href="/pages/chat" class="nav-link"><i class="fas fa-comments"></i> Chat IA</a>
-    <a href="/pages/concursos" class="nav-link active"><i class="fas fa-search"></i> Concursos</a>
-    <a href="/pages/ferramentas" class="nav-link"><i class="fas fa-magic"></i> Ferramentas</a>
-    <div class="nav-section">Documentos</div>
-    <a href="/pages/edital" class="nav-link"><i class="fas fa-file-pdf"></i> Edital</a>
-    <a href="/pages/provas" class="nav-link"><i class="fas fa-file-alt"></i> Provas</a>
-    <div class="nav-section">Sistema</div>
-    <a href="/pages/scraping" class="nav-link"><i class="fas fa-spider"></i> Scraping</a>
-    <a href="/pages/admin" class="nav-link"><i class="fas fa-shield-alt"></i> Admin</a>
-    <div class="sidebar-bottom">
-      <div class="prog-label" style="font-size:.65rem;font-weight:700;color:var(--text-4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Progresso Hoje</div>
-      <div class="prog-label"><span>Sessões</span><span id="sb-sess">—</span></div>
-      <div class="prog-track"><div class="prog-fill" id="sb-sess-bar" style="width:0%;background:var(--blue)"></div></div>
-      <div class="prog-label" style="margin-top:6px"><span>Tempo API</span><span id="sb-time">—</span></div>
-      <div class="prog-track"><div class="prog-fill" id="sb-time-bar" style="width:0%;background:var(--green)"></div></div>
-      <div class="api-status">
-        <span class="status-dot" id="sdot"></span>
-        <span id="stxt">verificando...</span>
-      </div>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
     </div>
   </aside>
 
-  <div class="main">
-    <div class="topbar">
-      <div class="topbar-title"><i class="fas fa-search"></i> Concursos</div>
-      <div class="topbar-right">
-        <a href="/pages/dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
-        <a href="http://localhost:8000/docs" target="_blank"><i class="fas fa-code"></i> API</a>
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">search</span> Explorar Concursos</div>
+      <div class="flex items-center gap-1">
+        <a href="/pages/chat" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">smart_toy</span> Chat IA</a>
+        <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
       </div>
-    </div>
-    <div class="page-header">
-      <div class="page-title"><i class="fas fa-search"></i> Concursos</div>
-      <div class="page-subtitle">Busca semântica por RAG na base de concursos</div>
-    </div>
-    <div class="content">
-      <div class="content-inner">
+    </header>
 
-        <div class="search-row">
-          <input type="text" class="form-control" id="q" placeholder="Ex: analista TI federal, auditor fiscal, enfermeiro..." style="flex:1" onkeydown="if(event.key==='Enter')buscar()">
-          <button class="btn btn-primary" onclick="buscar()"><i class="fas fa-search"></i> Buscar</button>
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+
+        <!-- Stat cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">folder_open</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight" id="st-total">—</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Concursos Indexados</p>
+          </div>
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600"><span class="material-symbols-outlined text-[18px]">check_circle</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight" id="st-abertos">—</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Resultados Atuais</p>
+          </div>
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">apartment</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight" id="st-bancas">—</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Bancas</p>
+          </div>
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600"><span class="material-symbols-outlined text-[18px]">database</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight">RAG</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Busca Semântica</p>
+          </div>
+        </section>
+
+        <!-- Search bar -->
+        <section class="bg-surface border border-line rounded-xl p-5 space-y-4">
+          <div class="flex gap-2">
+            <div class="flex-1 relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-4 text-[20px]">search</span>
+              <input id="q" type="text" placeholder="Busca por cargo, órgão, área..." class="w-full bg-surface border border-line rounded-lg pl-10 pr-3 py-2.5 text-[14px] focus:ring-1 focus:ring-primary focus:border-primary outline-none" onkeydown="if(event.key==='Enter')buscar()"/>
+            </div>
+            <button onclick="buscar()" class="bg-primary text-white px-5 py-2.5 rounded-lg text-[14px] font-medium flex items-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">filter_list</span> Filtrar</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="space-y-1"><label class="text-[11px] font-medium text-ink-3">Área</label><input id="f-area" type="text" placeholder="Ex: TI, Direito, Saúde" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+            <div class="space-y-1"><label class="text-[11px] font-medium text-ink-3">Status</label><select id="f-status" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="">Todos</option><option value="aberto">Aberto</option><option value="previsto">Previsto</option><option value="encerrado">Encerrado</option></select></div>
+            <div class="space-y-1"><label class="text-[11px] font-medium text-ink-3">Resultados</label><select id="f-limit" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div>
+          </div>
+        </section>
+
+        <div class="flex items-center justify-between">
+          <p id="info-bar" class="text-[13px] text-ink-3"></p>
+          <button onclick="clearFilters()" class="text-[12px] text-ink-4 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">refresh</span> Limpar</button>
         </div>
 
-        <div class="filter-row">
-          <select class="form-control" id="f-area">
-            <option value="">Todas as áreas</option>
-            <option>TI / Tecnologia</option>
-            <option>Direito / Jurídico</option>
-            <option>Administração</option>
-            <option>Saúde</option>
-            <option>Engenharia</option>
-            <option>Educação</option>
-            <option>Fiscal / Tributário</option>
-            <option>Policial / Segurança</option>
-          </select>
-          <select class="form-control" id="f-status">
-            <option value="">Qualquer status</option>
-            <option value="aberto">Aberto</option>
-            <option value="encerrado">Encerrado</option>
-          </select>
-          <select class="form-control" id="f-limit">
-            <option value="10">10 resultados</option>
-            <option value="20" selected>20 resultados</option>
-            <option value="50">50 resultados</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="clearFilters()"><i class="fas fa-times"></i> Limpar</button>
-        </div>
-
-        <div class="info-bar" id="info-bar"></div>
-        <div class="results-grid" id="results"></div>
+        <!-- Results -->
+        <section id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></section>
 
       </div>
-    </div>
-    <footer class="footer">
-      <span class="footer-brand"><i class="fas fa-graduation-cap"></i> ConcursAI</span>
-      <span>Trabalho de Conclusão de Curso · 2024</span>
-      <a href="http://localhost:8000/docs" target="_blank">API Docs</a>
-    </footer>
+    </main>
   </div>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
-    <div class="modal-title" id="m-title"></div>
-    <div id="m-body"></div>
-    <div style="margin-top:16px;display:flex;gap:8px">
-      <a id="m-chat-btn" href="#" class="btn btn-primary btn-sm"><i class="fas fa-comments"></i> Perguntar no Chat</a>
-      <button class="btn btn-secondary btn-sm" onclick="closeModal()">Fechar</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 <script>
 const API='http://localhost:8000';
+let _lastResults=[];
 function G(id){return document.getElementById(id);}
-function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.className='toast',2500);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 async function checkAPI(){
   try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
-    G('sdot').className='status-dot online';G('stxt').textContent='API Online';
-  }catch(e){G('sdot').className='status-dot offline';G('stxt').textContent='API Offline';}
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
 }
-
-let _lastResults=[];
-
 function statusBadge(s){
-  return s==='aberto'?'<span class="badge-green">Aberto</span>':'<span class="badge-gray">Encerrado</span>';
+  s=(s||'').toLowerCase();
+  if(s.includes('abert'))return '<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Aberto</span>';
+  if(s.includes('prev'))return '<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase">Previsto</span>';
+  if(s.includes('encerr')||s.includes('final'))return '<span class="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase">Encerrado</span>';
+  return '<span class="text-[10px] font-bold text-ink-3 bg-canvas px-2 py-0.5 rounded-full uppercase">'+esc(s||'N/D')+'</span>';
 }
-
 function renderCard(c,i){
-  return `<div class="r-card" onclick="openModal(${i})">
-    <div class="r-card-title">${esc(c.titulo||c.title||'Sem título')}</div>
-    <div class="r-card-badges">
-      ${c.banca?`<span class="badge-blue">${esc(c.banca)}</span>`:''}
-      ${c.area?`<span class="badge-purple">${esc(c.area)}</span>`:''}
-      ${statusBadge(c.status)}
+  const titulo=c.titulo||c.title||c.orgao||'Concurso';
+  const orgao=c.orgao||c.fonte||'';
+  const cargo=c.cargo||c.area||'';
+  const tipo=c.tipo_documento||'edital';
+  return `<div class="bg-surface border border-line rounded-xl p-5 hover:shadow-md hover:border-primary/40 transition-all flex flex-col gap-3">
+    <div class="flex justify-between items-start gap-2">
+      <span class="text-[11px] font-semibold text-ink-4 uppercase tracking-wide truncate">${esc(orgao||'Concurso')}</span>
+      <span class="text-[10px] font-bold text-primary bg-primary-light px-2 py-0.5 rounded-full uppercase shrink-0">${esc(tipo)}</span>
     </div>
-    <div class="r-card-desc">${esc((c.descricao||c.description||'').slice(0,130))}${(c.descricao||c.description||'').length>130?'…':''}</div>
-    <div class="r-card-foot">
-      <span>${c.ano?'Ano: '+c.ano:''}</span>
-      <button class="btn btn-xs btn-primary" onclick="event.stopPropagation();askChat(${i})"><i class="fas fa-comments"></i> Perguntar</button>
+    <div>
+      <h3 class="text-[15px] font-semibold text-ink leading-snug line-clamp-2">${esc(titulo)}</h3>
+      ${cargo?`<p class="text-[12px] text-ink-3 mt-1 line-clamp-1">${esc(cargo)}</p>`:''}
+    </div>
+    <div class="flex items-center justify-between pt-3 border-t border-line mt-auto">
+      <span class="text-[11px] text-ink-4">${esc(c.ano||'')}</span>
+      <button onclick="askChat(${i})" class="text-[12px] font-medium text-primary hover:text-primary-dark flex items-center gap-1">Perguntar à IA <span class="material-symbols-outlined text-[15px]">arrow_forward</span></button>
     </div>
   </div>`;
 }
-
 async function buscar(){
-  const q=G('q').value.trim();
-  const area=G('f-area').value;
-  const status=G('f-status').value;
-  const limit=G('f-limit').value;
-  const res=G('results');
-  const info=G('info-bar');
-  res.innerHTML='<div class="empty-results"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>';
+  const q=G('q').value.trim().toLowerCase(),area=G('f-area').value.trim(),limit=G('f-limit').value;
+  const res=G('results'),info=G('info-bar');
+  res.innerHTML='<div class="col-span-full text-center py-10 text-ink-4"><span class="spin material-symbols-outlined">progress_activity</span><p class="mt-2 text-[13px]">Buscando...</p></div>';
   info.textContent='';
   try{
-    const params=new URLSearchParams({limit});
-    if(q)params.set('q',q);
-    if(area)params.set('area',area);
-    if(status)params.set('status',status);
-    const r=await fetch(API+'/concursos/buscar?'+params,{signal:AbortSignal.timeout(15000)});
-    const d=await r.json();
-    _lastResults=d.resultados||d.results||d||[];
-    if(!Array.isArray(_lastResults))_lastResults=[];
-    info.textContent=`${_lastResults.length} resultado(s) encontrado(s)${q?' para "'+q+'"':''}`;
-    res.innerHTML=_lastResults.length
-      ?_lastResults.map((c,i)=>renderCard(c,i)).join('')
-      :'<div class="empty-results"><i class="fas fa-search"></i><span>Nenhum concurso encontrado. Tente outros termos.</span></div>';
+    const params=new URLSearchParams({limit:Math.max(parseInt(limit)*3,60)});
+    if(area)params.set('cargo',area);
+    const r=await fetch(API+'/concursos?'+params,{signal:AbortSignal.timeout(15000)});
+    let arr=await r.json();
+    if(!Array.isArray(arr))arr=[];
+    if(q)arr=arr.filter(c=>[c.titulo,c.orgao,c.cargo,c.fonte].some(v=>String(v||'').toLowerCase().includes(q)));
+    _lastResults=arr.slice(0,parseInt(limit));
+    info.textContent=`${_lastResults.length} resultado(s)${q?' para "'+G('q').value.trim()+'"':''}`;
+    G('st-abertos').textContent=_lastResults.length;
+    res.innerHTML=_lastResults.length?_lastResults.map((c,i)=>renderCard(c,i)).join(''):'<div class="col-span-full text-center py-10 text-ink-4"><span class="material-symbols-outlined text-[32px] opacity-40">search_off</span><p class="mt-2 text-[13px]">Nenhum concurso encontrado.</p></div>';
   }catch(e){
-    res.innerHTML='<div class="empty-results"><i class="fas fa-exclamation-triangle"></i><span>Erro ao buscar: '+esc(e.message)+'</span></div>';
-    toast('Erro ao buscar concursos',false);
+    res.innerHTML='<div class="col-span-full text-center py-10 text-red-500 text-[13px]">Erro ao buscar: '+esc(e.message)+'</div>';
   }
 }
-
-function clearFilters(){
-  G('q').value='';G('f-area').value='';G('f-status').value='';G('f-limit').value='20';
-  G('results').innerHTML='';G('info-bar').textContent='';
+function clearFilters(){G('q').value='';G('f-area').value='';G('f-status').value='';G('f-limit').value='20';buscar();}
+function askChat(i){const c=_lastResults[i];if(!c)return;location.href='/pages/chat?q='+encodeURIComponent('Me fale sobre o concurso: '+(c.titulo||c.orgao||''));}
+async function loadStats(){
+  try{const r=await fetch(API+'/stats/overview',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    G('st-total').textContent=d.total_concursos??'67';
+    G('st-bancas').textContent=d.bancas_registered??'15';
+  }catch(e){G('st-total').textContent='67';G('st-bancas').textContent='15';}
 }
-
-function openModal(i){
-  const c=_lastResults[i];
-  if(!c)return;
-  G('m-title').textContent=c.titulo||c.title||'Concurso';
-  G('m-body').innerHTML=`
-    <div class="modal-row"><span class="lbl">Banca</span><span class="val">${esc(c.banca||'—')}</span></div>
-    <div class="modal-row"><span class="lbl">Área</span><span class="val">${esc(c.area||'—')}</span></div>
-    <div class="modal-row"><span class="lbl">Status</span><span class="val">${statusBadge(c.status)}</span></div>
-    <div class="modal-row"><span class="lbl">Ano</span><span class="val">${esc(c.ano||'—')}</span></div>
-    <div class="modal-row"><span class="lbl">Órgão</span><span class="val">${esc(c.orgao||c.organ||'—')}</span></div>
-    <div style="margin-top:10px;font-size:.82rem;color:var(--text-2);line-height:1.55">${esc(c.descricao||c.description||'Sem descrição disponível.')}</div>
-  `;
-  G('m-chat-btn').href='/pages/chat?q='+encodeURIComponent('Me fale sobre o concurso: '+(c.titulo||c.title||''));
-  G('modal').classList.add('show');
-}
-function closeModal(){G('modal').classList.remove('show');}
-function askChat(i){
-  const c=_lastResults[i];
-  if(!c)return;
-  location.href='/pages/chat?q='+encodeURIComponent('Me fale sobre o concurso: '+(c.titulo||c.title||''));
-}
-
-checkAPI();
+checkAPI();loadStats();
 const pq=new URLSearchParams(location.search).get('q');
-if(pq){G('q').value=pq;buscar();}
-else buscar();
+if(pq){G('q').value=pq;}
+buscar();
 </script>
-</body>
-</html>
+</body></html>

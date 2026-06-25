@@ -2,6 +2,15 @@
 # -*- coding: utf-8 -*-
 """API FastAPI para o sistema ConcursAI com integração API ConcursosNoBrasil"""
 
+# Garante saída UTF-8 no console (evita UnicodeEncodeError nos logs com emoji,
+# especialmente no Windows/cp1252). Deve vir antes de qualquer import que imprima.
+import sys as _sys
+try:
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
@@ -15,6 +24,23 @@ from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
 import asyncio
+
+# Carrega variáveis de ambiente do .env (ex.: GROQ_API_KEY) o quanto antes
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception as _e:
+    print(f"⚠️ python-dotenv não disponível ({_e}); usando variáveis do sistema")
+
+# Orquestrador de agentes especializados (Supervisor + Skills)
+try:
+    from modules import agentes as agentes_mod
+    AGENTES_DISPONIVEL = True
+    print("✅ Orquestrador de agentes carregado")
+except Exception as e:
+    print(f"⚠️ Orquestrador de agentes indisponível: {e}")
+    agentes_mod = None
+    AGENTES_DISPONIVEL = False
 
 # Importar módulos do sistema com fallback
 try:
@@ -251,6 +277,42 @@ async def stats_overview():
         "bancas_registered": 15,
         "status": "online"
     }
+
+# ─────────────────────────────────────────────────────────────
+# AGENTES ESPECIALIZADOS (Supervisor + Skills)
+# ─────────────────────────────────────────────────────────────
+class AgenteRequest(BaseModel):
+    pergunta: str = Field(..., description="Pergunta/dúvida do aluno")
+    agente: Optional[str] = Field(None, description="ID do agente (None = supervisor escolhe)")
+    filtro_orgao: Optional[str] = Field(None)
+    filtro_ano: Optional[str] = Field(None)
+    filtro_cargo: Optional[str] = Field(None)
+    historico: Optional[str] = Field("", description="Contexto da conversa anterior")
+
+
+@app.get("/agentes")
+async def listar_agentes_endpoint():
+    """Lista os agentes especializados disponíveis."""
+    if not AGENTES_DISPONIVEL:
+        return {"agentes": [], "disponivel": False}
+    return {"agentes": agentes_mod.listar_agentes(), "disponivel": True}
+
+
+@app.post("/agente/perguntar")
+async def agente_perguntar(req: AgenteRequest):
+    """Roteia a pergunta para o agente especializado e retorna a resposta."""
+    if not AGENTES_DISPONIVEL:
+        raise HTTPException(status_code=503, detail="Orquestrador de agentes indisponível")
+    resultado = agentes_mod.responder(
+        pergunta=req.pergunta,
+        agente_id=req.agente,
+        orgao=req.filtro_orgao or "Todos",
+        ano=req.filtro_ano or "Todos",
+        cargo=req.filtro_cargo or "Todos",
+        contexto_extra=req.historico or "",
+    )
+    return resultado
+
 
 class ChatMessageRequest(BaseModel):
     message: str
@@ -767,19 +829,29 @@ async def listar_concursos(
         # Paginação
         df_paginated = df.iloc[offset:offset + limit]
         
-        # Converter para modelo
+        # Converter para modelo (tratando NaN e tipos não-string do CSV)
+        def s(val, default=''):
+            if val is None:
+                return default
+            try:
+                if pd.isna(val):
+                    return default
+            except (TypeError, ValueError):
+                pass
+            return str(val)
+
         concursos = []
         for _, row in df_paginated.iterrows():
             concurso = ConcursoModel(
-                titulo=row.get('titulo', ''),
-                orgao=row.get('orgao', ''),
-                cargo=row.get('cargo', ''),
-                ano=row.get('ano', ''),
-                tipo_documento=row.get('tipo_documento', 'edital'),
-                url=row.get('url', ''),
-                data_publicacao=row.get('data_publicacao', ''),
-                fonte=row.get('fonte', ''),
-                conteudo=row.get('conteudo', '')
+                titulo=s(row.get('titulo')),
+                orgao=s(row.get('orgao')),
+                cargo=s(row.get('cargo')),
+                ano=s(row.get('ano')),
+                tipo_documento=s(row.get('tipo_documento'), 'edital'),
+                url=s(row.get('url')),
+                data_publicacao=s(row.get('data_publicacao')),
+                fonte=s(row.get('fonte')),
+                conteudo=s(row.get('conteudo'))
             )
             concursos.append(concurso)
         
@@ -797,10 +869,10 @@ async def buscar_semantica(request: BuscaSemanticaRequest):
         if responder_interface:
             # Usar sistema RAG completo
             resposta = responder_interface(
-                request.pergunta,
                 request.filtro_orgao or "",
                 request.filtro_ano or "",
-                request.filtro_cargo or ""
+                request.filtro_cargo or "",
+                request.pergunta
             )
         else:
             # Fallback: busca textual simples

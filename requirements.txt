@@ -45,3 +45,7 @@ pydantic==2.5.1
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
 httpx==0.25.2
+
+# Agendador de scraping (opcional) e leitura avançada de PDF de editais
+apscheduler>=3.10.0
+pymupdf>=1.23.0
