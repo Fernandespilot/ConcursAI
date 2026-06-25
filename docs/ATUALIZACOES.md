@@ -102,6 +102,22 @@ mudança na estrutura do site):
 > do acervo; fica mais precisa quanto mais provas forem raspadas e indexadas.
 > A coleta em lote de provas em PDF roda via `scrapers/provas_scraper.py`.
 
+## 6. Mais fontes de dados + enriquecimento
+
+- **PCI Concursos** adicionado ao coletor (`scrapers/coletar_2026.py`):
+  agora raspa de **duas fontes** (ConcursosNoBrasil + PCI), com dedupe e
+  reindex. Base saltou de ~130 para **614 concursos** indexados.
+- **BrasilAPI** (pública, sem chave) integrada como enriquecimento
+  (`modules/brasil_api.py`): `GET /enriquecimento/feriados?ano=` e
+  `GET /enriquecimento/cnpj/{cnpj}`. O **plano de estudos** já usa os feriados
+  nacionais para montar o cronograma.
+- `.env.example` limpo: removidas as chaves fantasma `BRASIL_API_KEY` e
+  `CONCURSOS_API_KEY` (não existem como serviço). A única chave necessária é a
+  `GROQ_API_KEY`.
+
+> Não há API gratuita oficial de concursos com cadastro/chave; a obtenção de
+> dados é por web scraping (sem chave).
+
 ## Como rodar a partir de um clone
 
 ```bash

@@ -102,6 +102,55 @@ def salvar_e_dedupe(itens: list[dict]) -> int:
     return len(novos)
 
 
+def coletar_pci() -> list[dict]:
+    """Coleta concursos recentes do PCI Concursos (pciconcursos.com.br)."""
+    itens: list[dict] = []
+    vistos: set[str] = set()
+    sess = requests.Session()
+    sess.headers.update(HEADERS)
+    for url in [f"https://www.pciconcursos.com.br/ultimas/",
+                f"https://www.pciconcursos.com.br/concursos/"]:
+        try:
+            r = sess.get(url, timeout=30)
+            if r.status_code != 200:
+                print(f"⚠️ PCI {url} -> HTTP {r.status_code}")
+                continue
+            soup = BeautifulSoup(r.text, "lxml")
+            blocos = soup.find_all("div", class_="ca")
+            achados = 0
+            for b in blocos:
+                a = b.find("a", href=True)
+                if not a:
+                    continue
+                href = a["href"]
+                if href in vistos:
+                    continue
+                titulo = (a.get("title") or a.get_text(strip=True)).strip()
+                texto = b.get_text(" ", strip=True)
+                if not titulo or len(titulo) < 8:
+                    continue
+                # órgão = antes do " - UF"; UF = sigla de 2 letras
+                m_uf = re.search(r"\b([A-Z]{2})\b", texto)
+                orgao = re.split(r"\s+-\s+", titulo)[0][:120]
+                vistos.add(href)
+                itens.append({
+                    "conteudo": texto[:600],
+                    "orgao": orgao,
+                    "ano": str(time.localtime().tm_year),
+                    "cargo": "",
+                    "tipo_documento": "concurso",
+                    "titulo": titulo,
+                    "url": href,
+                    "data_publicacao": time.strftime("%Y-%m-%d"),
+                })
+                achados += 1
+            print(f"📄 PCI {url} -> {achados} concursos")
+            time.sleep(1)
+        except Exception as e:
+            print(f"⚠️ erro PCI {url}: {repr(e)[:120]}")
+    return itens
+
+
 def reindexar() -> int:
     """Reconstrói a coleção do ChromaDB a partir do CSV completo. Retorna nº indexado."""
     import chromadb
@@ -140,10 +189,18 @@ def reindexar() -> int:
 if __name__ == "__main__":
     ano = int(sys.argv[1]) if len(sys.argv) > 1 else datetime.now().year
     paginas = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-    print(f"🔎 Coletando concursos de {ano} ({paginas} páginas)...")
+
+    print(f"🔎 Fonte 1 — ConcursosNoBrasil (ano {ano}, {paginas} páginas)...")
     itens = coletar(ano, paginas)
-    print(f"📊 Total coletado (ano {ano}): {len(itens)}")
-    adicionados = salvar_e_dedupe(itens)
+    print(f"   coletados: {len(itens)}")
+
+    print("🔎 Fonte 2 — PCI Concursos (últimos)...")
+    itens_pci = coletar_pci()
+    print(f"   coletados: {len(itens_pci)}")
+
+    todos = itens + itens_pci
+    print(f"📊 Total bruto: {len(todos)}")
+    adicionados = salvar_e_dedupe(todos)
     print(f"💾 Novos concursos adicionados ao CSV: {adicionados}")
     if adicionados:
         reindexar()

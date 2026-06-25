@@ -341,6 +341,103 @@ async def banca_analisar(req: BancaAnaliseRequest):
 
 
 # ─────────────────────────────────────────────────────────────
+# ENRIQUECIMENTO via BrasilAPI (público, sem chave)
+# ─────────────────────────────────────────────────────────────
+try:
+    from modules import brasil_api as brasil_api_mod
+    BRASIL_API_OK = True
+except Exception as e:
+    print(f"⚠️ BrasilAPI indisponível: {e}")
+    brasil_api_mod = None
+    BRASIL_API_OK = False
+
+
+@app.get("/enriquecimento/feriados")
+async def enriq_feriados(ano: int = Query(default=datetime.now().year)):
+    """Feriados nacionais do ano (BrasilAPI) — apoia o cronograma de estudos."""
+    if not BRASIL_API_OK:
+        raise HTTPException(status_code=503, detail="BrasilAPI indisponível")
+    return brasil_api_mod.feriados(ano)
+
+
+@app.get("/enriquecimento/cnpj/{cnpj}")
+async def enriq_cnpj(cnpj: str):
+    """Dados do órgão pelo CNPJ (BrasilAPI)."""
+    if not BRASIL_API_OK:
+        raise HTTPException(status_code=503, detail="BrasilAPI indisponível")
+    return brasil_api_mod.cnpj(cnpj)
+
+
+@app.get("/dashboard/dados")
+async def dashboard_dados():
+    """Métricas reais para o dashboard, calculadas do acervo (CSV)."""
+    try:
+        df = pd.read_csv("concursos_chunks.csv")
+    except Exception:
+        return {"total": 0, "abertos": 0, "por_banca": {}, "por_ano": {},
+                "por_area": {}, "embeddings": 0, "recentes": []}
+
+    total = int(len(df))
+    ano_atual = str(datetime.now().year)
+    abertos = int((df["ano"].astype(str) == ano_atual).sum()) if "ano" in df.columns else 0
+
+    # por ano (apenas anos plausíveis)
+    por_ano = {}
+    if "ano" in df.columns:
+        vc = df["ano"].astype(str).str.extract(r"(20\d\d)")[0].value_counts()
+        por_ano = {k: int(v) for k, v in sorted(vc.items()) if k}
+
+    # blob de texto por linha para extração por palavra-chave
+    def blob(row):
+        return " ".join(str(row.get(c, "")) for c in ("titulo", "conteudo", "orgao", "cargo")).lower()
+    blobs = df.apply(blob, axis=1)
+
+    bancas = ["cespe", "cebraspe", "fcc", "fgv", "vunesp", "ibfc", "aocp",
+              "quadrix", "idecan", "consulplan", "ibade", "instituto aocp"]
+    por_banca = {}
+    for b in bancas:
+        n = int(blobs.str.contains(b, regex=False).sum())
+        if n:
+            por_banca[b.upper()] = n
+
+    areas = {
+        "TI": ["tecnologia", "informática", "informatica", "sistemas", "analista de ti", "computação"],
+        "Saúde": ["saúde", "saude", "médico", "medico", "enfermeir", "farmac", "odontolog"],
+        "Direito": ["jurídic", "juridic", "advogad", "procurador", "promotor", "direito"],
+        "Educação": ["professor", "educação", "educacao", "docente", "pedagog"],
+        "Administração": ["administrativ", "administração", "administracao", "assistente", "auxiliar"],
+        "Fiscal/Controle": ["fiscal", "auditor", "controlador", "tributár"],
+        "Segurança": ["policial", "guarda", "bombeiro", "militar", "agente penitenci"],
+    }
+    por_area = {}
+    for area, kws in areas.items():
+        n = int(blobs.apply(lambda t: any(k in t for k in kws)).sum())
+        if n:
+            por_area[area] = n
+
+    # recentes
+    recentes = []
+    cols = df.columns
+    for _, r in df.tail(8).iloc[::-1].iterrows():
+        recentes.append({
+            "titulo": str(r.get("titulo", ""))[:80] if "titulo" in cols else "",
+            "banca": next((b.upper() for b in bancas if b in blob(r)), "—"),
+            "area": next((a for a, kws in areas.items() if any(k in blob(r) for k in kws)), "—"),
+            "status": "aberto" if str(r.get("ano", "")) == ano_atual else "—",
+        })
+
+    emb = 0
+    try:
+        emb = collection.count() if collection is not None else 0
+    except Exception:
+        pass
+
+    return {"total": total, "abertos": abertos, "por_banca": por_banca,
+            "por_ano": por_ano, "por_area": por_area, "embeddings": emb,
+            "bancas_count": len(por_banca), "recentes": recentes}
+
+
+# ─────────────────────────────────────────────────────────────
 # FERRAMENTAS DE ESTUDO (geradas por IA)
 # ─────────────────────────────────────────────────────────────
 def _ferramenta_llm(system_prompt: str, mensagem: str, temp: float = 0.5) -> str:
@@ -425,8 +522,21 @@ async def ferramenta_analise_banca(r: AnaliseBancaReq):
 async def ferramenta_plano(r: PlanoRequest):
     sp = ("Você monta planos de estudo para concursos. Gere um cronograma em "
           "markdown (tabela por semana) realista, com revisões espaçadas e "
-          "simulados, priorizando disciplinas de maior peso.")
-    msg = f"Cargo: {r.cargo}. Tempo: {r.semanas} semanas, {r.horas_dia}h/dia."
+          "simulados, priorizando disciplinas de maior peso. Considere os "
+          "feriados nacionais informados (use-os como dias de revisão leve ou "
+          "descanso).")
+    # Enriquecimento BrasilAPI: feriados do ano corrente para o cronograma
+    feriados_txt = ""
+    if BRASIL_API_OK:
+        try:
+            fer = brasil_api_mod.feriados(datetime.now().year)
+            if fer.get("feriados"):
+                itens = ", ".join(f"{f['date']} ({f['name']})" for f in fer["feriados"][:14])
+                feriados_txt = f" Feriados nacionais de {datetime.now().year}: {itens}."
+        except Exception:
+            pass
+    msg = (f"Cargo: {r.cargo}. Tempo: {r.semanas} semanas, {r.horas_dia}h/dia."
+           f"{feriados_txt}")
     return {"resultado": _ferramenta_llm(sp, msg)}
 
 

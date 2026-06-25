@@ -67,14 +67,14 @@
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">storage</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-total">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Total Concursos</p></div>
           <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600"><span class="material-symbols-outlined text-[18px]">check_circle</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-abertos">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Abertos</p></div>
-          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">apartment</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-bancas">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Bancas</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">apartment</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-bancas">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Áreas</p></div>
           <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600"><span class="material-symbols-outlined text-[18px]">database</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-emb">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Chunks RAG</p></div>
         </section>
 
         <!-- Charts row 1 -->
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div class="bg-surface border border-line rounded-xl p-5">
-            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-[18px] text-primary">bar_chart</span> Concursos por Banca</h3>
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-[18px] text-primary">bar_chart</span> Concursos por Área</h3>
             <div class="h-64"><canvas id="ch-bancas"></canvas></div>
           </div>
           <div class="bg-surface border border-line rounded-xl p-5">
@@ -147,14 +147,20 @@ function statusBadge(s){
 }
 async function loadDashboard(){
   try{
-    const r=await fetch(API+'/dashboard',{signal:AbortSignal.timeout(8000)});const d=await r.json();
+    const r=await fetch(API+'/dashboard/dados',{signal:AbortSignal.timeout(8000)});const d=await r.json();
     G('st-total').textContent=d.total??'—';
     G('st-abertos').textContent=d.abertos??'—';
-    G('st-bancas').textContent=d.bancas_count??(Object.keys(d.por_banca||{}).length||'—');
+    const parea=d.por_area||{};
+    G('st-bancas').textContent=Object.keys(parea).length||'—';
     G('st-emb').textContent=d.embeddings??'—';
-    const pb=d.por_banca||{};mkChart('ch-bancas','bar',Object.keys(pb),Object.values(pb),'Concursos',Object.keys(pb).map((_,i)=>COLORS[i%COLORS.length]));
+    // barra: usa por_banca se houver dados; senão, por_área (o que temos de real)
+    const pb=d.por_banca||{};
+    const temBanca=Object.keys(pb).length>0;
+    const barLabels=temBanca?Object.keys(pb):Object.keys(parea);
+    const barData=temBanca?Object.values(pb):Object.values(parea);
+    mkChart('ch-bancas','bar',barLabels,barData,'Concursos',barLabels.map((_,i)=>COLORS[i%COLORS.length]));
     const pa=d.por_ano||{};mkChart('ch-anos','line',Object.keys(pa),Object.values(pa),'Concursos');
-    const parea=d.por_area||{};mkChart('ch-area','doughnut',Object.keys(parea),Object.values(parea),'Área',Object.keys(parea).map((_,i)=>COLORS[i%COLORS.length]));
+    mkChart('ch-area','doughnut',Object.keys(parea),Object.values(parea),'Área',Object.keys(parea).map((_,i)=>COLORS[i%COLORS.length]));
     G('area-legend').innerHTML=Object.entries(parea).map(([k,v],i)=>`<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${COLORS[i%COLORS.length]}"></span><span class="text-ink-2">${esc(k)} <span class="text-ink-4">(${v})</span></span></div>`).join('');
     const rec=d.recentes||[];
     G('tb-recentes').innerHTML=rec.length?rec.map(c=>`<tr class="border-t border-line hover:bg-canvas"><td class="px-4 py-2.5 text-ink-2">${esc(c.titulo||c.title||'—')}</td><td class="px-4 py-2.5 text-ink-3">${esc(c.banca||'—')}</td><td class="px-4 py-2.5 text-ink-3">${esc(c.area||'—')}</td><td class="px-4 py-2.5">${statusBadge(c.status)}</td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-ink-4 py-6">Nenhum dado</td></tr>';
