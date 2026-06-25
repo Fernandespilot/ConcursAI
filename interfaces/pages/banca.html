@@ -196,5 +196,16 @@ function render(d){
   }
 }
 checkAPI();
+// auto-análise via URL: ?banca=CESPE/CEBRASPE&cargo=...&anos=5&auto=1
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.get('banca')){
+    const sel=G('banca');
+    [...sel.options].forEach(o=>{if(o.value.toLowerCase()===p.get('banca').toLowerCase())sel.value=o.value;});
+  }
+  if(p.get('cargo'))G('cargo').value=p.get('cargo');
+  if(p.get('anos'))G('anos').value=p.get('anos');
+  if(p.get('auto'))analisar();
+})();
 </script>
 </body></html>
