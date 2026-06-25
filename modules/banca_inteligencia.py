@@ -60,6 +60,15 @@ def _coletar_evidencias(banca: str, anos: int) -> dict:
     except Exception:
         pass
 
+    # 3) trechos REAIS de provas/gabaritos indexados (o "que já caiu")
+    ev["trechos_provas"] = []
+    try:
+        from modules.provas_indexer import consultar_provas
+        trechos = consultar_provas(banca=banca, termo="questão prova conteúdo", limite=6)
+        ev["trechos_provas"] = [t["trecho"] for t in trechos]
+    except Exception:
+        pass
+
     return ev
 
 
@@ -113,6 +122,10 @@ def analisar_banca(banca: str, cargo: str = "", anos: int = 5) -> dict:
     )
     if ev["amostras"]:
         contexto += "Exemplos de concursos no acervo:\n- " + "\n- ".join(ev["amostras"][:6])
+    if ev.get("trechos_provas"):
+        contexto += ("\n\nTRECHOS REAIS DE PROVAS/GABARITOS DESTA BANCA (use-os como "
+                     "base concreta para a incidência — isto é o que JÁ CAIU):\n---\n"
+                     + "\n---\n".join(t[:400] for t in ev["trechos_provas"][:6]))
 
     system = (
         "Você é um analista especialista em bancas de concursos públicos "

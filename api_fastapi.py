@@ -618,17 +618,55 @@ def _provas_por_banca() -> Dict[str, int]:
     return res
 
 
+try:
+    from modules import provas_indexer as provas_idx
+    PROVAS_IDX_OK = True
+except Exception as e:
+    print(f"⚠️ Indexador de provas indisponível: {e}")
+    provas_idx = None
+    PROVAS_IDX_OK = False
+
+
 @app.get("/api/provas/stats")
 async def provas_stats():
     pb = _provas_por_banca()
     total = sum(pb.values())
-    indexados = 0
-    try:
-        indexados = collection.count() if collection is not None else 0
-    except Exception:
-        pass
-    return {"total_pdfs": total, "indexados": indexados,
+    blocos = 0
+    if PROVAS_IDX_OK:
+        try:
+            blocos = provas_idx.estatisticas().get("blocos_indexados", 0)
+        except Exception:
+            pass
+    return {"total_pdfs": total, "indexados": blocos,
             "bancas": len(pb), "questoes": 0, "historico": []}
+
+
+@app.post("/api/provas/indexar")
+async def provas_indexar():
+    """Indexa as provas/gabaritos da pasta provas/<banca>/ no ChromaDB."""
+    if not PROVAS_IDX_OK:
+        raise HTTPException(status_code=503, detail="Indexador indisponível")
+    r = provas_idx.indexar_provas()
+    return {"mensagem": f"{r['provas_indexadas']} prova(s) indexada(s) "
+                        f"({r['blocos']} blocos). Total na coleção: {r['total_colecao']}.",
+            **r}
+
+
+class BaixarProvasReq(BaseModel):
+    urls: List[str]
+    banca: str = "geral"
+
+
+@app.post("/api/provas/baixar")
+async def provas_baixar(req: BaixarProvasReq):
+    """Baixa provas de URLs de PDF DIRETO (sites oficiais) e indexa."""
+    if not PROVAS_IDX_OK:
+        raise HTTPException(status_code=503, detail="Indexador indisponível")
+    res = provas_idx.baixar_lote(req.urls, req.banca)
+    idx = provas_idx.indexar_provas()
+    return {"mensagem": f"{res['baixados']} arquivo(s) baixado(s) e indexado(s).",
+            "baixados": res["baixados"], "arquivos": res["arquivos"],
+            "indexados": idx["blocos"]}
 
 
 @app.get("/api/provas/listar")
@@ -668,14 +706,20 @@ async def provas_buscar(q: str = Query(...), limit: int = Query(5)):
 
 @app.post("/api/provas/coletar")
 async def provas_coletar(payload: Dict[str, Any] = None):
-    """Coleta provas por banca (delegado ao coletor; seguro/limitado)."""
+    """Indexa o acervo atual de provas (PDFs em provas/<banca>/)."""
     pb = _provas_por_banca()
     total = sum(pb.values())
-    return {"mensagem": (
-        f"Acervo atual: {total} provas em PDF ({len(pb)} bancas). "
-        "A coleta em lote de provas roda pelo script "
-        "`python scrapers/provas_scraper.py <banca> <qtd>` para não travar a API. "
-        "Os concursos do ano já são raspados em /pages/scraping.")}
+    msg = f"Acervo: {total} prova(s) em PDF ({len(pb)} banca(s)). "
+    if PROVAS_IDX_OK and total:
+        try:
+            r = provas_idx.indexar_provas()
+            msg += f"Indexados {r['blocos']} blocos no RAG."
+        except Exception as e:
+            msg += f"Erro ao indexar: {e}"
+    else:
+        msg += ("Adicione PDFs de provas/gabaritos em provas/<banca>/ "
+                "(ou use /api/provas/baixar com URLs de PDF direto) e indexe.")
+    return {"mensagem": msg}
 
 
 # ─────────────────────────────────────────────────────────────

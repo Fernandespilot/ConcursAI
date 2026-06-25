@@ -118,6 +118,24 @@ mudança na estrutura do site):
 > Não há API gratuita oficial de concursos com cadastro/chave; a obtenção de
 > dados é por web scraping (sem chave).
 
+## 7. Pipeline de provas e gabaritos ("estudar o que já caiu")
+
+`modules/provas_indexer.py` + endpoints permitem o modelo estudar com base em
+exames reais:
+
+- **Ingestão**: PDFs de prova/gabarito ficam em `provas/<banca>/`.
+- **Indexação**: `POST /api/provas/indexar` extrai o texto, detecta prova vs
+  gabarito e indexa no ChromaDB (coleção `provas_concursos`).
+- **Download direto**: `POST /api/provas/baixar` `{urls, banca}` baixa PDFs de
+  **URLs de PDF direto** (sites oficiais) e indexa.
+- **Aterramento**: a Análise de Banca passa a incluir trechos reais das provas
+  indexadas no contexto da IA — a incidência deixa de ser só estimada.
+
+> Importante: agregadores como o PCI Concursos **bloqueiam download automático**
+> de PDF (links protegidos por JavaScript/hash + anti-bot). Por isso a coleta
+> confiável é por **PDF direto** (banca oficial) ou colocando os arquivos em
+> `provas/<banca>/`. Quanto mais provas indexadas, mais precisa fica a análise.
+
 ## Como rodar a partir de um clone
 
 ```bash
