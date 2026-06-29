@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Ferramentas IA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">construction</span> Ferramentas IA</div>
+      <div class="flex items-center gap-1">
+        <a href="/pages/chat" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">smart_toy</span> Chat IA</a>
+        <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto">
+        <div class="mb-5">
+          <h1 class="text-xl font-semibold text-ink">Ferramentas Inteligentes</h1>
+          <p class="text-[13px] text-ink-3 mt-0.5">Use IA para otimizar seu tempo de estudo e focar no que realmente importa.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+          <!-- 1. Resumo -->
+          <div class="bg-surface border border-line rounded-xl p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">description</span></div><h3 class="text-[15px] font-medium text-ink">Resumo de Conteúdo</h3></div>
+            <textarea id="r-texto" rows="3" placeholder="Cole o conteúdo ou tópico..." class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none resize-none"></textarea>
+            <select id="r-nivel" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="basico">Básico</option><option value="intermediario" selected>Intermediário</option><option value="avancado">Avançado</option></select>
+            <button onclick="gerarResumo()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">auto_awesome</span> Gerar com IA</button>
+            <div id="ra-resumo" class="hidden text-[13px] leading-relaxed text-ink-2 bg-canvas border border-line rounded-lg p-3 whitespace-pre-wrap"></div>
+          </div>
+
+          <!-- 2. Flashcards -->
+          <div class="bg-surface border border-line rounded-xl p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">style</span></div><h3 class="text-[15px] font-medium text-ink">Flashcards</h3></div>
+            <input id="fc-topico" type="text" placeholder="Tópico (ex: Princípios da Adm. Pública)" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+            <div class="grid grid-cols-2 gap-2">
+              <input id="fc-qtd" type="number" value="5" min="3" max="20" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+              <select id="fc-dif" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="facil">Fácil</option><option value="medio" selected>Médio</option><option value="dificil">Difícil</option></select>
+            </div>
+            <button onclick="gerarFlashcards()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">auto_awesome</span> Gerar com IA</button>
+            <div id="ra-flash" class="hidden text-[13px] leading-relaxed text-ink-2 bg-canvas border border-line rounded-lg p-3 whitespace-pre-wrap"></div>
+          </div>
+
+          <!-- 3. Análise de Banca -->
+          <div class="bg-surface border border-line rounded-xl p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">apartment</span></div><h3 class="text-[15px] font-medium text-ink">Análise de Banca</h3></div>
+            <select id="ab-banca" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option>CESPE/CEBRASPE</option><option>FCC</option><option>VUNESP</option><option>FGV</option><option>IBFC</option><option>AOCP</option><option>QUADRIX</option></select>
+            <input id="ab-cargo" type="text" placeholder="Cargo / Área (ex: Analista de TI)" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+            <button onclick="analisarBanca()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">auto_awesome</span> Gerar com IA</button>
+            <div id="ra-banca" class="hidden text-[13px] leading-relaxed text-ink-2 bg-canvas border border-line rounded-lg p-3 whitespace-pre-wrap"></div>
+          </div>
+
+          <!-- 4. Plano de Estudos -->
+          <div class="bg-surface border border-line rounded-xl p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">calendar_month</span></div><h3 class="text-[15px] font-medium text-ink">Plano de Estudos</h3></div>
+            <input id="pe-cargo" type="text" placeholder="Concurso / Cargo" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+            <div class="grid grid-cols-2 gap-2">
+              <div><label class="text-[11px] text-ink-3">Semanas</label><input id="pe-semanas" type="number" value="12" min="4" max="52" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+              <div><label class="text-[11px] text-ink-3">Horas/dia</label><input id="pe-horas" type="number" value="3" min="1" max="12" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+            </div>
+            <button onclick="gerarPlano()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">auto_awesome</span> Gerar com IA</button>
+            <div id="ra-plano" class="hidden text-[13px] leading-relaxed text-ink-2 bg-canvas border border-line rounded-lg p-3 whitespace-pre-wrap"></div>
+          </div>
+
+          <!-- 5. Questões -->
+          <div class="bg-surface border border-line rounded-xl p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">quiz</span></div><h3 class="text-[15px] font-medium text-ink">Questões Simulado</h3></div>
+            <input id="qs-topico" type="text" placeholder="Disciplina / Tópico" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+            <div class="grid grid-cols-2 gap-2">
+              <input id="qs-qtd" type="number" value="5" min="1" max="20" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/>
+              <select id="qs-estilo" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="cespe">CESPE (C/E)</option><option value="multipla" selected>Múltipla escolha</option><option value="dissertativa">Dissertativa</option></select>
+            </div>
+            <button onclick="gerarQuestoes()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">auto_awesome</span> Gerar com IA</button>
+            <div id="ra-quest" class="hidden text-[13px] leading-relaxed text-ink-2 bg-canvas border border-line rounded-lg p-3 whitespace-pre-wrap"></div>
+          </div>
+
+          <!-- 6. Comparar Bancas -->
+          <div class="bg-surface border border-line rounded-xl p-5 flex flex-col gap-3">
+            <div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">balance</span></div><h3 class="text-[15px] font-medium text-ink">Comparar Bancas</h3></div>
+            <div class="grid grid-cols-2 gap-2">
+              <select id="cb-a" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option selected>CESPE/CEBRASPE</option><option>FCC</option><option>VUNESP</option><option>FGV</option><option>IBFC</option></select>
+              <select id="cb-b" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option>CESPE/CEBRASPE</option><option selected>FCC</option><option>VUNESP</option><option>FGV</option><option>IBFC</option></select>
+            </div>
+            <button onclick="compararBancas()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">auto_awesome</span> Gerar com IA</button>
+            <div id="ra-comp" class="hidden text-[13px] leading-relaxed text-ink-2 bg-canvas border border-line rounded-lg p-3 whitespace-pre-wrap"></div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast" class="fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-0 translate-y-2 transition-all pointer-events-none z-50"></div>
+
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-100 translate-y-0 transition-all z-50 '+(ok?'bg-emerald-700':'bg-red-600');setTimeout(()=>t.className='fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-0 translate-y-2 transition-all pointer-events-none z-50',2500);}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+function show(el,html){el.innerHTML=html;el.classList.remove('hidden');}
+function loading(el,msg){el.classList.remove('hidden');el.innerHTML=`<span class="spin material-symbols-outlined text-[16px] text-primary align-middle">progress_activity</span> <span class="text-ink-3">${esc(msg)}</span>`;}
+async function call(endpoint,body,raEl,loadMsg){
+  loading(raEl,loadMsg);
+  try{
+    const r=await fetch(API+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();
+    const txt=d.resultado||d.resposta||d.response||d.content||JSON.stringify(d,null,2);
+    show(raEl,esc(txt));
+  }catch(e){show(raEl,`<span class="text-red-600">Erro: ${esc(e.message)}</span>`);toast('Erro na operação',false);}
+}
+async function gerarResumo(){const t=G('r-texto').value.trim();if(!t)return toast('Informe o tópico',false);await call('/ferramentas/resumo',{texto:t,nivel:G('r-nivel').value},G('ra-resumo'),'Gerando resumo...');}
+async function gerarFlashcards(){const t=G('fc-topico').value.trim();if(!t)return toast('Informe o tópico',false);await call('/ferramentas/flashcards',{topico:t,quantidade:parseInt(G('fc-qtd').value),dificuldade:G('fc-dif').value},G('ra-flash'),'Gerando flashcards...');}
+async function analisarBanca(){await call('/ferramentas/analise-banca',{banca:G('ab-banca').value,cargo:G('ab-cargo').value},G('ra-banca'),'Analisando banca...');}
+async function gerarPlano(){const c=G('pe-cargo').value.trim();if(!c)return toast('Informe o cargo',false);await call('/ferramentas/plano-estudos',{cargo:c,semanas:parseInt(G('pe-semanas').value),horas_dia:parseInt(G('pe-horas').value)},G('ra-plano'),'Gerando plano...');}
+async function gerarQuestoes(){const t=G('qs-topico').value.trim();if(!t)return toast('Informe o tópico',false);await call('/ferramentas/questoes',{topico:t,quantidade:parseInt(G('qs-qtd').value),estilo:G('qs-estilo').value},G('ra-quest'),'Gerando questões...');}
+async function compararBancas(){const a=G('cb-a').value,b=G('cb-b').value;if(a===b)return toast('Selecione bancas diferentes',false);await call('/ferramentas/comparar-bancas',{banca_a:a,banca_b:b},G('ra-comp'),'Comparando bancas...');}
+checkAPI();
+</script>
+</body></html>

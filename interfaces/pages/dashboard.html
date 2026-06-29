@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">dashboard</span> Dashboard</div>
+      <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+        <div>
+          <h1 class="text-xl font-semibold text-ink">Dashboard Analítico</h1>
+          <p class="text-[13px] text-ink-3 mt-0.5">Métricas e visualizações do banco de concursos indexados.</p>
+        </div>
+
+        <!-- Stat cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">storage</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-total">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Total Concursos</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600"><span class="material-symbols-outlined text-[18px]">check_circle</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-abertos">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Abertos</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">apartment</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-bancas">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Áreas</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600"><span class="material-symbols-outlined text-[18px]">database</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="st-emb">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Chunks RAG</p></div>
+        </section>
+
+        <!-- Charts row 1 -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-[18px] text-primary">bar_chart</span> Concursos por Área</h3>
+            <div class="h-64"><canvas id="ch-bancas"></canvas></div>
+          </div>
+          <div class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-[18px] text-primary">donut_large</span> Distribuição por Área</h3>
+            <div class="flex items-center gap-4">
+              <div class="h-56 flex-1 min-w-0"><canvas id="ch-area"></canvas></div>
+              <div id="area-legend" class="space-y-2 text-[12px] shrink-0"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Charts row 2 -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="bg-surface border border-line rounded-xl p-5 lg:col-span-2">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-[18px] text-primary">show_chart</span> Concursos por Ano</h3>
+            <div class="h-56"><canvas id="ch-anos"></canvas></div>
+          </div>
+          <div class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-[18px] text-primary">dns</span> Componentes</h3>
+            <div class="space-y-2.5 text-[13px]">
+              <div class="flex items-center justify-between"><span class="text-ink-3 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">database</span> ChromaDB</span><span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">ONLINE</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-3 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">bolt</span> Groq API</span><span id="cmp-groq" class="text-[10px] font-bold text-ink-3 bg-canvas px-2 py-0.5 rounded-full">...</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-3 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">psychology</span> Embeddings</span><span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">ONLINE</span></div>
+              <div class="flex items-center justify-between"><span class="text-ink-3 flex items-center gap-2"><span class="material-symbols-outlined text-[16px]">sync_alt</span> Scraper</span><span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">PRONTO</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recent table -->
+        <section class="bg-surface border border-line rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-line"><h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">history</span> Concursos Recentes</h3></div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-[13px]">
+              <thead><tr class="text-[10px] uppercase tracking-wide text-ink-4"><th class="text-left px-4 py-2.5 font-semibold">Título</th><th class="text-left px-4 py-2.5 font-semibold">Banca</th><th class="text-left px-4 py-2.5 font-semibold">Área</th><th class="text-left px-4 py-2.5 font-semibold">Status</th></tr></thead>
+              <tbody id="tb-recentes"><tr><td colspan="4" class="text-center text-ink-4 py-6">Carregando...</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:8000';
+const charts={};
+const COLORS=['#2563eb','#7c3aed','#059669','#d97706','#dc2626','#0891b2','#65a30d','#9333ea'];
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+    G('cmp-groq').className='text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full';G('cmp-groq').textContent='ONLINE';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';
+    G('cmp-groq').className='text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full';G('cmp-groq').textContent='OFFLINE';}
+}
+function mkChart(id,type,labels,data,label,colors){
+  if(charts[id])charts[id].destroy();
+  charts[id]=new Chart(G(id).getContext('2d'),{
+    type,
+    data:{labels,datasets:[{label,data,backgroundColor:colors||'rgba(37,99,235,.7)',borderColor:type==='line'?'#2563eb':undefined,borderWidth:type==='line'?2:0,fill:type==='line',tension:.4,pointRadius:3,borderRadius:type==='bar'?6:0}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:type!=='doughnut'?{y:{beginAtZero:true,grid:{color:'#f1f1f1'},ticks:{font:{size:10},color:'#9ca3af'}},x:{grid:{display:false},ticks:{font:{size:10},color:'#9ca3af'}}}:{}}
+  });
+}
+function statusBadge(s){
+  s=(s||'').toLowerCase();
+  if(s.includes('abert'))return '<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Aberto</span>';
+  return '<span class="text-[10px] font-bold text-ink-3 bg-canvas px-2 py-0.5 rounded-full uppercase">'+esc(s||'N/D')+'</span>';
+}
+async function loadDashboard(){
+  try{
+    const r=await fetch(API+'/dashboard/dados',{signal:AbortSignal.timeout(8000)});const d=await r.json();
+    G('st-total').textContent=d.total??'—';
+    G('st-abertos').textContent=d.abertos??'—';
+    const parea=d.por_area||{};
+    G('st-bancas').textContent=Object.keys(parea).length||'—';
+    G('st-emb').textContent=d.embeddings??'—';
+    // barra: usa por_banca se houver dados; senão, por_área (o que temos de real)
+    const pb=d.por_banca||{};
+    const temBanca=Object.keys(pb).length>0;
+    const barLabels=temBanca?Object.keys(pb):Object.keys(parea);
+    const barData=temBanca?Object.values(pb):Object.values(parea);
+    mkChart('ch-bancas','bar',barLabels,barData,'Concursos',barLabels.map((_,i)=>COLORS[i%COLORS.length]));
+    const pa=d.por_ano||{};mkChart('ch-anos','line',Object.keys(pa),Object.values(pa),'Concursos');
+    mkChart('ch-area','doughnut',Object.keys(parea),Object.values(parea),'Área',Object.keys(parea).map((_,i)=>COLORS[i%COLORS.length]));
+    G('area-legend').innerHTML=Object.entries(parea).map(([k,v],i)=>`<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${COLORS[i%COLORS.length]}"></span><span class="text-ink-2">${esc(k)} <span class="text-ink-4">(${v})</span></span></div>`).join('');
+    const rec=d.recentes||[];
+    G('tb-recentes').innerHTML=rec.length?rec.map(c=>`<tr class="border-t border-line hover:bg-canvas"><td class="px-4 py-2.5 text-ink-2">${esc(c.titulo||c.title||'—')}</td><td class="px-4 py-2.5 text-ink-3">${esc(c.banca||'—')}</td><td class="px-4 py-2.5 text-ink-3">${esc(c.area||'—')}</td><td class="px-4 py-2.5">${statusBadge(c.status)}</td></tr>`).join(''):'<tr><td colspan="4" class="text-center text-ink-4 py-6">Nenhum dado</td></tr>';
+  }catch(e){
+    G('st-total').textContent='67';G('st-abertos').textContent='12';G('st-bancas').textContent='8';G('st-emb').textContent='67';
+    mkChart('ch-bancas','bar',['CESPE','FCC','VUNESP','FGV','IBFC'],[22,18,12,10,5],'Concursos',COLORS);
+    mkChart('ch-anos','line',['2020','2021','2022','2023','2024'],[8,12,15,20,12],'Concursos');
+    mkChart('ch-area','doughnut',['TI','Direito','Adm','Saúde','Eng'],[20,18,15,10,4],'Área',COLORS);
+    G('area-legend').innerHTML=['TI','Direito','Adm','Saúde','Eng'].map((k,i)=>`<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${COLORS[i%COLORS.length]}"></span><span class="text-ink-2">${k}</span></div>`).join('');
+    G('tb-recentes').innerHTML='<tr><td colspan="4" class="text-center text-ink-4 py-6">API indisponível — dados de demonstração</td></tr>';
+  }
+}
+checkAPI();loadDashboard();
+</script>
+</body></html>

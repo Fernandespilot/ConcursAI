@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Web Scraping</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb", terminal:"#161b22" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">sync_alt</span> Web Scraping</div>
+      <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+
+        <!-- Stat cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">inventory_2</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="sc-total">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Concursos Coletados</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600"><span class="material-symbols-outlined text-[18px]">picture_as_pdf</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="sc-pdfs">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">PDFs Baixados</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">schedule</span></div></div><h3 class="text-[15px] font-bold tracking-tight pt-1.5" id="sc-ultima">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Última Coleta</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600"><span id="sc-status-dot" class="material-symbols-outlined text-[18px]">bolt</span></div></div><h3 class="text-[15px] font-bold tracking-tight pt-1.5" id="sc-status">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Status Scraper</p></div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Coletar concursos -->
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">travel_explore</span> Coletar Concursos</h3>
+            <div class="space-y-3">
+              <div><label class="text-[11px] text-ink-3">Fonte</label><select id="cc-fonte" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="pciconcursos">PCI Concursos</option><option value="cebraspe">CEBRASPE</option><option value="fgv">FGV</option></select></div>
+              <div class="grid grid-cols-2 gap-2">
+                <div><label class="text-[11px] text-ink-3">Limite</label><input id="cc-limit" type="number" value="10" min="1" max="50" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+                <div><label class="text-[11px] text-ink-3">Área (opcional)</label><input id="cc-area" type="text" placeholder="Ex: TI" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+              </div>
+              <button onclick="coletarConcursos()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">play_arrow</span> Iniciar Scraping</button>
+              <div id="ra-cc" class="hidden text-[13px] text-ink-2 bg-canvas border border-line rounded-lg p-3"></div>
+            </div>
+          </section>
+
+          <!-- Coletar PDFs + status -->
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">cloud_download</span> Coletar PDFs de Provas</h3>
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-2">
+                <div><label class="text-[11px] text-ink-3">Tipo</label><select id="pdf-tipo" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="provas">Provas</option><option value="editais">Editais</option><option value="gabaritos">Gabaritos</option></select></div>
+                <div><label class="text-[11px] text-ink-3">Limite</label><input id="pdf-limit" type="number" value="10" min="1" max="50" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+              </div>
+              <button onclick="coletarPDFs()" class="w-full bg-surface border border-line text-ink-2 py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-canvas active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">download</span> Baixar PDFs</button>
+              <div id="ra-pdf" class="hidden text-[13px] text-ink-2 bg-canvas border border-line rounded-lg p-3"></div>
+              <div class="pt-2 border-t border-line">
+                <p class="text-[10px] font-semibold text-ink-4 uppercase tracking-wider mb-2">Status das Fontes</p>
+                <div id="status-body" class="space-y-1.5 text-[12px] text-ink-3">Carregando...</div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Busca RAG -->
+        <section class="bg-surface border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">search</span> Busca RAG nos Dados Coletados</h3>
+          <div class="flex gap-2">
+            <input id="rag-q" type="text" placeholder="Buscar nos dados indexados..." class="flex-1 bg-surface border border-line rounded-lg px-3 py-2.5 text-[14px] focus:ring-1 focus:ring-primary outline-none" onkeydown="if(event.key==='Enter')buscarRAG()"/>
+            <button onclick="buscarRAG()" class="bg-primary text-white px-5 py-2.5 rounded-lg text-[14px] font-medium flex items-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">search</span> Buscar</button>
+          </div>
+          <div id="ra-rag" class="hidden mt-3 space-y-2"></div>
+        </section>
+
+        <!-- Log -->
+        <section class="bg-surface border border-line rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-line flex items-center justify-between">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">terminal</span> Log em Tempo Real</h3>
+            <div class="flex gap-1.5 items-center"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-[10px] uppercase font-bold text-ink-4 tracking-wider">Live</span></div>
+          </div>
+          <div id="log-box" class="bg-terminal font-mono text-[12px] text-[#8b949e] p-4 h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed">Sistema de scraping pronto. Aguardando comandos...</div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast" class="fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-0 translate-y-2 transition-all pointer-events-none z-50"></div>
+
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-100 translate-y-0 transition-all z-50 '+(ok?'bg-emerald-700':'bg-red-600');setTimeout(()=>t.className='fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-0 translate-y-2 transition-all pointer-events-none z-50',2500);}
+function show(el,html){el.innerHTML=html;el.classList.remove('hidden');}
+function loading(el,msg){el.classList.remove('hidden');el.innerHTML=`<span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> ${esc(msg)}`;}
+function log(m){const b=G('log-box');const t=new Date().toLocaleTimeString('pt-BR');b.textContent+=`\n[${t}] ${m}`;b.scrollTop=b.scrollHeight;}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+async function loadStats(){
+  try{
+    const r=await fetch(API+'/scraping/stats',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    G('sc-total').textContent=d.total_concursos??d.total??'0';
+    G('sc-pdfs').textContent=d.total_pdfs??d.pdfs??'0';
+    G('sc-ultima').textContent=d.ultima_coleta??d.ultima??'—';
+    G('sc-status').textContent=d.status??'OK';
+  }catch(e){G('sc-total').textContent='0';G('sc-pdfs').textContent='0';}
+}
+async function loadStatus(){
+  try{
+    const r=await fetch(API+'/scraping/status',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    const fontes=d.fontes||d.scrapers||[];
+    G('status-body').innerHTML=fontes.length?fontes.map(f=>`<div class="flex items-center justify-between"><span class="text-ink-2">${esc(f.nome||f.name||f)}</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${f.ativo||f.online?'text-emerald-700 bg-emerald-50':'text-red-700 bg-red-50'}">${f.ativo||f.online?'Ativo':'Inativo'}</span></div>`).join(''):'<p class="text-ink-4">Sem fontes configuradas.</p>';
+  }catch(e){G('status-body').innerHTML='<p class="text-ink-4">Status indisponível.</p>';}
+}
+async function coletarConcursos(){
+  const ra=G('ra-cc');loading(ra,'Executando scraping...');log('Iniciando coleta de concursos...');
+  try{
+    const body={fonte:G('cc-fonte').value,limite:parseInt(G('cc-limit').value),area:G('cc-area').value||undefined};
+    const r=await fetch(API+'/scraping/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(180000)});
+    const d=await r.json();const msg=d.mensagem||d.message||JSON.stringify(d);
+    show(ra,esc(msg));log('Coleta concluída: '+msg);toast('Coleta concluída!');loadStats();
+  }catch(e){show(ra,'<span class="text-red-600">Erro: '+esc(e.message)+'</span>');log('ERRO: '+e.message);toast('Erro no scraping',false);}
+}
+async function coletarPDFs(){
+  const ra=G('ra-pdf');loading(ra,'Coletando PDFs...');log('Iniciando coleta de PDFs...');
+  try{
+    const body={tipo:G('pdf-tipo').value,limite:parseInt(G('pdf-limit').value)};
+    const r=await fetch(API+'/scraping/pdfs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
+    const d=await r.json();const msg=d.mensagem||d.message||JSON.stringify(d);
+    show(ra,esc(msg));log('PDFs coletados: '+msg);toast('PDFs coletados!');
+  }catch(e){show(ra,'<span class="text-red-600">Erro: '+esc(e.message)+'</span>');log('ERRO PDF: '+e.message);toast('Erro',false);}
+}
+async function buscarRAG(){
+  const q=G('rag-q').value.trim();if(!q)return toast('Digite um termo',false);
+  const ra=G('ra-rag');ra.classList.remove('hidden');ra.innerHTML='<p class="text-ink-3 text-[13px]"><span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> Buscando...</p>';
+  try{
+    const r=await fetch(API+'/buscar?q='+encodeURIComponent(q)+'&limit=5',{signal:AbortSignal.timeout(15000)});const d=await r.json();
+    const res=d.resultados||d.results||[];
+    ra.innerHTML=res.length?res.map(x=>`<div class="p-3 border border-line rounded-lg bg-canvas"><p class="text-[13px] font-semibold text-ink">${esc(x.titulo||x.title||'')}</p><p class="text-[12px] text-ink-3 mt-1">${esc((x.trecho||x.texto||'').slice(0,180))}...</p></div>`).join(''):'<p class="text-[13px] text-ink-3">Nenhum resultado.</p>';
+  }catch(e){ra.innerHTML='<p class="text-red-600 text-[13px]">Erro: '+esc(e.message)+'</p>';}
+}
+async function loadLog(){
+  try{
+    const r=await fetch(API+'/scraping/log',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    const lines=d.log||d.logs||d||[];
+    if(Array.isArray(lines)&&lines.length){G('log-box').textContent=lines.join('\n');G('log-box').scrollTop=G('log-box').scrollHeight;}
+  }catch(e){}
+}
+checkAPI();loadStats();loadStatus();loadLog();
+</script>
+</body></html>

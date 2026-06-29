@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ConcursAI Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f5f6fa;color:#1a1a2e;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:#fff;border-bottom:1px solid #eaecf0;height:52px;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+.logo{font-weight:700;font-size:.95rem;color:#5b21b6;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.topbar-nav{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+.topbar-nav::-webkit-scrollbar{display:none}
+.tn{border:none;background:none;padding:5px 11px;border-radius:7px;font-size:.78rem;font-weight:500;color:#6b7280;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px}
+.tn:hover{background:#f3f4f6;color:#374151}
+.tn.active{background:#ede9fe;color:#5b21b6;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.dot{width:7px;height:7px;border-radius:50%;background:#d1d5db}
+.dot.on{background:#10b981}.dot.off{background:#ef4444}
+.stxt{font-size:.72rem;color:#6b7280}
+.btn-xs{border:1px solid #e5e7eb;background:#fff;border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:500;color:#374151;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.btn-xs:hover{background:#f9fafb}
+.workspace{display:flex;flex:1;overflow:hidden}
+.sidebar{width:252px;background:#fff;border-right:1px solid #eaecf0;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.sb-sec{border-bottom:1px solid #f3f4f6;padding:14px}
+.sb-ttl{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+label{display:block;font-size:.76rem;font-weight:500;color:#374151;margin-bottom:4px}
+select,input[type=text],input[type=password],input[type=number],textarea{width:100%;border:1px solid #e5e7eb;border-radius:7px;padding:6px 9px;font-size:.8rem;font-family:inherit;color:#1a1a1a;background:#fff;outline:none;transition:border-color .15s}
+select:focus,input:focus,textarea:focus{border-color:#5b21b6;box-shadow:0 0 0 3px rgba(91,33,182,.07)}
+textarea{resize:vertical;line-height:1.5}
+.fg{margin-bottom:10px}.fg:last-child{margin-bottom:0}
+.rf{display:flex;gap:6px;align-items:center}
+.rf input{flex:1}
+.ib{border:1px solid #e5e7eb;background:#fff;border-radius:7px;padding:6px 8px;cursor:pointer;color:#6b7280;font-size:.8rem;flex-shrink:0}
+.ib:hover{background:#f9fafb}
+input[type=range]{flex:1;accent-color:#5b21b6;height:3px;border:none;padding:0;cursor:pointer;background:transparent}
+.rv{font-size:.75rem;font-weight:700;color:#5b21b6;min-width:30px;text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.chip{padding:3px 8px;border-radius:20px;font-size:.7rem;font-weight:500;border:1px solid #e5e7eb;cursor:pointer;color:#6b7280;background:#fff;transition:all .15s}
+.chip:hover{border-color:#5b21b6;color:#5b21b6}
+.chip.on{background:#5b21b6;color:#fff;border-color:#5b21b6}
+.save-btn{background:#5b21b6;color:#fff;border:none;border-radius:8px;padding:8px;font-size:.8rem;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
+.save-btn:hover{background:#4c1d95}
+.saved-msg{font-size:.7rem;color:#10b981;text-align:center;margin-top:4px;opacity:0;transition:opacity .3s}
+.saved-msg.show{opacity:1}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tp{display:none;flex:1;overflow:hidden;flex-direction:column}
+.tp.active{display:flex}
+.scroll{flex:1;overflow-y:auto;padding:18px 22px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat-card{background:#fff;border-radius:10px;padding:16px 18px;border:1px solid #eaecf0;cursor:pointer;transition:all .15s}
+.stat-card:hover{border-color:#c4b5fd;box-shadow:0 4px 14px rgba(91,33,182,.08)}
+.snum{font-size:1.7rem;font-weight:700;color:#5b21b6;margin-bottom:3px}
+.slbl{font-size:.75rem;color:#6b7280;font-weight:500}
+.block{background:#fff;border-radius:10px;border:1px solid #eaecf0;margin-bottom:14px;overflow:hidden}
+.bh{padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between}
+.bh-left{display:flex;align-items:center;gap:7px;font-weight:600;font-size:.85rem;color:#374151}
+.bh-left i{color:#5b21b6;font-size:.85rem}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:14px}
+.ic{border:1px solid #f3f4f6;border-radius:9px;padding:13px}
+.ic h4{font-size:.8rem;font-weight:600;color:#374151;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.ic p{font-size:.75rem;color:#6b7280;line-height:1.6;margin-bottom:3px}
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:.68rem;font-weight:600}
+.badge.green{background:#d1fae5;color:#059669}
+.badge.red{background:#fee2e2;color:#ef4444}
+.badge.gray{background:#f3f4f6;color:#6b7280}
+.badge.yellow{background:#fef3c7;color:#d97706}
+.badge.blue{background:#dbeafe;color:#2563eb}
+.act-row{display:flex;flex-wrap:wrap;gap:7px;padding:14px}
+.ab{border:1px solid #e5e7eb;background:#fff;border-radius:7px;padding:7px 14px;font-size:.78rem;font-weight:500;color:#374151;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px;text-decoration:none}
+.ab:hover{border-color:#5b21b6;color:#5b21b6;background:#faf5ff}
+.ab.green{border-color:#10b981;color:#059669;background:#f0fdf4}.ab.green:hover{background:#d1fae5}
+.ab.blue{border-color:#3b82f6;color:#2563eb;background:#eff6ff}.ab.blue:hover{background:#dbeafe}
+.ab.red{border-color:#ef4444;color:#ef4444;background:#fef2f2}.ab.red:hover{background:#fee2e2}
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:24px 36px;display:flex;flex-direction:column;gap:16px}
+.empty-chat{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#9ca3af;text-align:center;gap:8px;padding:40px}
+.empty-chat i{font-size:2rem;opacity:.2}
+.empty-chat h3{font-size:.95rem;font-weight:600;color:#6b7280}
+.empty-chat p{font-size:.8rem;max-width:300px;line-height:1.6}
+.sugs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:5px}
+.sg{background:#fff;border:1px solid #e5e7eb;border-radius:20px;padding:5px 12px;font-size:.75rem;cursor:pointer;color:#374151;transition:all .15s;font-family:inherit}
+.sg:hover{border-color:#5b21b6;color:#5b21b6;background:#faf5ff}
+.msg{display:flex;gap:9px;max-width:740px}
+.msg.user{margin-left:auto;flex-direction:row-reverse}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0}
+.av.ai{background:#ede9fe;color:#5b21b6}
+.av.user{background:#dbeafe;color:#2563eb}
+.bubble{background:#fff;border:1px solid #e5e7eb;border-radius:11px;padding:10px 13px;font-size:.83rem;line-height:1.65;color:#1a1a1a;max-width:560px}
+.msg.user .bubble{background:#5b21b6;color:#fff;border-color:#5b21b6}
+.bubble.thinking{color:#9ca3af;font-style:italic}
+.input-bar{background:#fff;border-top:1px solid #eaecf0;padding:12px 36px}
+.iw{display:flex;align-items:flex-end;gap:7px;border:1.5px solid #e5e7eb;border-radius:11px;padding:8px 10px;background:#fff;transition:border-color .15s}
+.iw:focus-within{border-color:#5b21b6;box-shadow:0 0 0 3px rgba(91,33,182,.06)}
+#ci{flex:1;border:none;outline:none;font-size:.85rem;font-family:inherit;resize:none;min-height:20px;max-height:110px;line-height:1.5;background:transparent;color:#1a1a1a}
+.send-btn{background:#5b21b6;color:#fff;border:none;border-radius:7px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0}
+.send-btn:hover{background:#4c1d95}
+.send-btn:disabled{background:#d1d5db;cursor:not-allowed}
+.hint{display:flex;justify-content:space-between;margin-top:5px;font-size:.7rem;color:#9ca3af}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full-btn{width:100%;background:#5b21b6;color:#fff;border:none;border-radius:8px;padding:9px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.full-btn:hover{background:#4c1d95}
+.full-btn.green{background:#059669}.full-btn.green:hover{background:#047857}
+.result-box{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px;font-size:.8rem;line-height:1.7;color:#374151;min-height:60px;margin-top:10px;white-space:pre-wrap;word-break:break-word}
+.result-box.loading{color:#9ca3af;font-style:italic}
+.upload-area{border:2px dashed #e5e7eb;border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.upload-area:hover,.upload-area.drag{border-color:#5b21b6;background:#faf5ff}
+.upload-area i{font-size:1.8rem;color:#c4b5fd;margin-bottom:8px}
+.upload-area p{font-size:.8rem;color:#6b7280}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.conc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.cc{background:#fff;border:1px solid #eaecf0;border-radius:10px;padding:14px;transition:all .15s}
+.cc:hover{border-color:#c4b5fd;box-shadow:0 3px 12px rgba(91,33,182,.07)}
+.cc-title{font-size:.83rem;font-weight:600;color:#1a1a2e;margin-bottom:7px}
+.cc-meta{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.cc-tag{font-size:.68rem;padding:2px 6px;border-radius:4px;background:#f3f4f6;color:#6b7280;font-weight:500}
+.cc-body{font-size:.76rem;color:#6b7280;line-height:1.6;margin-bottom:9px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.cc-btn{border:1px solid #e5e7eb;background:#fff;border-radius:6px;padding:4px 10px;font-size:.72rem;cursor:pointer;color:#5b21b6;font-weight:500;font-family:inherit}
+.cc-btn:hover{background:#faf5ff;border-color:#5b21b6}
+.prova-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f9fafb}
+.prova-row:last-child{border-bottom:none}
+.prova-icon{width:36px;height:36px;border-radius:8px;background:#ede9fe;display:flex;align-items:center;justify-content:center;color:#5b21b6;font-size:.85rem;flex-shrink:0}
+.prova-info{flex:1}
+.prova-title{font-size:.82rem;font-weight:600;color:#374151}
+.prova-meta{font-size:.72rem;color:#9ca3af}
+.logbox{padding:14px 16px;font-size:.75rem;font-family:monospace;color:#6b7280;background:#fafafa;min-height:80px;max-height:220px;overflow-y:auto;line-height:1.9;white-space:pre-wrap}
+.mon-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px}
+.mon-card{border:1px solid #f3f4f6;border-radius:9px;padding:14px;text-align:center}
+.mon-num{font-size:1.4rem;font-weight:700;color:#5b21b6}
+.mon-lbl{font-size:.72rem;color:#9ca3af;margin-top:2px}
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1a2e;color:#fff;padding:10px 18px;border-radius:9px;font-size:.8rem;font-weight:500;opacity:0;transform:translateY(10px);transition:all .25s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.sr{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sr input,.sr select{flex:1;min-width:130px;border:1px solid #e5e7eb;border-radius:8px;padding:7px 10px;font-size:.8rem;font-family:inherit;outline:none}
+.sr input:focus,.sr select:focus{border-color:#5b21b6}
+.sr button{background:#5b21b6;color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><i class="fas fa-graduation-cap"></i>ConcursAI</div>
+  <div class="topbar-nav">
+    <button class="tn active" onclick="go('dashboard',this)"><i class="fas fa-tachometer-alt"></i>Dashboard</button>
+    <button class="tn" onclick="go('chat',this)"><i class="fas fa-comments"></i>Chat IA</button>
+    <button class="tn" onclick="go('concursos',this)"><i class="fas fa-search"></i>Concursos</button>
+    <button class="tn" onclick="go('ferramentas',this)"><i class="fas fa-magic"></i>Ferramentas IA</button>
+    <button class="tn" onclick="go('edital',this)"><i class="fas fa-file-pdf"></i>PDF / Edital</button>
+    <button class="tn" onclick="go('provas',this)"><i class="fas fa-file-alt"></i>Provas</button>
+    <button class="tn" onclick="go('scraping',this)"><i class="fas fa-spider"></i>Scraping</button>
+    <button class="tn" onclick="go('admin',this)"><i class="fas fa-shield-alt"></i>Admin</button>
+  </div>
+  <div class="topbar-right">
+    <span class="dot" id="adot"></span>
+    <span class="stxt" id="atxt">Conectando...</span>
+    <a href="http://localhost:8000/docs" target="_blank" class="btn-xs"><i class="fas fa-book"></i>Docs</a>
+  </div>
+</div>
+
+<div class="workspace">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-sec">
+    <div class="sb-ttl"><i class="fas fa-robot"></i>Agente</div>
+    <div class="fg"><label>Tipo</label>
+      <select id="agtype" onchange="onAgent()">
+        <option value="concursos">🎯 Assistente de Concursos</option>
+        <option value="edital">📄 Analisador de Editais</option>
+        <option value="estudo">📚 Orientador de Estudos</option>
+        <option value="banca">🏛️ Especialista em Bancas</option>
+        <option value="custom">⚙️ Personalizado</option>
+      </select>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-ttl"><i class="fas fa-microchip"></i>Modelo</div>
+    <div class="fg"><label>Provedor</label>
+      <select id="prov" onchange="onProv()">
+        <option value="groq">Groq (Cloud)</option>
+        <option value="ollama">Ollama (Local)</option>
+        <option value="openai">OpenAI</option>
+        <option value="backend">Backend (.env)</option>
+      </select>
+    </div>
+    <div class="fg"><label>Modelo</label><select id="msel" onchange="updHint()"></select></div>
+    <div class="fg"><label>Chave de API</label>
+      <div class="rf">
+        <input type="password" id="akey" placeholder="gsk_..." oninput="updHint()">
+        <button class="ib" onclick="togKey()"><i class="fas fa-eye" id="eyi"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-ttl"><i class="fas fa-sliders-h"></i>Parâmetros</div>
+    <div class="fg"><label>Temperatura</label>
+      <div class="rf"><input type="range" id="temp" min="0" max="1" step="0.05" value="0.3" oninput="V('tv',this.value)"><span class="rv" id="tv">0.3</span></div>
+    </div>
+    <div class="fg"><label>Máx. Tokens</label>
+      <div class="rf"><input type="range" id="maxtok" min="256" max="4096" step="128" value="1000" oninput="V('mtv',this.value)"><span class="rv" id="mtv">1000</span></div>
+    </div>
+    <div class="fg"><label>Docs RAG</label>
+      <div class="rf"><input type="range" id="ragk" min="1" max="10" step="1" value="5" oninput="V('rkv',this.value)"><span class="rv" id="rkv">5</span></div>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-ttl"><i class="fas fa-terminal"></i>System Prompt</div>
+    <div class="fg"><textarea id="sysp" rows="5" placeholder="Comportamento do agente..."></textarea></div>
+    <div class="chips" id="prchips">
+      <span class="chip on" onclick="setPr('concursos',this)">Concursos</span>
+      <span class="chip" onclick="setPr('edital',this)">Edital</span>
+      <span class="chip" onclick="setPr('estudo',this)">Estudo</span>
+      <span class="chip" onclick="setPr('banca',this)">Bancas</span>
+      <span class="chip" onclick="setPr('custom',this)">Livre</span>
+    </div>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-ttl"><i class="fas fa-filter"></i>Filtros RAG</div>
+    <div class="fg"><label>Órgão</label><select id="forg"><option value="">Todos</option></select></div>
+    <div class="fg"><label>Ano</label><select id="fano"><option value="">Todos</option></select></div>
+    <div class="fg"><label>Cargo</label><input type="text" id="fcar" placeholder="Ex: Analista..."></div>
+  </div>
+  <div class="sb-sec">
+    <button class="save-btn" onclick="saveCfg()"><i class="fas fa-save"></i> Salvar Config</button>
+    <div class="saved-msg" id="svmsg">✓ Salvo!</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+<!-- DASHBOARD -->
+<div class="tp active" id="tab-dashboard"><div class="scroll">
+  <div class="stat-row">
+    <div class="stat-card"><div class="snum" id="s1">—</div><div class="slbl">🎯 Concursos</div></div>
+    <div class="stat-card"><div class="snum" id="s2">—</div><div class="slbl">🏛️ Órgãos</div></div>
+    <div class="stat-card"><div class="snum" id="s3">—</div><div class="slbl">📅 Anos</div></div>
+    <div class="stat-card"><div class="snum" id="s4" style="font-size:1rem">—</div><div class="slbl">⚡ API</div></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-server"></i>Status do Sistema</div>
+      <button class="btn-xs" onclick="loadStatus()"><i class="fas fa-sync"></i> Atualizar</button></div>
+    <div class="cards-grid">
+      <div class="ic"><h4><i class="fas fa-plug"></i>FastAPI</h4><p>Porta: <strong>8000</strong></p><p>Status: <span id="b-api" class="badge gray">—</span></p></div>
+      <div class="ic"><h4><i class="fas fa-brain"></i>RAG</h4><p>Embeddings: <strong>HuggingFace</strong></p><p>Status: <span id="b-rag" class="badge gray">—</span></p></div>
+      <div class="ic"><h4><i class="fas fa-microchip"></i>Modelo</h4><p>Provedor: <strong id="b-prov">—</strong></p><p>Chave: <span id="b-key" class="badge gray">—</span></p></div>
+      <div class="ic"><h4><i class="fas fa-spider"></i>Scraping</h4><p>Jobs: <strong id="b-jobs">—</strong></p><p>Status: <span id="b-scr" class="badge gray">—</span></p></div>
+      <div class="ic"><h4><i class="fas fa-chart-line"></i>Monitoramento</h4><p>Requisições: <strong id="b-req">—</strong></p><p>Saúde: <span id="b-hlt" class="badge gray">—</span></p></div>
+      <div class="ic"><h4><i class="fas fa-bell"></i>Notificações</h4><p>Total: <strong id="b-ntf">—</strong></p><p>Não lidas: <strong id="b-nrd">—</strong></p></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-bolt"></i>Ações Rápidas</div></div>
+    <div class="act-row">
+      <button class="ab" onclick="go('chat',qn(1))"><i class="fas fa-comments"></i>Chat IA</button>
+      <button class="ab" onclick="go('ferramentas',qn(3))"><i class="fas fa-magic"></i>Ferramentas IA</button>
+      <button class="ab" onclick="go('edital',qn(4))"><i class="fas fa-file-pdf"></i>Analisar PDF</button>
+      <button class="ab green" onclick="go('scraping',qn(6));scrapeAll()"><i class="fas fa-download"></i>Coletar Dados</button>
+      <button class="ab blue" onclick="go('admin',qn(7))"><i class="fas fa-shield-alt"></i>Admin</button>
+      <a href="http://localhost:8000/docs" target="_blank" class="ab"><i class="fas fa-book"></i>API Docs</a>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-rocket"></i>Funcionalidades</div></div>
+    <div class="cards-grid">
+      <div class="ic"><h4><i class="fas fa-comments"></i>Chat com IA</h4><p>RAG com 67 concursos. Groq, OpenAI, Ollama.</p><button class="cc-btn" style="margin-top:7px" onclick="go('chat',qn(1))">Abrir →</button></div>
+      <div class="ic"><h4><i class="fas fa-magic"></i>Ferramentas IA</h4><p>Analisar editais, dicas, comparar, explicar.</p><button class="cc-btn" style="margin-top:7px" onclick="go('ferramentas',qn(3))">Abrir →</button></div>
+      <div class="ic"><h4><i class="fas fa-file-pdf"></i>PDF / Edital</h4><p>Upload e chat sobre editais em PDF.</p><button class="cc-btn" style="margin-top:7px" onclick="go('edital',qn(4))">Abrir →</button></div>
+      <div class="ic"><h4><i class="fas fa-file-alt"></i>Provas</h4><p>Coleta e consulta de provas e gabaritos.</p><button class="cc-btn" style="margin-top:7px" onclick="go('provas',qn(5))">Abrir →</button></div>
+      <div class="ic"><h4><i class="fas fa-spider"></i>Scraping</h4><p>Coleta automática Cebraspe, FCC, FGV.</p><button class="cc-btn" style="margin-top:7px" onclick="go('scraping',qn(6))">Abrir →</button></div>
+      <div class="ic"><h4><i class="fas fa-shield-alt"></i>Admin</h4><p>Monitoramento, métricas e coleta avançada.</p><button class="cc-btn" style="margin-top:7px" onclick="go('admin',qn(7))">Abrir →</button></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- CHAT -->
+<div class="tp" id="tab-chat">
+  <div class="chat-main">
+    <div class="chat-msgs" id="cmsg">
+      <div class="empty-chat" id="echst">
+        <i class="fas fa-robot"></i>
+        <h3>Assistente ConcursAI</h3>
+        <p>Configure o agente no painel lateral e faça sua pergunta.</p>
+        <div class="sugs">
+          <button class="sg" onclick="usex('Quais concursos estão abertos agora?')">Concursos abertos</button>
+          <button class="sg" onclick="usex('Monte um cronograma de 3 meses para concurso federal')">Cronograma</button>
+          <button class="sg" onclick="usex('Quais temas a FGV mais cobra em Direito Administrativo?')">Temas FGV</button>
+          <button class="sg" onclick="usex('Diferenças entre Cebraspe e FCC')">Cebraspe vs FCC</button>
+          <button class="sg" onclick="usex('Qual salário médio de Analista Judiciário?')">Salários</button>
+          <button class="sg" onclick="usex('Estratégia de estudo para Português em concursos')">Estratégia</button>
+        </div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <div class="iw">
+        <textarea id="ci" rows="1" placeholder="Pergunte sobre concursos, editais, estratégias..."
+          onkeydown="hkey(event)" oninput="ar(this)"></textarea>
+        <button class="send-btn" id="sbtn" onclick="send()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <div class="hint"><span id="mhint">— configure o modelo —</span><span>Enter = enviar · Shift+Enter = nova linha</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONCURSOS -->
+<div class="tp" id="tab-concursos"><div class="scroll">
+  <div class="sr">
+    <input type="text" id="qb" placeholder="Buscar concursos..." onkeydown="if(event.key==='Enter')bConc()">
+    <select id="qorg"><option value="">Todos órgãos</option></select>
+    <select id="qano"><option value="">Todos anos</option></select>
+    <input type="text" id="qcargo" placeholder="Cargo...">
+    <button onclick="bConc()"><i class="fas fa-search"></i> Buscar</button>
+  </div>
+  <div class="conc-grid" id="cgrid">
+    <div style="grid-column:1/-1;text-align:center;padding:50px;color:#9ca3af;font-size:.85rem">
+      <i class="fas fa-search" style="font-size:2rem;opacity:.2;display:block;margin-bottom:10px"></i>Use a busca acima
+    </div>
+  </div>
+</div></div>
+
+<!-- FERRAMENTAS IA -->
+<div class="tp" id="tab-ferramentas"><div class="scroll">
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-microchip"></i>Status da IA</div>
+      <button class="btn-xs" onclick="loadIAStatus()"><i class="fas fa-sync"></i> Verificar</button></div>
+    <div class="cards-grid" id="ia-sc"><div class="ic"><p style="color:#9ca3af;font-size:.78rem">Clique em Verificar</p></div></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-list"></i>Modelos Disponíveis</div>
+      <button class="btn-xs" onclick="loadModels()"><i class="fas fa-sync"></i> Carregar</button></div>
+    <div id="mlist" style="padding:14px;font-size:.8rem;color:#6b7280">—</div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-sliders-h"></i>Definir Modelo no Backend</div></div>
+    <div style="padding:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div class="fg" style="margin:0;flex:1;min-width:160px"><label>Modelo</label><input type="text" id="dm-m" placeholder="llama-3.3-70b-versatile"></div>
+      <div class="fg" style="margin:0;width:90px"><label>Temp.</label><input type="number" id="dm-t" value="0.3" min="0" max="1" step="0.05"></div>
+      <button class="ab green" onclick="definirModelo()"><i class="fas fa-check"></i> Aplicar</button>
+    </div>
+    <div id="dm-r" class="result-box" style="margin:0 14px 14px;display:none"></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-file-search"></i>Analisar Edital</div></div>
+    <div style="padding:14px">
+      <div class="fg"><label>Texto do edital</label><textarea id="ae-tx" rows="5" placeholder="Cole o conteúdo do edital aqui..."></textarea></div>
+      <div class="form-row">
+        <div class="fg"><label>Tipo</label>
+          <select id="ae-tp"><option value="completa">Análise Completa</option><option value="resumo">Resumo</option><option value="cronograma">Cronograma</option><option value="requisitos">Requisitos</option><option value="conteudo">Conteúdo Programático</option></select></div>
+        <div class="fg"><label>Cargo alvo</label><input type="text" id="ae-cg" placeholder="Ex: Analista de TI"></div>
+      </div>
+      <button class="full-btn" onclick="analisarEdital()"><i class="fas fa-magic"></i> Analisar</button>
+      <div id="ae-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-book-open"></i>Explicar Seção</div></div>
+    <div style="padding:14px">
+      <div class="fg"><label>Seção do edital</label><textarea id="es-tx" rows="4" placeholder="Cole a seção específica..."></textarea></div>
+      <div class="form-row">
+        <div class="fg"><label>Nível</label><select id="es-nv"><option value="basico">Básico</option><option value="intermediario">Intermediário</option><option value="avancado">Avançado</option></select></div>
+        <div class="fg"><label>Público</label><select id="es-pb"><option value="candidato">Candidato</option><option value="iniciante">Iniciante</option><option value="experiente">Experiente</option></select></div>
+      </div>
+      <button class="full-btn" onclick="explicarSecao()"><i class="fas fa-lightbulb"></i> Explicar</button>
+      <div id="es-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-graduation-cap"></i>Dicas de Estudo</div></div>
+    <div style="padding:14px">
+      <div class="form-row">
+        <div class="fg"><label>Concurso / Órgão</label><input type="text" id="de-cn" placeholder="Ex: INSS, Receita Federal"></div>
+        <div class="fg"><label>Cargo</label><input type="text" id="de-cg" placeholder="Ex: Técnico"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label>Nível</label><select id="de-nv"><option value="medio">Ensino Médio</option><option value="superior">Superior</option></select></div>
+        <div class="fg"><label>Tempo</label><select id="de-tm"><option value="1">1 mês</option><option value="3">3 meses</option><option value="6">6 meses</option><option value="12">1 ano</option></select></div>
+      </div>
+      <div class="fg"><label>Matérias prioritárias</label><input type="text" id="de-mt" placeholder="Direito Administrativo, Português..."></div>
+      <button class="full-btn green" onclick="dicasEstudo()"><i class="fas fa-book"></i> Gerar Dicas</button>
+      <div id="de-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-balance-scale"></i>Comparar Editais</div></div>
+    <div style="padding:14px">
+      <div class="form-row">
+        <div class="fg"><label>Edital 1</label><textarea id="ce-e1" rows="4" placeholder="Cole o primeiro edital..."></textarea></div>
+        <div class="fg"><label>Edital 2</label><textarea id="ce-e2" rows="4" placeholder="Cole o segundo edital..."></textarea></div>
+      </div>
+      <div class="fg"><label>Aspectos</label>
+        <div class="chips" id="ce-chips" style="margin-top:0">
+          <span class="chip on" data-v="salario">Salário</span>
+          <span class="chip on" data-v="vagas">Vagas</span>
+          <span class="chip on" data-v="requisitos">Requisitos</span>
+          <span class="chip on" data-v="conteudo">Conteúdo</span>
+          <span class="chip" data-v="cronograma">Cronograma</span>
+          <span class="chip" data-v="dificuldade">Dificuldade</span>
+        </div>
+      </div>
+      <button class="full-btn" style="margin-top:10px" onclick="compararEditais()"><i class="fas fa-balance-scale"></i> Comparar</button>
+      <div id="ce-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- PDF / EDITAL -->
+<div class="tp" id="tab-edital"><div class="scroll">
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-upload"></i>Upload de PDF</div></div>
+    <div style="padding:14px">
+      <div class="upload-area" id="uparea" ondrop="dropPDF(event)" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')">
+        <input type="file" accept=".pdf" onchange="uploadPDF(event)">
+        <i class="fas fa-file-pdf"></i>
+        <p><strong>Clique ou arraste um PDF</strong></p>
+        <p style="font-size:.72rem;margin-top:3px">Editais, provas, gabaritos — máx. 50MB</p>
+      </div>
+      <div id="up-st" style="display:none;margin-top:10px" class="result-box"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-list"></i>Editais Carregados</div>
+      <button class="btn-xs" onclick="loadEditais()"><i class="fas fa-sync"></i> Atualizar</button></div>
+    <div id="editais-list" style="padding:14px;font-size:.8rem;color:#6b7280"><p>Nenhum edital. Faça upload acima.</p></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-comments"></i>Conversar com Edital</div></div>
+    <div style="padding:14px">
+      <div class="form-row">
+        <div class="fg"><label>ID do Edital</label><input type="text" id="ed-id" placeholder="ID do edital carregado"></div>
+        <div class="fg"><label>User ID</label><input type="text" id="ed-uid" value="user1"></div>
+      </div>
+      <div id="edchat" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;min-height:100px;max-height:280px;overflow-y:auto;padding:12px;font-size:.8rem;line-height:1.7;margin-bottom:10px;color:#6b7280">Selecione um edital e pergunte...</div>
+      <div class="rf">
+        <input type="text" id="ed-q" placeholder="Pergunte sobre o edital..." onkeydown="if(event.key==='Enter')convEdital()">
+        <button class="ab green" onclick="convEdital()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-file-contract"></i>Resumo do Edital</div></div>
+    <div style="padding:14px">
+      <div class="rf"><input type="text" id="res-id" placeholder="ID do edital...">
+        <button class="ab" onclick="resumoEdital()"><i class="fas fa-magic"></i> Gerar Resumo</button></div>
+      <div id="res-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-history"></i>Histórico de Conversas</div></div>
+    <div style="padding:14px">
+      <div class="rf">
+        <input type="text" id="hist-uid" value="user1" placeholder="User ID...">
+        <button class="ab" onclick="loadHist()"><i class="fas fa-search"></i> Carregar</button>
+        <button class="ab red" onclick="delHist()"><i class="fas fa-trash"></i> Limpar</button>
+      </div>
+      <div id="hist-list" style="margin-top:10px;font-size:.78rem;color:#6b7280"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-microscope"></i>Analisar PDF com IA</div></div>
+    <div style="padding:14px">
+      <div class="fg"><label>PDF</label><input type="file" id="pdf-f" accept=".pdf" style="padding:5px"></div>
+      <div class="fg"><label>Pergunta</label><input type="text" id="pdf-q" placeholder="O que quer saber sobre este PDF?"></div>
+      <button class="full-btn" onclick="analisarPDF()"><i class="fas fa-microscope"></i> Analisar</button>
+      <div id="pdf-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- PROVAS -->
+<div class="tp" id="tab-provas"><div class="scroll">
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-chart-bar"></i>Estatísticas</div>
+      <button class="btn-xs" onclick="loadProvasStats()"><i class="fas fa-sync"></i> Atualizar</button></div>
+    <div class="mon-grid">
+      <div class="mon-card"><div class="mon-num" id="ps1">—</div><div class="mon-lbl">Provas</div></div>
+      <div class="mon-card"><div class="mon-num" id="ps2">—</div><div class="mon-lbl">Gabaritos</div></div>
+      <div class="mon-card"><div class="mon-num" id="ps3">—</div><div class="mon-lbl">Bancas</div></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-download"></i>Coletar Provas</div></div>
+    <div style="padding:14px">
+      <div class="form-row">
+        <div class="fg"><label>Banca</label><select id="pr-b"><option value="cebraspe">Cebraspe</option><option value="fcc">FCC</option><option value="fgv">FGV</option></select></div>
+        <div class="fg"><label>Ano (opcional)</label><input type="number" id="pr-a" placeholder="2024"></div>
+      </div>
+      <div class="act-row" style="padding:0;margin-top:8px;gap:7px">
+        <button class="ab green" onclick="coletarProva()"><i class="fas fa-play"></i> Coletar Banca</button>
+        <button class="ab" onclick="coletarTodasProvas()"><i class="fas fa-layer-group"></i> Coletar Todas</button>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-folder-open"></i>PDFs Coletados</div>
+      <button class="btn-xs" onclick="loadPDFs()"><i class="fas fa-sync"></i> Carregar</button></div>
+    <div id="pdfs-list" style="max-height:280px;overflow-y:auto"><div style="padding:14px;font-size:.8rem;color:#9ca3af">Clique em Carregar.</div></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-list-alt"></i>Listar Provas</div>
+      <button class="btn-xs" onclick="listarProvas()"><i class="fas fa-sync"></i> Carregar</button></div>
+    <div style="padding:14px">
+      <div class="sr" style="margin-bottom:10px">
+        <select id="lp-b"><option value="">Todas bancas</option><option value="cebraspe">Cebraspe</option><option value="fcc">FCC</option><option value="fgv">FGV</option></select>
+        <select id="lp-t"><option value="">Todos tipos</option><option value="prova">Prova</option><option value="gabarito">Gabarito</option></select>
+      </div>
+      <div id="provas-list"><div style="color:#9ca3af;font-size:.8rem">Clique em Carregar.</div></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-question-circle"></i>Perguntar sobre Provas</div></div>
+    <div style="padding:14px">
+      <div class="fg"><label>Pergunta</label><input type="text" id="pp-q" placeholder="Ex: Temas mais cobrados em 2023?" onkeydown="if(event.key==='Enter')pergProvas()"></div>
+      <div class="form-row">
+        <div class="fg"><label>Banca</label><select id="pp-b"><option value="">Todas</option><option value="cebraspe">Cebraspe</option><option value="fcc">FCC</option><option value="fgv">FGV</option></select></div>
+        <div class="fg"><label>Ano</label><input type="number" id="pp-a" placeholder="2024"></div>
+      </div>
+      <button class="full-btn" onclick="pergProvas()"><i class="fas fa-paper-plane"></i> Perguntar</button>
+      <div id="pp-r" class="result-box" style="display:none"></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SCRAPING -->
+<div class="tp" id="tab-scraping"><div class="scroll">
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-info-circle"></i>Status do Scraping</div>
+      <button class="btn-xs" onclick="loadScrStatus()"><i class="fas fa-sync"></i> Atualizar</button></div>
+    <div class="cards-grid" id="scr-st"><div class="ic"><p style="color:#9ca3af;font-size:.78rem">Clique em Atualizar</p></div></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-play-circle"></i>Coleta Manual</div></div>
+    <div class="act-row">
+      <button class="ab green" onclick="scrape('cebraspe')"><i class="fas fa-play"></i>Cebraspe</button>
+      <button class="ab green" onclick="scrape('fgv')"><i class="fas fa-play"></i>FGV</button>
+      <button class="ab green" onclick="scrape('fcc')"><i class="fas fa-play"></i>FCC</button>
+      <button class="ab" onclick="scrapeAll()"><i class="fas fa-layer-group"></i>Todas</button>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-database"></i>Coletar + Indexar</div></div>
+    <div style="padding:14px">
+      <div class="fg"><label>Banca</label><select id="ci-b"><option value="cebraspe">Cebraspe</option><option value="fcc">FCC</option><option value="fgv">FGV</option></select></div>
+      <div class="act-row" style="padding:0;margin-top:8px;gap:7px">
+        <button class="ab blue" onclick="coletarIndexar()"><i class="fas fa-database"></i>Coletar+Indexar</button>
+        <button class="ab" onclick="coletarIndexarTodas()"><i class="fas fa-layer-group"></i>Todas</button>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-spider"></i>PCI Avançado</div></div>
+    <div style="padding:14px">
+      <div class="fg"><label>Banca</label><select id="pci-b"><option value="cebraspe">Cebraspe</option><option value="fcc">FCC</option><option value="fgv">FGV</option></select></div>
+      <div class="act-row" style="padding:0;margin-top:8px;gap:7px">
+        <button class="ab" onclick="pciColetar()"><i class="fas fa-spider"></i>Coletar</button>
+        <button class="ab" onclick="pciColetarTodas()"><i class="fas fa-layer-group"></i>Todas</button>
+        <button class="ab blue" onclick="pciInfo()"><i class="fas fa-info"></i>Info</button>
+      </div>
+      <div id="pci-r" style="display:none;margin-top:8px" class="result-box"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-clock"></i>Agendador</div></div>
+    <div style="padding:14px">
+      <div class="form-row" style="margin-bottom:10px">
+        <div class="fg"><label>Tipo</label><select id="sch-t"><option value="diario">Diário</option><option value="semanal">Semanal</option></select></div>
+        <div class="fg"><label>Hora</label><input type="number" id="sch-h" value="6" min="0" max="23"></div>
+      </div>
+      <div class="act-row" style="padding:0;gap:7px">
+        <button class="ab green" onclick="agendar()"><i class="fas fa-clock"></i>Agendar</button>
+        <button class="ab red" onclick="pararScr()"><i class="fas fa-stop"></i>Parar</button>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-globe"></i>API Concursos Brasil</div></div>
+    <div style="padding:14px">
+      <div class="sr" style="margin-bottom:10px">
+        <select id="est-s"><option value="">Todos estados</option>
+          <option value="sp">SP</option><option value="rj">RJ</option><option value="mg">MG</option>
+          <option value="pr">PR</option><option value="rs">RS</option><option value="sc">SC</option>
+          <option value="ba">BA</option><option value="pe">PE</option><option value="df">DF</option>
+          <option value="go">GO</option><option value="ce">CE</option><option value="am">AM</option>
+        </select>
+        <button onclick="buscarApiBr()"><i class="fas fa-download"></i> Buscar</button>
+        <button class="ab" onclick="testeConn()"><i class="fas fa-wifi"></i> Testar</button>
+        <button class="ab green" onclick="coletaCompl()"><i class="fas fa-layer-group"></i> Coleta Completa</button>
+      </div>
+      <div id="apibr-r" style="font-size:.78rem"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-terminal"></i>Log</div>
+      <button class="btn-xs" onclick="G('logb').textContent='Limpo.'">Limpar</button></div>
+    <div class="logbox" id="logb">Aguardando ações...</div>
+  </div>
+</div></div>
+
+<!-- ADMIN -->
+<div class="tp" id="tab-admin"><div class="scroll">
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-chart-line"></i>Monitoramento</div>
+      <button class="btn-xs" onclick="loadMon()"><i class="fas fa-sync"></i> Atualizar</button></div>
+    <div class="mon-grid">
+      <div class="mon-card"><div class="mon-num" id="m1">—</div><div class="mon-lbl">Req. Totais</div></div>
+      <div class="mon-card"><div class="mon-num" id="m2">—</div><div class="mon-lbl">Req/Min</div></div>
+      <div class="mon-card"><div class="mon-num" id="m3">—</div><div class="mon-lbl">Uptime (s)</div></div>
+      <div class="mon-card"><div class="mon-num" id="m4">—</div><div class="mon-lbl">Erros</div></div>
+      <div class="mon-card"><div class="mon-num" id="m5">—</div><div class="mon-lbl">Buscas Semânticas</div></div>
+      <div class="mon-card"><div class="mon-num" id="m6">—</div><div class="mon-lbl">Cache Hits</div></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-heartbeat"></i>Saúde do Sistema</div>
+      <button class="btn-xs" onclick="loadHealth()"><i class="fas fa-sync"></i> Verificar</button></div>
+    <div id="health-c" class="cards-grid"><div class="ic"><p style="color:#9ca3af;font-size:.78rem">Clique em Verificar</p></div></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-tachometer-alt"></i>Métricas Detalhadas</div>
+      <button class="btn-xs" onclick="loadMetrics()"><i class="fas fa-sync"></i> Carregar</button></div>
+    <div id="met-b" class="result-box" style="display:none;margin:14px"></div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-bell"></i>Notificações</div>
+      <button class="btn-xs" onclick="loadNotifs()"><i class="fas fa-sync"></i> Carregar</button></div>
+    <div class="mon-grid">
+      <div class="mon-card"><div class="mon-num" id="ntf1">—</div><div class="mon-lbl">Total</div></div>
+      <div class="mon-card"><div class="mon-num" id="ntf2">—</div><div class="mon-lbl">Não Lidas</div></div>
+      <div class="mon-card"><div class="mon-num" id="ntf3">—</div><div class="mon-lbl">Críticas</div></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-download"></i>Coleta Avançada</div></div>
+    <div style="padding:14px">
+      <div class="form-row">
+        <div class="fg"><label>Banca</label><select id="adm-b"><option value="cebraspe">Cebraspe</option><option value="fcc">FCC</option><option value="fgv">FGV</option></select></div>
+        <div class="fg"><label>Máx. concursos</label><input type="number" id="adm-mx" value="10" min="1" max="100"></div>
+      </div>
+      <div class="act-row" style="padding:0;margin-top:8px;gap:7px">
+        <button class="ab green" onclick="admColetar()"><i class="fas fa-download"></i>Coletar</button>
+        <button class="ab" onclick="admBrApi()"><i class="fas fa-globe"></i>Brasil API</button>
+        <button class="ab blue" onclick="admPCI()"><i class="fas fa-spider"></i>PCI Avançado</button>
+        <button class="ab" onclick="admCompleta()"><i class="fas fa-layer-group"></i>Coleta Completa</button>
+      </div>
+      <div id="adm-r" class="result-box" style="display:none;margin-top:10px"></div>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-clock"></i>Agendador Admin</div></div>
+    <div style="padding:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="ab green" onclick="admSched('iniciar')"><i class="fas fa-play"></i>Iniciar</button>
+      <button class="ab red" onclick="admSched('parar')"><i class="fas fa-stop"></i>Parar</button>
+    </div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-list"></i>Fontes Disponíveis</div>
+      <button class="btn-xs" onclick="loadFontes()"><i class="fas fa-sync"></i> Carregar</button></div>
+    <div id="fontes-l" style="padding:14px;font-size:.8rem;color:#6b7280">—</div>
+  </div>
+  <div class="block">
+    <div class="bh"><div class="bh-left"><i class="fas fa-terminal"></i>Log Admin</div>
+      <button class="btn-xs" onclick="G('adm-log').textContent='Limpo.'">Limpar</button></div>
+    <div class="logbox" id="adm-log">Aguardando...</div>
+  </div>
+</div></div>
+
+</div></div><!-- /content /workspace -->
+<div class="toast" id="toast"></div>
+
+<script>
+const A='http://localhost:8000';
+const MODELS={
+  groq:[{v:'llama-3.3-70b-versatile',l:'Llama 3.3 70B'},{v:'llama-3.1-8b-instant',l:'Llama 3.1 8B'},{v:'mixtral-8x7b-32768',l:'Mixtral 8x7B'},{v:'gemma2-9b-it',l:'Gemma 2 9B'},{v:'deepseek-r1-distill-llama-70b',l:'DeepSeek R1 70B'}],
+  ollama:[{v:'llama3',l:'Llama 3'},{v:'mistral',l:'Mistral'},{v:'gemma',l:'Gemma'},{v:'phi3',l:'Phi-3'}],
+  openai:[{v:'gpt-4o',l:'GPT-4o'},{v:'gpt-4o-mini',l:'GPT-4o Mini'},{v:'gpt-3.5-turbo',l:'GPT-3.5'}],
+  backend:[{v:'llama-3.3-70b-versatile',l:'(usa chave do .env)'}]
+};
+const PROMPTS={
+  concursos:`Você é o ConcursAI, especialista em concursos públicos brasileiros. Use APENAS o contexto fornecido. Seja direto, cite dados específicos. Use markdown.`,
+  edital:`Você é especialista em análise de editais. Extraia: vagas, cargos, salários, requisitos, cronograma e conteúdo programático.`,
+  estudo:`Você é orientador de estudos para concursos. Crie planos personalizados, defina prioridades e sugira materiais. Seja prático e motivador.`,
+  banca:`Você é especialista nas bancas (Cebraspe, FCC, FGV, Vunesp). Analise estilos de prova, temas cobrados e estratégias.`,
+  custom:''
+};
+
+function go(n,b){document.querySelectorAll('.tp').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.tn').forEach(x=>x.classList.remove('active'));G('tab-'+n).classList.add('active');if(b)b.classList.add('active');}
+function qn(i){return document.querySelectorAll('.tn')[i];}
+function G(id){return document.getElementById(id);}
+function V(id,v){G(id).textContent=v;}
+function toast(msg,ok=true){const t=G('toast');t.textContent=msg;t.style.background=ok?'#059669':'#ef4444';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function log(msg,box='logb'){const el=G(box);if(!el)return;const ts=new Date().toLocaleTimeString('pt-BR');el.textContent+=`[${ts}] ${msg}\n`;el.scrollTop=el.scrollHeight;}
+async function api(m,p,b=null){const o={method:m,headers:{'Content-Type':'application/json'}};if(b)o.body=JSON.stringify(b);const r=await fetch(A+p,o);if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function show(id,txt){const el=G(id);el.style.display='block';el.classList.remove('loading');el.textContent=typeof txt==='object'?JSON.stringify(txt,null,2):txt;}
+function loading(id){const el=G(id);el.style.display='block';el.classList.add('loading');el.textContent='Processando...';}
+
+function onProv(){
+  const p=G('prov').value,s=G('msel');s.innerHTML='';
+  (MODELS[p]||[]).forEach(m=>{const o=document.createElement('option');o.value=m.v;o.textContent=m.l;s.appendChild(o);});
+  G('akey').placeholder=p==='groq'?'gsk_...':p==='openai'?'sk-...':p==='backend'?'(usa .env)':'(não necessário)';
+  updHint();
+}
+function updHint(){
+  const p=G('prov').value,m=G('msel').value,k=G('akey').value;
+  G('mhint').textContent=`${p} / ${m}`;G('b-prov').textContent=p;
+  G('b-key').innerHTML=k?'<span class="badge green">Configurada ✓</span>':'<span class="badge gray">Não configurada</span>';
+}
+function togKey(){const i=G('akey'),ic=G('eyi');i.type=i.type==='password'?'text':'password';ic.className=i.type==='password'?'fas fa-eye':'fas fa-eye-slash';updHint();}
+function onAgent(){const t=G('agtype').value;if(t!=='custom')setPr(t,null);}
+function setPr(k,el){G('sysp').value=PROMPTS[k]||'';document.querySelectorAll('#prchips .chip').forEach(c=>c.classList.remove('on'));if(el)el.classList.add('on');else document.querySelectorAll('#prchips .chip').forEach(c=>{if(c.getAttribute('onclick')&&c.getAttribute('onclick').includes(k))c.classList.add('on');});}
+function saveCfg(){localStorage.setItem('cai',JSON.stringify({prov:G('prov').value,model:G('msel').value,key:G('akey').value,temp:G('temp').value,tok:G('maxtok').value,ragk:G('ragk').value,prompt:G('sysp').value,agent:G('agtype').value,fcar:G('fcar').value}));const el=G('svmsg');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2000);}
+function loadCfg(){try{const c=JSON.parse(localStorage.getItem('cai')||'{}');if(c.prov){G('prov').value=c.prov;onProv();}if(c.model)G('msel').value=c.model;if(c.key)G('akey').value=c.key;if(c.temp){G('temp').value=c.temp;V('tv',c.temp);}if(c.tok){G('maxtok').value=c.tok;V('mtv',c.tok);}if(c.ragk){G('ragk').value=c.ragk;V('rkv',c.ragk);}if(c.prompt)G('sysp').value=c.prompt;if(c.agent)G('agtype').value=c.agent;if(c.fcar)G('fcar').value=c.fcar;}catch(e){}}
+
+async function loadStatus(){
+  try{const d=await api('GET','/status');G('s1').textContent=d.total_concursos||'67';G('s4').textContent='✅ Online';G('b-api').innerHTML='<span class="badge green">Online ✓</span>';G('b-rag').innerHTML='<span class="badge green">Ativo ✓</span>';G('adot').className='dot on';G('atxt').textContent='Online';}
+  catch(e){G('s4').textContent='❌ Offline';G('b-api').innerHTML='<span class="badge red">Offline</span>';G('adot').className='dot off';G('atxt').textContent='Offline';}
+  try{const d=await api('GET','/orgaos');G('s2').textContent=d.orgaos.length;['forg','qorg'].forEach(id=>{const s=G(id);s.innerHTML=id==='forg'?'<option value="">Todos</option>':'<option value="">Todos órgãos</option>';d.orgaos.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;s.appendChild(op);});});}catch(e){}
+  try{const d=await api('GET','/anos');G('s3').textContent=d.anos.length;['fano','qano'].forEach(id=>{const s=G(id);s.innerHTML=id==='fano'?'<option value="">Todos</option>':'<option value="">Todos anos</option>';d.anos.forEach(a=>{const op=document.createElement('option');op.value=a;op.textContent=a;s.appendChild(op);});});}catch(e){}
+  try{const d=await api('GET','/scraping/status');G('b-jobs').textContent=d.scheduler?.jobs_ativos||'0';G('b-scr').innerHTML=d.disponivel?'<span class="badge green">Ativo</span>':'<span class="badge gray">—</span>';}catch(e){}
+  try{const d=await api('GET','/api/monitoring/stats');G('b-req').textContent=d.total_requests||'0';G('b-hlt').innerHTML='<span class="badge green">OK</span>';}catch(e){}
+  try{const d=await api('GET','/api/notifications/stats');G('b-ntf').textContent=d.total||'0';G('b-nrd').textContent=d.nao_lidas||'0';}catch(e){}
+  updHint();
+}
+
+async function loadIAStatus(){
+  try{const d=await api('GET','/ia/status');const html=Object.entries(d).map(([k,v])=>`<div class="ic"><h4>${k}</h4><p>${typeof v==='object'?JSON.stringify(v):v}</p></div>`).join('');G('ia-sc').innerHTML=html||'<div class="ic"><p>Sem dados.</p></div>';}
+  catch(e){G('ia-sc').innerHTML='<div class="ic"><p class="badge red">Erro</p></div>';}
+}
+async function loadModels(){try{const d=await api('GET','/ia/modelos-disponiveis');G('mlist').innerHTML='<pre style="font-size:.75rem;white-space:pre-wrap">'+JSON.stringify(d,null,2)+'</pre>';}catch(e){G('mlist').textContent='Erro: '+e.message;}}
+async function definirModelo(){const m=G('dm-m').value.trim(),t=parseFloat(G('dm-t').value);if(!m){toast('Digite o modelo',false);return;}loading('dm-r');try{const d=await api('POST','/ia/definir-modelo',{model:m,temperatura:t});show('dm-r',d.message||JSON.stringify(d));toast('Modelo definido!');}catch(e){show('dm-r','Erro: '+e.message);toast(e.message,false);}}
+
+async function analisarEdital(){const tx=G('ae-tx').value.trim();if(!tx){toast('Cole o texto',false);return;}loading('ae-r');try{const d=await api('POST','/ia/analisar-edital',{texto_edital:tx,tipo_analise:G('ae-tp').value,cargo_alvo:G('ae-cg').value||null});show('ae-r',d.analise||d.resultado||JSON.stringify(d));toast('Análise concluída!');}catch(e){show('ae-r','Erro: '+e.message);toast(e.message,false);}}
+async function explicarSecao(){const tx=G('es-tx').value.trim();if(!tx){toast('Cole a seção',false);return;}loading('es-r');try{const d=await api('POST','/ia/explicar-secao',{secao:tx,nivel_detalhe:G('es-nv').value,publico_alvo:G('es-pb').value});show('es-r',d.explicacao||d.resultado||JSON.stringify(d));toast('Seção explicada!');}catch(e){show('es-r','Erro: '+e.message);toast(e.message,false);}}
+async function dicasEstudo(){const cn=G('de-cn').value.trim();if(!cn){toast('Informe o concurso',false);return;}loading('de-r');try{const d=await api('POST','/ia/dicas-estudo',{concurso:cn,cargo:G('de-cg').value||null,nivel:G('de-nv').value,tempo_disponivel_meses:parseInt(G('de-tm').value),materias_prioritarias:G('de-mt').value||null});show('de-r',d.dicas||d.resultado||JSON.stringify(d));toast('Dicas geradas!');}catch(e){show('de-r','Erro: '+e.message);toast(e.message,false);}}
+async function compararEditais(){const e1=G('ce-e1').value.trim(),e2=G('ce-e2').value.trim();if(!e1||!e2){toast('Cole os dois editais',false);return;}const asp=[...document.querySelectorAll('#ce-chips .chip.on')].map(c=>c.dataset.v);loading('ce-r');try{const d=await api('POST','/ia/comparar-editais',{edital1:e1,edital2:e2,aspectos_comparacao:asp});show('ce-r',d.comparacao||d.resultado||JSON.stringify(d));toast('Comparação concluída!');}catch(e){show('ce-r','Erro: '+e.message);toast(e.message,false);}}
+document.querySelectorAll('#ce-chips .chip').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('on')));
+
+async function uploadPDF(evt){const f=evt.target.files[0];if(!f)return;G('up-st').style.display='block';G('up-st').classList.add('loading');G('up-st').textContent='Enviando...';const fd=new FormData();fd.append('file',f);try{const r=await fetch(A+'/chat/upload-edital',{method:'POST',body:fd});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();G('up-st').classList.remove('loading');G('up-st').textContent=`✅ ID: ${d.edital_id||'—'}\n${JSON.stringify(d,null,2)}`;if(d.edital_id){G('ed-id').value=d.edital_id;G('res-id').value=d.edital_id;}toast('PDF enviado!');loadEditais();}catch(e){G('up-st').classList.remove('loading');G('up-st').textContent='Erro: '+e.message;toast(e.message,false);}}
+function dropPDF(e){e.preventDefault();G('uparea').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)uploadPDF({target:{files:[f]}});}
+async function loadEditais(){try{const d=await api('GET','/chat/editais-carregados');if(!d.length){G('editais-list').innerHTML='<p style="font-size:.78rem;color:#9ca3af">Nenhum edital.</p>';return;}G('editais-list').innerHTML=d.map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #f9fafb"><div><strong style="font-size:.8rem">${e.nome||e.edital_id}</strong><br><span style="font-size:.72rem;color:#9ca3af">${e.edital_id}</span></div><button class="cc-btn" onclick="G('ed-id').value='${e.edital_id}';G('res-id').value='${e.edital_id}'">Selecionar</button></div>`).join('');}catch(e){G('editais-list').innerHTML='<p style="font-size:.78rem;color:#ef4444">Erro: '+e.message+'</p>';}}
+async function convEdital(){const pid=G('ed-id').value.trim(),uid=G('ed-uid').value||'user1',q=G('ed-q').value.trim();if(!pid||!q){toast('Informe ID e pergunta',false);return;}const box=G('edchat');box.innerHTML+=`<div style="text-align:right;margin-bottom:5px"><strong>Você:</strong> ${q}</div>`;G('ed-q').value='';box.innerHTML+='<div id="ecl" style="color:#9ca3af;font-style:italic">Pensando...</div>';box.scrollTop=box.scrollHeight;try{const d=await api('POST','/chat/conversar-edital',{edital_id:pid,pergunta:q,user_id:uid});G('ecl').outerHTML=`<div style="margin-bottom:8px"><strong>IA:</strong> ${(d.resposta||JSON.stringify(d)).replace(/\n/g,'<br>')}</div>`;box.scrollTop=box.scrollHeight;}catch(e){G('ecl').outerHTML=`<div style="color:#ef4444">Erro: ${e.message}</div>`;}}
+async function resumoEdital(){const id=G('res-id').value.trim();if(!id){toast('Informe o ID',false);return;}loading('res-r');try{const d=await api('GET',`/chat/edital/${id}/resumo`);show('res-r',d.resumo||JSON.stringify(d));}catch(e){show('res-r','Erro: '+e.message);}}
+async function loadHist(){const uid=G('hist-uid').value||'user1';try{const d=await api('GET',`/chat/historico/${uid}`);G('hist-list').innerHTML=!d.length?'<p style="font-size:.78rem;color:#9ca3af">Sem histórico.</p>':d.map(m=>`<div style="font-size:.75rem;padding:4px 0;border-bottom:1px solid #f9fafb"><strong>[${m.role}]</strong> ${(m.content||'').substring(0,100)}</div>`).join('');}catch(e){G('hist-list').innerHTML='<p style="font-size:.78rem;color:#ef4444">Erro: '+e.message+'</p>';}}
+async function delHist(){const uid=G('hist-uid').value||'user1';try{await fetch(A+`/chat/historico/${uid}`,{method:'DELETE'});toast('Histórico limpo!');G('hist-list').innerHTML='';}catch(e){toast(e.message,false);}}
+async function analisarPDF(){const f=G('pdf-f').files[0],q=G('pdf-q').value.trim();if(!f){toast('Selecione PDF',false);return;}loading('pdf-r');try{const fd=new FormData();fd.append('file',f);if(q)fd.append('pergunta',q);const r=await fetch(A+'/chat/analisar-pdf',{method:'POST',body:fd});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();show('pdf-r',d.analise||d.resultado||JSON.stringify(d));toast('PDF analisado!');}catch(e){show('pdf-r','Erro: '+e.message);toast(e.message,false);}}
+
+async function loadProvasStats(){try{const d=await api('GET','/scraping/provas/estatisticas');G('ps1').textContent=d.total_provas||d.provas||'—';G('ps2').textContent=d.total_gabaritos||d.gabaritos||'—';G('ps3').textContent=d.bancas||'—';}catch(e){G('ps1').textContent='Erro';}}
+async function coletarProva(){const b=G('pr-b').value,a=G('pr-a').value;log(`Coletando provas ${b}${a?' '+a:''}...`);try{const body={banca:b};if(a)body.ano=parseInt(a);const d=await api('POST','/scraping/provas/coletar',body);log(d.message||'Iniciado.');toast('Coleta iniciada!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function coletarTodasProvas(){log('Coletando provas de todas...');try{const d=await api('POST','/scraping/provas/coletar-todas');log(d.message||'Iniciado.');toast('Coleta iniciada!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function loadPDFs(){try{const d=await api('GET','/scraping/pdfs');const list=d.pdfs||d||[];if(!list.length){G('pdfs-list').innerHTML='<div style="padding:14px;font-size:.8rem;color:#9ca3af">Nenhum PDF.</div>';return;}G('pdfs-list').innerHTML=list.slice(0,30).map(p=>`<div class="prova-row"><div class="prova-icon"><i class="fas fa-file-pdf"></i></div><div class="prova-info"><div class="prova-title">${p.nome||p.filename||p}</div><div class="prova-meta">${p.banca||''} ${p.ano||''}</div></div></div>`).join('');}catch(e){G('pdfs-list').innerHTML='<div style="padding:14px;font-size:.78rem;color:#ef4444">Erro: '+e.message+'</div>';}}
+async function listarProvas(){const b=G('lp-b').value,t=G('lp-t').value;let url='/scraping/provas/listar?';if(b)url+=`banca=${b}&`;if(t)url+=`tipo=${t}&`;try{const d=await api('GET',url);const list=d.provas||d||[];if(!list.length){G('provas-list').innerHTML='<p style="font-size:.78rem;color:#9ca3af">Nenhuma prova.</p>';return;}G('provas-list').innerHTML=list.slice(0,20).map(p=>`<div class="prova-row"><div class="prova-icon"><i class="fas fa-${p.tipo==='gabarito'?'check-square':'file-alt'}"></i></div><div class="prova-info"><div class="prova-title">${p.titulo||p.nome||'Prova'}</div><div class="prova-meta">${p.banca||''} — ${p.ano||''} — ${p.tipo||''}</div></div></div>`).join('');}catch(e){G('provas-list').innerHTML='<p style="font-size:.78rem;color:#ef4444">Erro: '+e.message+'</p>';}}
+async function pergProvas(){const q=G('pp-q').value.trim();if(!q){toast('Digite uma pergunta',false);return;}loading('pp-r');try{const body={pergunta:q};const b=G('pp-b').value,a=G('pp-a').value;if(b)body.banca=b;if(a)body.ano=parseInt(a);const d=await api('POST','/chat/perguntar-provas',body);show('pp-r',d.resposta||d.resultado||JSON.stringify(d));toast('Resposta gerada!');}catch(e){show('pp-r','Erro: '+e.message);toast(e.message,false);}}
+
+async function loadScrStatus(){try{const d=await api('GET','/scraping/status');G('scr-st').innerHTML=`<div class="ic"><h4><i class="fas fa-clock"></i>Agendador</h4><p>Jobs: <strong>${d.scheduler?.jobs_ativos||'0'}</strong></p><p>Status: <span class="badge ${d.scheduler?.ativo?'green':'gray'}">${d.scheduler?.ativo?'Ativo':'Inativo'}</span></p></div><div class="ic"><h4><i class="fas fa-chart-bar"></i>Estatísticas</h4><p>Total: <strong>${d.estatisticas?.total_coletados||'0'}</strong></p><p>Última: <strong>${d.estatisticas?.ultima_coleta||'Nunca'}</strong></p></div><div class="ic"><h4><i class="fas fa-plug"></i>Disponível</h4><p><span class="badge ${d.disponivel?'green':'gray'}">${d.disponivel?'Sim':'Não'}</span></p></div>`;}catch(e){G('scr-st').innerHTML='<div class="ic"><p class="badge red">Erro</p></div>';}}
+async function scrape(b){log(`Coletando: ${b.toUpperCase()}...`);try{const d=await api('POST','/scraping/coletar',{banca:b,max_concursos:5});log(d.message||`${b} iniciado.`);toast('Coleta iniciada!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function scrapeAll(){log('Coletando todas...');try{const d=await api('POST','/scraping/coletar-todas');log(d.message||'Geral iniciada.');toast('Coleta geral iniciada!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function coletarIndexar(){const b=G('ci-b').value;log(`Coletar+Indexar: ${b}...`);try{const d=await api('POST','/scraping/coletar-indexar',{banca:b});log(d.message||'Concluído.');toast('Concluído!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function coletarIndexarTodas(){log('Coletar+Indexar todas...');try{const d=await api('POST','/scraping/coletar-indexar-todas');log(d.message||'Concluído.');toast('Concluído!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function pciColetar(){const b=G('pci-b').value;log(`PCI: ${b}...`);try{const d=await api('POST','/scraping/pci/coletar',{banca:b});log(d.message||'PCI concluído.');toast('PCI concluído!');}catch(e){log('Erro PCI: '+e.message);toast(e.message,false);}}
+async function pciColetarTodas(){log('PCI todas...');try{const d=await api('POST','/scraping/pci/coletar-todas');log(d.message||'PCI geral.');toast('PCI geral!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function pciInfo(){try{const d=await api('GET','/scraping/pci/info');G('pci-r').style.display='block';G('pci-r').textContent=JSON.stringify(d,null,2);}catch(e){toast(e.message,false);}}
+async function agendar(){const t=G('sch-t').value,h=parseInt(G('sch-h').value);log(`Agendando ${t} às ${h}:00...`);try{const d=await api('POST','/scraping/agendar',{tipo:t,hora:h,minuto:0});log(d.message||'Agendado.');toast('Agendado!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function pararScr(){log('Parando...');try{const d=await api('POST','/scraping/parar');log(d.message||'Parado.');toast('Parado!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function buscarApiBr(){const est=G('est-s').value,url=est?`/api-brasil/concursos/${est}`:'/api-brasil/concursos';log(`API Brasil ${est||'todos'}...`);try{const d=await api('GET',url);const list=Array.isArray(d)?d:d.concursos||[];log(`${list.length} concursos.`);G('apibr-r').innerHTML=list.slice(0,6).map(c=>`<div style="border:1px solid #f3f4f6;border-radius:7px;padding:9px;margin-bottom:7px;font-size:.76rem"><strong>${c.titulo||'Concurso'}</strong><br><span style="color:#6b7280">${c.orgao||''} — ${c.estado||''} — ${c.vagas||''} vagas</span></div>`).join('')||'<p style="color:#9ca3af;font-size:.78rem">Sem resultados.</p>';}catch(e){log('Erro: '+e.message);G('apibr-r').innerHTML='<p style="color:#ef4444;font-size:.76rem">Erro: '+e.message+'</p>';}}
+async function testeConn(){log('Testando conectividade...');try{const d=await api('GET','/api-brasil/teste-conectividade');log(JSON.stringify(d));toast('Conectividade OK!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+async function coletaCompl(){log('Coleta completa API Brasil...');try{const d=await api('POST','/api-brasil/coleta-completa');log(d.message||'Iniciada.');toast('Coleta iniciada!');}catch(e){log('Erro: '+e.message);toast(e.message,false);}}
+
+async function loadMon(){try{const d=await api('GET','/api/monitoring/stats');G('m1').textContent=d.total_requests||'0';G('m2').textContent=d.requests_per_minute||'0';G('m3').textContent=d.uptime_seconds?Math.floor(d.uptime_seconds):'—';G('m4').textContent=d.total_errors||'0';G('m5').textContent=d.semantic_searches||'0';G('m6').textContent=d.cache_hits||'0';}catch(e){toast('Monitoramento: '+e.message,false);}}
+async function loadHealth(){try{const d=await api('GET','/api/monitoring/health');const keys=Object.keys(d).filter(k=>k!=='status'&&k!=='timestamp');G('health-c').innerHTML=keys.map(k=>`<div class="ic"><h4>${k}</h4><p><span class="badge ${d[k]?.status==='ok'||d[k]===true?'green':'red'}">${d[k]?.status||JSON.stringify(d[k])}</span></p>${d[k]?.message?`<p>${d[k].message}</p>`:''}</div>`).join('')||'<div class="ic"><p style="color:#9ca3af">Sem dados.</p></div>';}catch(e){G('health-c').innerHTML='<div class="ic"><p class="badge red">Erro</p></div>';}}
+async function loadMetrics(){try{const d=await api('GET','/api/monitoring/metrics');G('met-b').style.display='block';G('met-b').textContent=JSON.stringify(d,null,2);}catch(e){toast(e.message,false);}}
+async function loadNotifs(){try{const d=await api('GET','/api/notifications/stats');G('ntf1').textContent=d.total||'0';G('ntf2').textContent=d.nao_lidas||'0';G('ntf3').textContent=d.criticas||'0';}catch(e){toast(e.message,false);}}
+async function admColetar(){const b=G('adm-b').value,mx=parseInt(G('adm-mx').value)||10;loading('adm-r');log('Admin coleta...','adm-log');try{const d=await api('POST','/admin/coletar',{banca:b,max_concursos:mx});show('adm-r',d.message||JSON.stringify(d));log(d.message||'Concluído.','adm-log');toast('Iniciado!');}catch(e){show('adm-r','Erro: '+e.message);log('Erro: '+e.message,'adm-log');toast(e.message,false);}}
+async function admBrApi(){loading('adm-r');log('Admin Brasil API...','adm-log');try{const d=await api('POST','/admin/coletar/brasil-api');show('adm-r',JSON.stringify(d,null,2));log(d.message||'OK.','adm-log');toast('Brasil API OK!');}catch(e){show('adm-r','Erro: '+e.message);log('Erro: '+e.message,'adm-log');toast(e.message,false);}}
+async function admPCI(){loading('adm-r');log('Admin PCI avançado...','adm-log');try{const d=await api('POST','/admin/coletar/pci-avancado');show('adm-r',JSON.stringify(d,null,2));log(d.message||'OK.','adm-log');toast('PCI OK!');}catch(e){show('adm-r','Erro: '+e.message);toast(e.message,false);}}
+async function admCompleta(){loading('adm-r');log('Admin coleta melhorada...','adm-log');try{const d=await api('POST','/admin/coletar/completa-melhorada');show('adm-r',JSON.stringify(d,null,2));log(d.message||'OK.','adm-log');toast('Coleta completa!');}catch(e){show('adm-r','Erro: '+e.message);toast(e.message,false);}}
+async function admSched(a){log(`Admin ${a} agendador...`,'adm-log');try{const d=await api('POST',`/admin/agendador/${a}`);log(d.message||'OK.','adm-log');toast(`Agendador ${a}!`);}catch(e){log('Erro: '+e.message,'adm-log');toast(e.message,false);}}
+async function loadFontes(){try{const d=await api('GET','/admin/fontes-disponiveis');G('fontes-l').innerHTML='<pre style="font-size:.75rem;white-space:pre-wrap">'+JSON.stringify(d,null,2)+'</pre>';}catch(e){G('fontes-l').textContent='Erro: '+e.message;}}
+
+async function bConc(){const q=G('qb').value.trim(),org=G('qorg').value,ano=G('qano').value,cg=G('qcargo').value.trim();G('cgrid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px;color:#9ca3af"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;display:block;margin-bottom:8px"></i>Buscando...</div>';try{let url=`/concursos?limit=50`;if(org)url+=`&orgao=${encodeURIComponent(org)}`;if(ano)url+=`&ano=${ano}`;if(cg)url+=`&cargo=${encodeURIComponent(cg)}`;let data=await api('GET',url);if(q)data=data.filter(c=>(c.titulo||'').toLowerCase().includes(q.toLowerCase())||(c.orgao||'').toLowerCase().includes(q.toLowerCase()));if(!data.length){G('cgrid').innerHTML='<div style="grid-column:1/-1;text-align:center;padding:50px;color:#9ca3af">Nenhum resultado.</div>';return;}G('cgrid').innerHTML=data.map(c=>`<div class="cc"><div class="cc-title">${c.titulo||'Concurso'}</div><div class="cc-meta"><span class="cc-tag">${c.orgao||'—'}</span><span class="cc-tag">${c.ano||'—'}</span>${c.cargo?`<span class="cc-tag">${c.cargo}</span>`:''}</div><div class="cc-body">${c.conteudo||'Sem descrição.'}</div><button class="cc-btn" onclick="chatSobre('${(c.titulo||'').replace(/'/g,"\\'")}')"><i class="fas fa-comments"></i> Chat</button></div>`).join('');}catch(e){G('cgrid').innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:50px;color:#ef4444">Erro: ${e.message}</div>`;}}
+function chatSobre(t){G('ci').value=`Me conte mais sobre o concurso: ${t}`;go('chat',qn(1));send();}
+
+function ar(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+function hkey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
+function usex(t){G('ci').value=t;go('chat',qn(1));send();}
+function addMsg(txt,role){G('echst')?.remove();const c=G('cmsg');const d=document.createElement('div');d.className=`msg ${role}`;d.innerHTML=`<div class="av ${role==='user'?'user':'ai'}">${role==='user'?'Eu':'AI'}</div><div class="bubble">${txt.replace(/\n/g,'<br>')}</div>`;c.appendChild(d);c.scrollTop=c.scrollHeight;return d.querySelector('.bubble');}
+async function send(){const inp=G('ci'),msg=inp.value.trim();if(!msg)return;inp.value='';inp.style.height='auto';G('sbtn').disabled=true;addMsg(msg,'user');const b=addMsg('Pensando...','ai');b.classList.add('thinking');try{const pv=G('prov').value,m=G('msel').value,k=G('akey').value.trim(),sys=G('sysp').value,org=G('forg').value,ano=G('fano').value,cg=G('fcar').value;const rd=await api('POST','/buscar',{pergunta:msg,filtro_orgao:org||null,filtro_ano:ano||null,filtro_cargo:cg||null});let resp=rd.resposta||'Sem resposta.';if(k&&pv==='groq')resp=await callGroq(msg,resp,k,m,sys);else if(k&&pv==='openai')resp=await callOAI(msg,resp,k,m,sys);b.classList.remove('thinking');b.innerHTML=resp.replace(/\n/g,'<br>');}catch(e){b.classList.remove('thinking');b.innerHTML=`<span style="color:#ef4444">Erro: ${e.message}</span>`;}G('sbtn').disabled=false;G('ci').focus();}
+async function callGroq(q,ctx,key,model,sys){const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model,messages:[{role:'system',content:sys||PROMPTS.concursos},{role:'user',content:`CONTEXTO:\n${ctx}\n\nPERGUNTA: ${q}`}],temperature:parseFloat(G('temp').value),max_tokens:parseInt(G('maxtok').value)})});if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Erro Groq');}return (await r.json()).choices[0].message.content;}
+async function callOAI(q,ctx,key,model,sys){const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},body:JSON.stringify({model,messages:[{role:'system',content:sys||PROMPTS.concursos},{role:'user',content:`CONTEXTO:\n${ctx}\n\nPERGUNTA: ${q}`}],temperature:parseFloat(G('temp').value),max_tokens:parseInt(G('maxtok').value)})});if(!r.ok){const e=await r.json();throw new Error(e.error?.message||'Erro OpenAI');}return (await r.json()).choices[0].message.content;}
+
+document.addEventListener('DOMContentLoaded',()=>{onProv();G('sysp').value=PROMPTS.concursos;loadCfg();loadStatus();setInterval(()=>{if(G('tab-dashboard').classList.contains('active'))loadStatus();},60000);});
+</script>
+</body>
+</html>

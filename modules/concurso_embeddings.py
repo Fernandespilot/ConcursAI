@@ -3,7 +3,6 @@
 """Módulo de embeddings para o sistema ConcursAI"""
 
 import chromadb
-from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 import pandas as pd
 import os
@@ -70,7 +69,7 @@ def get_embedder():
 print("🔄 Inicializando banco de dados ChromaDB...")
 try:
     os.makedirs("db_concursos", exist_ok=True)
-    chroma_client = chromadb.Client(Settings(persist_directory="db_concursos"))
+    chroma_client = chromadb.PersistentClient(path="db_concursos")
     collection = chroma_client.get_or_create_collection(name="concursos_publicos")
     print("✅ ChromaDB inicializado")
 except Exception as e:

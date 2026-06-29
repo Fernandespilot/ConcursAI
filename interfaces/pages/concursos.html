@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Concursos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">search</span> Explorar Concursos</div>
+      <div class="flex items-center gap-1">
+        <a href="/pages/chat" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">smart_toy</span> Chat IA</a>
+        <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+
+        <!-- Stat cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">folder_open</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight" id="st-total">—</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Concursos Indexados</p>
+          </div>
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600"><span class="material-symbols-outlined text-[18px]">check_circle</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight" id="st-abertos">—</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Resultados Atuais</p>
+          </div>
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">apartment</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight" id="st-bancas">—</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Bancas</p>
+          </div>
+          <div class="bg-surface border border-line p-5 rounded-lg">
+            <div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600"><span class="material-symbols-outlined text-[18px]">database</span></div></div>
+            <h3 class="text-2xl font-bold tracking-tight">RAG</h3>
+            <p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Busca Semântica</p>
+          </div>
+        </section>
+
+        <!-- Search bar -->
+        <section class="bg-surface border border-line rounded-xl p-5 space-y-4">
+          <div class="flex gap-2">
+            <div class="flex-1 relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-ink-4 text-[20px]">search</span>
+              <input id="q" type="text" placeholder="Busca por cargo, órgão, área..." class="w-full bg-surface border border-line rounded-lg pl-10 pr-3 py-2.5 text-[14px] focus:ring-1 focus:ring-primary focus:border-primary outline-none" onkeydown="if(event.key==='Enter')buscar()"/>
+            </div>
+            <button onclick="buscar()" class="bg-primary text-white px-5 py-2.5 rounded-lg text-[14px] font-medium flex items-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">filter_list</span> Filtrar</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="space-y-1"><label class="text-[11px] font-medium text-ink-3">Área</label><input id="f-area" type="text" placeholder="Ex: TI, Direito, Saúde" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+            <div class="space-y-1"><label class="text-[11px] font-medium text-ink-3">Status</label><select id="f-status" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="">Todos</option><option value="aberto">Aberto</option><option value="previsto">Previsto</option><option value="encerrado">Encerrado</option></select></div>
+            <div class="space-y-1"><label class="text-[11px] font-medium text-ink-3">Resultados</label><select id="f-limit" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="10">10</option><option value="20" selected>20</option><option value="50">50</option></select></div>
+          </div>
+        </section>
+
+        <div class="flex items-center justify-between">
+          <p id="info-bar" class="text-[13px] text-ink-3"></p>
+          <button onclick="clearFilters()" class="text-[12px] text-ink-4 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">refresh</span> Limpar</button>
+        </div>
+
+        <!-- Results -->
+        <section id="results" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:8000';
+let _lastResults=[];
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+function statusBadge(s){
+  s=(s||'').toLowerCase();
+  if(s.includes('abert'))return '<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Aberto</span>';
+  if(s.includes('prev'))return '<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full uppercase">Previsto</span>';
+  if(s.includes('encerr')||s.includes('final'))return '<span class="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded-full uppercase">Encerrado</span>';
+  return '<span class="text-[10px] font-bold text-ink-3 bg-canvas px-2 py-0.5 rounded-full uppercase">'+esc(s||'N/D')+'</span>';
+}
+function renderCard(c,i){
+  const titulo=c.titulo||c.title||c.orgao||'Concurso';
+  const orgao=c.orgao||c.fonte||'';
+  const cargo=c.cargo||c.area||'';
+  const tipo=c.tipo_documento||'edital';
+  return `<div class="bg-surface border border-line rounded-xl p-5 hover:shadow-md hover:border-primary/40 transition-all flex flex-col gap-3">
+    <div class="flex justify-between items-start gap-2">
+      <span class="text-[11px] font-semibold text-ink-4 uppercase tracking-wide truncate">${esc(orgao||'Concurso')}</span>
+      <span class="text-[10px] font-bold text-primary bg-primary-light px-2 py-0.5 rounded-full uppercase shrink-0">${esc(tipo)}</span>
+    </div>
+    <div>
+      <h3 class="text-[15px] font-semibold text-ink leading-snug line-clamp-2">${esc(titulo)}</h3>
+      ${cargo?`<p class="text-[12px] text-ink-3 mt-1 line-clamp-1">${esc(cargo)}</p>`:''}
+    </div>
+    <div class="flex items-center justify-between pt-3 border-t border-line mt-auto">
+      <span class="text-[11px] text-ink-4">${esc(c.ano||'')}</span>
+      <button onclick="askChat(${i})" class="text-[12px] font-medium text-primary hover:text-primary-dark flex items-center gap-1">Perguntar à IA <span class="material-symbols-outlined text-[15px]">arrow_forward</span></button>
+    </div>
+  </div>`;
+}
+async function buscar(){
+  const q=G('q').value.trim().toLowerCase(),area=G('f-area').value.trim(),limit=G('f-limit').value;
+  const res=G('results'),info=G('info-bar');
+  res.innerHTML='<div class="col-span-full text-center py-10 text-ink-4"><span class="spin material-symbols-outlined">progress_activity</span><p class="mt-2 text-[13px]">Buscando...</p></div>';
+  info.textContent='';
+  try{
+    const params=new URLSearchParams({limit:Math.max(parseInt(limit)*3,60)});
+    if(area)params.set('cargo',area);
+    const r=await fetch(API+'/concursos?'+params,{signal:AbortSignal.timeout(15000)});
+    let arr=await r.json();
+    if(!Array.isArray(arr))arr=[];
+    if(q)arr=arr.filter(c=>[c.titulo,c.orgao,c.cargo,c.fonte].some(v=>String(v||'').toLowerCase().includes(q)));
+    _lastResults=arr.slice(0,parseInt(limit));
+    info.textContent=`${_lastResults.length} resultado(s)${q?' para "'+G('q').value.trim()+'"':''}`;
+    G('st-abertos').textContent=_lastResults.length;
+    res.innerHTML=_lastResults.length?_lastResults.map((c,i)=>renderCard(c,i)).join(''):'<div class="col-span-full text-center py-10 text-ink-4"><span class="material-symbols-outlined text-[32px] opacity-40">search_off</span><p class="mt-2 text-[13px]">Nenhum concurso encontrado.</p></div>';
+  }catch(e){
+    res.innerHTML='<div class="col-span-full text-center py-10 text-red-500 text-[13px]">Erro ao buscar: '+esc(e.message)+'</div>';
+  }
+}
+function clearFilters(){G('q').value='';G('f-area').value='';G('f-status').value='';G('f-limit').value='20';buscar();}
+function askChat(i){const c=_lastResults[i];if(!c)return;location.href='/pages/chat?q='+encodeURIComponent('Me fale sobre o concurso: '+(c.titulo||c.orgao||''));}
+async function loadStats(){
+  try{const r=await fetch(API+'/stats/overview',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    G('st-total').textContent=d.total_concursos??'67';
+    G('st-bancas').textContent=d.bancas_registered??'15';
+  }catch(e){G('st-total').textContent='67';G('st-bancas').textContent='15';}
+}
+checkAPI();loadStats();
+const pq=new URLSearchParams(location.search).get('q');
+if(pq){G('q').value=pq;}
+buscar();
+</script>
+</body></html>

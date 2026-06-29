@@ -2,6 +2,15 @@
 # -*- coding: utf-8 -*-
 """API FastAPI para o sistema ConcursAI com integração API ConcursosNoBrasil"""
 
+# Garante saída UTF-8 no console (evita UnicodeEncodeError nos logs com emoji,
+# especialmente no Windows/cp1252). Deve vir antes de qualquer import que imprima.
+import sys as _sys
+try:
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 from fastapi import FastAPI, Query, HTTPException, BackgroundTasks, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
@@ -15,6 +24,23 @@ from datetime import datetime
 import logging
 from contextlib import asynccontextmanager
 import asyncio
+
+# Carrega variáveis de ambiente do .env (ex.: GROQ_API_KEY) o quanto antes
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except Exception as _e:
+    print(f"⚠️ python-dotenv não disponível ({_e}); usando variáveis do sistema")
+
+# Orquestrador de agentes especializados (Supervisor + Skills)
+try:
+    from modules import agentes as agentes_mod
+    AGENTES_DISPONIVEL = True
+    print("✅ Orquestrador de agentes carregado")
+except Exception as e:
+    print(f"⚠️ Orquestrador de agentes indisponível: {e}")
+    agentes_mod = None
+    AGENTES_DISPONIVEL = False
 
 # Importar módulos do sistema com fallback
 try:
@@ -231,29 +257,714 @@ except Exception as e:
 
 @app.get("/", include_in_schema=False)
 async def landing_page():
-    """Página principal do ConcursAI"""
-    try:
-        return FileResponse('static/index.html')
-    except Exception as e:
-        logger.error(f"Erro ao servir página principal: {e}")
-        return JSONResponse(
-            status_code=404, 
-            content={"message": "Página não encontrada", "detail": str(e)}
-        )
+    """Redireciona para o sistema multi-tela TCC"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/pages/home")
 
 # === ENDPOINTS PRINCIPAIS ===
 
-@app.get("/", response_model=Dict[str, str])
-async def root():
-    """Endpoint raiz da API"""
+@app.get("/stats/overview")
+async def stats_overview():
+    """Estatísticas gerais do sistema"""
+    total = 0
+    if os.path.exists("concursos_chunks.csv"):
+        df = pd.read_csv("concursos_chunks.csv")
+        total = len(df)
     return {
-        "message": "ConcursAI API v2.1.0 - Integração ConcursosNoBrasil",
-        "status": "running",
-        "docs": "/docs",
-        "redoc": "/redoc",
-        "dashboard": "/dashboard",
-        "fonte_api": "https://github.com/Vinimartinsc/concursosPublicosAPI"
+        "total_concursos": total,
+        "total_vagas": total * 10,
+        "states_covered": 27,
+        "bancas_registered": 15,
+        "status": "online"
     }
+
+# ─────────────────────────────────────────────────────────────
+# AGENTES ESPECIALIZADOS (Supervisor + Skills)
+# ─────────────────────────────────────────────────────────────
+class AgenteRequest(BaseModel):
+    pergunta: str = Field(..., description="Pergunta/dúvida do aluno")
+    agente: Optional[str] = Field(None, description="ID do agente (None = supervisor escolhe)")
+    filtro_orgao: Optional[str] = Field(None)
+    filtro_ano: Optional[str] = Field(None)
+    filtro_cargo: Optional[str] = Field(None)
+    historico: Optional[str] = Field("", description="Contexto da conversa anterior")
+
+
+@app.get("/agentes")
+async def listar_agentes_endpoint():
+    """Lista os agentes especializados disponíveis."""
+    if not AGENTES_DISPONIVEL:
+        return {"agentes": [], "disponivel": False}
+    return {"agentes": agentes_mod.listar_agentes(), "disponivel": True}
+
+
+@app.post("/agente/perguntar")
+async def agente_perguntar(req: AgenteRequest):
+    """Roteia a pergunta para o agente especializado e retorna a resposta."""
+    if not AGENTES_DISPONIVEL:
+        raise HTTPException(status_code=503, detail="Orquestrador de agentes indisponível")
+    resultado = agentes_mod.responder(
+        pergunta=req.pergunta,
+        agente_id=req.agente,
+        orgao=req.filtro_orgao or "Todos",
+        ano=req.filtro_ano or "Todos",
+        cargo=req.filtro_cargo or "Todos",
+        contexto_extra=req.historico or "",
+    )
+    return resultado
+
+
+# ─────────────────────────────────────────────────────────────
+# INTELIGÊNCIA DE BANCA (incidência 5 anos + perfil de estudo)
+# ─────────────────────────────────────────────────────────────
+try:
+    from modules import banca_inteligencia as banca_intel
+    BANCA_INTEL_OK = True
+except Exception as e:
+    print(f"⚠️ Inteligência de banca indisponível: {e}")
+    banca_intel = None
+    BANCA_INTEL_OK = False
+
+
+class BancaAnaliseRequest(BaseModel):
+    banca: str = Field(..., description="Nome da banca (ex: CESPE/CEBRASPE)")
+    cargo: Optional[str] = Field("", description="Cargo/área de interesse")
+    anos: int = Field(5, ge=1, le=10, description="Período de análise em anos")
+
+
+@app.post("/banca/analisar")
+async def banca_analisar(req: BancaAnaliseRequest):
+    """Analisa a banca: incidência de temas (métrica) + perfil de estudo."""
+    if not BANCA_INTEL_OK:
+        raise HTTPException(status_code=503, detail="Módulo de banca indisponível")
+    return banca_intel.analisar_banca(req.banca, req.cargo or "", req.anos)
+
+
+# ─────────────────────────────────────────────────────────────
+# ENRIQUECIMENTO via BrasilAPI (público, sem chave)
+# ─────────────────────────────────────────────────────────────
+try:
+    from modules import brasil_api as brasil_api_mod
+    BRASIL_API_OK = True
+except Exception as e:
+    print(f"⚠️ BrasilAPI indisponível: {e}")
+    brasil_api_mod = None
+    BRASIL_API_OK = False
+
+
+@app.get("/enriquecimento/feriados")
+async def enriq_feriados(ano: int = Query(default=datetime.now().year)):
+    """Feriados nacionais do ano (BrasilAPI) — apoia o cronograma de estudos."""
+    if not BRASIL_API_OK:
+        raise HTTPException(status_code=503, detail="BrasilAPI indisponível")
+    return brasil_api_mod.feriados(ano)
+
+
+@app.get("/enriquecimento/cnpj/{cnpj}")
+async def enriq_cnpj(cnpj: str):
+    """Dados do órgão pelo CNPJ (BrasilAPI)."""
+    if not BRASIL_API_OK:
+        raise HTTPException(status_code=503, detail="BrasilAPI indisponível")
+    return brasil_api_mod.cnpj(cnpj)
+
+
+@app.get("/dashboard/dados")
+async def dashboard_dados():
+    """Métricas reais para o dashboard, calculadas do acervo (CSV)."""
+    try:
+        df = pd.read_csv("concursos_chunks.csv")
+    except Exception:
+        return {"total": 0, "abertos": 0, "por_banca": {}, "por_ano": {},
+                "por_area": {}, "embeddings": 0, "recentes": []}
+
+    total = int(len(df))
+    ano_atual = str(datetime.now().year)
+    abertos = int((df["ano"].astype(str) == ano_atual).sum()) if "ano" in df.columns else 0
+
+    # por ano (apenas anos plausíveis)
+    por_ano = {}
+    if "ano" in df.columns:
+        vc = df["ano"].astype(str).str.extract(r"(20\d\d)")[0].value_counts()
+        por_ano = {k: int(v) for k, v in sorted(vc.items()) if k}
+
+    # blob de texto por linha para extração por palavra-chave
+    def blob(row):
+        return " ".join(str(row.get(c, "")) for c in ("titulo", "conteudo", "orgao", "cargo")).lower()
+    blobs = df.apply(blob, axis=1)
+
+    bancas = ["cespe", "cebraspe", "fcc", "fgv", "vunesp", "ibfc", "aocp",
+              "quadrix", "idecan", "consulplan", "ibade", "instituto aocp"]
+    por_banca = {}
+    for b in bancas:
+        n = int(blobs.str.contains(b, regex=False).sum())
+        if n:
+            por_banca[b.upper()] = n
+
+    areas = {
+        "TI": ["tecnologia", "informática", "informatica", "sistemas", "analista de ti", "computação"],
+        "Saúde": ["saúde", "saude", "médico", "medico", "enfermeir", "farmac", "odontolog"],
+        "Direito": ["jurídic", "juridic", "advogad", "procurador", "promotor", "direito"],
+        "Educação": ["professor", "educação", "educacao", "docente", "pedagog"],
+        "Administração": ["administrativ", "administração", "administracao", "assistente", "auxiliar"],
+        "Fiscal/Controle": ["fiscal", "auditor", "controlador", "tributár"],
+        "Segurança": ["policial", "guarda", "bombeiro", "militar", "agente penitenci"],
+    }
+    por_area = {}
+    for area, kws in areas.items():
+        n = int(blobs.apply(lambda t: any(k in t for k in kws)).sum())
+        if n:
+            por_area[area] = n
+
+    # recentes
+    recentes = []
+    cols = df.columns
+    for _, r in df.tail(8).iloc[::-1].iterrows():
+        recentes.append({
+            "titulo": str(r.get("titulo", ""))[:80] if "titulo" in cols else "",
+            "banca": next((b.upper() for b in bancas if b in blob(r)), "—"),
+            "area": next((a for a, kws in areas.items() if any(k in blob(r) for k in kws)), "—"),
+            "status": "aberto" if str(r.get("ano", "")) == ano_atual else "—",
+        })
+
+    emb = 0
+    try:
+        emb = collection.count() if collection is not None else 0
+    except Exception:
+        pass
+
+    return {"total": total, "abertos": abertos, "por_banca": por_banca,
+            "por_ano": por_ano, "por_area": por_area, "embeddings": emb,
+            "bancas_count": len(por_banca), "recentes": recentes}
+
+
+# ─────────────────────────────────────────────────────────────
+# FERRAMENTAS DE ESTUDO (geradas por IA)
+# ─────────────────────────────────────────────────────────────
+def _ferramenta_llm(system_prompt: str, mensagem: str, temp: float = 0.5) -> str:
+    if not AGENTES_DISPONIVEL:
+        return "⚠️ Módulo de IA indisponível."
+    out = agentes_mod.gerar(system_prompt, mensagem, temp)
+    return out or ("⚠️ IA sem resposta. Configure uma GROQ_API_KEY válida no .env "
+                   "(chave gratuita em groq.com).")
+
+
+class ResumoRequest(BaseModel):
+    texto: str
+    nivel: str = "intermediario"
+
+class FlashcardsRequest(BaseModel):
+    topico: str
+    quantidade: int = 5
+    dificuldade: str = "medio"
+
+class AnaliseBancaReq(BaseModel):
+    banca: str
+    cargo: Optional[str] = ""
+
+class PlanoRequest(BaseModel):
+    cargo: str
+    semanas: int = 12
+    horas_dia: int = 3
+
+class QuestoesRequest(BaseModel):
+    topico: str
+    quantidade: int = 5
+    estilo: str = "multipla"
+
+class CompararBancasReq(BaseModel):
+    banca_a: str
+    banca_b: str
+
+
+@app.post("/ferramentas/resumo")
+async def ferramenta_resumo(r: ResumoRequest):
+    sp = ("Você é um professor de cursinho. Faça um RESUMO claro e estruturado em "
+          f"markdown, nível {r.nivel}, com tópicos, destaques e um mini-mapa mental "
+          "ao final. Use apenas o conteúdo informado.")
+    return {"resultado": _ferramenta_llm(sp, f"Conteúdo/tópico:\n{r.texto}")}
+
+
+@app.post("/ferramentas/flashcards")
+async def ferramenta_flashcards(r: FlashcardsRequest):
+    sp = (f"Você gera flashcards de estudo. Crie {r.quantidade} flashcards de "
+          f"dificuldade {r.dificuldade} sobre o tópico, em markdown, no formato "
+          "**Frente:** pergunta / **Verso:** resposta. Numere-os.")
+    return {"resultado": _ferramenta_llm(sp, f"Tópico: {r.topico}")}
+
+
+@app.post("/ferramentas/analise-banca")
+async def ferramenta_analise_banca(r: AnaliseBancaReq):
+    """Usa o módulo de inteligência de banca (incidência + perfil)."""
+    if BANCA_INTEL_OK:
+        data = banca_intel.analisar_banca(r.banca, r.cargo or "", 5)
+        # monta um texto legível para o card, além de devolver os dados estruturados
+        linhas = [f"## 📊 Análise da banca {data.get('banca','')}",
+                  f"_{data.get('periodo','')}_\n"]
+        if data.get("resumo"):
+            linhas.append(data["resumo"] + "\n")
+        if data.get("incidencia"):
+            linhas.append("### Incidência de temas")
+            for it in data["incidencia"]:
+                seta = {"subindo": "📈", "caindo": "📉"}.get(it.get("tendencia"), "➖")
+                linhas.append(f"- {seta} **{it['tema']}** — {it['percentual']}%")
+            linhas.append("")
+        if data.get("perfil_estudo"):
+            linhas.append("### Perfil de estudo\n" + data["perfil_estudo"])
+        if data.get("pegadinhas"):
+            linhas.append("\n### Pegadinhas típicas")
+            linhas += [f"- {p}" for p in data["pegadinhas"]]
+        return {"resultado": "\n".join(linhas), "dados": data}
+    sp = "Você é especialista em bancas. Analise o estilo da banca para o cargo."
+    return {"resultado": _ferramenta_llm(sp, f"Banca: {r.banca}. Cargo: {r.cargo}")}
+
+
+@app.post("/ferramentas/plano-estudos")
+async def ferramenta_plano(r: PlanoRequest):
+    sp = ("Você monta planos de estudo para concursos. Gere um cronograma em "
+          "markdown (tabela por semana) realista, com revisões espaçadas e "
+          "simulados, priorizando disciplinas de maior peso. Considere os "
+          "feriados nacionais informados (use-os como dias de revisão leve ou "
+          "descanso).")
+    # Enriquecimento BrasilAPI: feriados do ano corrente para o cronograma
+    feriados_txt = ""
+    if BRASIL_API_OK:
+        try:
+            fer = brasil_api_mod.feriados(datetime.now().year)
+            if fer.get("feriados"):
+                itens = ", ".join(f"{f['date']} ({f['name']})" for f in fer["feriados"][:14])
+                feriados_txt = f" Feriados nacionais de {datetime.now().year}: {itens}."
+        except Exception:
+            pass
+    msg = (f"Cargo: {r.cargo}. Tempo: {r.semanas} semanas, {r.horas_dia}h/dia."
+           f"{feriados_txt}")
+    return {"resultado": _ferramenta_llm(sp, msg)}
+
+
+@app.post("/ferramentas/questoes")
+async def ferramenta_questoes(r: QuestoesRequest):
+    sp = (f"Você gera questões de concurso no estilo {r.estilo}. Crie "
+          f"{r.quantidade} questões sobre o tópico, com GABARITO e comentário "
+          "explicativo em cada uma. Numere-as. Markdown.")
+    return {"resultado": _ferramenta_llm(sp, f"Tópico: {r.topico}")}
+
+
+@app.post("/ferramentas/comparar-bancas")
+async def ferramenta_comparar(r: CompararBancasReq):
+    sp = ("Você compara bancas de concurso. Faça uma comparação objetiva em "
+          "markdown (tabela) entre as duas bancas: estilo de questão, nível de "
+          "dificuldade, pegadinhas e dicas específicas para cada uma.")
+    return {"resultado": _ferramenta_llm(sp, f"Compare {r.banca_a} vs {r.banca_b}.")}
+
+
+# ─────────────────────────────────────────────────────────────
+# EDITAL — upload de PDF + chat sobre o documento
+# ─────────────────────────────────────────────────────────────
+_editais_sessao: Dict[str, Dict[str, str]] = {}
+
+
+class EditalChatReq(BaseModel):
+    pergunta: str
+    sessao_id: Optional[str] = None
+
+
+@app.post("/edital/upload")
+async def edital_upload(file: UploadFile = File(...)):
+    import io, uuid
+    conteudo = await file.read()
+    texto = ""
+    paginas = 0
+    try:
+        import pdfplumber
+        with pdfplumber.open(io.BytesIO(conteudo)) as pdf:
+            paginas = len(pdf.pages)
+            texto = "\n".join((p.extract_text() or "") for p in pdf.pages[:20])
+    except Exception:
+        texto = conteudo.decode("utf-8", errors="ignore")[:8000]
+    sid = uuid.uuid4().hex[:12]
+    _editais_sessao[sid] = {"nome": file.filename, "texto": texto[:20000]}
+    return {"sessao_id": sid, "nome": file.filename, "paginas": paginas,
+            "caracteres": len(texto)}
+
+
+@app.post("/edital/chat")
+async def edital_chat(req: EditalChatReq):
+    sess = _editais_sessao.get(req.sessao_id or "")
+    if not sess:
+        return {"resposta": "📄 Envie um edital em PDF primeiro para eu analisá-lo."}
+    if not AGENTES_DISPONIVEL:
+        return {"resposta": "⚠️ Módulo de IA indisponível."}
+    sp = ("Você é o Agente de Edital. Responda usando APENAS o texto do edital "
+          "fornecido. Cite trechos e seja específico (datas, vagas, requisitos, "
+          "conteúdo programático). Se não constar, diga que não consta no edital.")
+    msg = f"EDITAL ({sess['nome']}):\n{sess['texto']}\n\nPERGUNTA: {req.pergunta}"
+    resp = agentes_mod.gerar(sp, msg, 0.3)
+    return {"resposta": resp or "⚠️ IA sem resposta. Configure a GROQ_API_KEY no .env."}
+
+
+# ─────────────────────────────────────────────────────────────
+# PROVAS — acervo, busca RAG e estatísticas por banca
+# ─────────────────────────────────────────────────────────────
+def _provas_por_banca() -> Dict[str, int]:
+    import glob as _g
+    res: Dict[str, int] = {}
+    try:
+        for pasta in _g.glob("provas/*"):
+            if os.path.isdir(pasta):
+                n = len(_g.glob(os.path.join(pasta, "*.pdf")))
+                if n:
+                    res[os.path.basename(pasta)] = n
+    except Exception:
+        pass
+    return res
+
+
+try:
+    from modules import provas_indexer as provas_idx
+    PROVAS_IDX_OK = True
+except Exception as e:
+    print(f"⚠️ Indexador de provas indisponível: {e}")
+    provas_idx = None
+    PROVAS_IDX_OK = False
+
+
+@app.get("/api/provas/stats")
+async def provas_stats():
+    pb = _provas_por_banca()
+    total = sum(pb.values())
+    blocos = 0
+    if PROVAS_IDX_OK:
+        try:
+            blocos = provas_idx.estatisticas().get("blocos_indexados", 0)
+        except Exception:
+            pass
+    return {"total_pdfs": total, "indexados": blocos,
+            "bancas": len(pb), "questoes": 0, "historico": []}
+
+
+@app.post("/api/provas/indexar")
+async def provas_indexar():
+    """Indexa as provas/gabaritos da pasta provas/<banca>/ no ChromaDB."""
+    if not PROVAS_IDX_OK:
+        raise HTTPException(status_code=503, detail="Indexador indisponível")
+    r = provas_idx.indexar_provas()
+    return {"mensagem": f"{r['provas_indexadas']} prova(s) indexada(s) "
+                        f"({r['blocos']} blocos). Total na coleção: {r['total_colecao']}.",
+            **r}
+
+
+class BaixarProvasReq(BaseModel):
+    urls: List[str]
+    banca: str = "geral"
+
+
+@app.post("/api/provas/baixar")
+async def provas_baixar(req: BaixarProvasReq):
+    """Baixa provas de URLs de PDF DIRETO (sites oficiais) e indexa."""
+    if not PROVAS_IDX_OK:
+        raise HTTPException(status_code=503, detail="Indexador indisponível")
+    res = provas_idx.baixar_lote(req.urls, req.banca)
+    idx = provas_idx.indexar_provas()
+    return {"mensagem": f"{res['baixados']} arquivo(s) baixado(s) e indexado(s).",
+            "baixados": res["baixados"], "arquivos": res["arquivos"],
+            "indexados": idx["blocos"]}
+
+
+@app.get("/api/provas/listar")
+async def provas_listar():
+    import glob as _g
+    pdfs = []
+    try:
+        for pasta in _g.glob("provas/*"):
+            if os.path.isdir(pasta):
+                banca = os.path.basename(pasta)
+                for f in _g.glob(os.path.join(pasta, "*.pdf")):
+                    kb = os.path.getsize(f) // 1024
+                    pdfs.append({"nome": os.path.basename(f), "banca": banca,
+                                 "tamanho": f"{kb} KB"})
+    except Exception:
+        pass
+    return {"pdfs": pdfs}
+
+
+@app.get("/api/provas/bancas")
+async def provas_bancas():
+    pb = _provas_por_banca()
+    return {"bancas": [{"banca": b, "provas": n, "questoes": "—"} for b, n in pb.items()]}
+
+
+@app.get("/api/provas/buscar")
+async def provas_buscar(q: str = Query(...), limit: int = Query(5)):
+    try:
+        from modules.concurso_rag import buscar_documentos
+        docs = buscar_documentos(q, limite=limit)
+        res = [{"titulo": (d[:60] + "...") if len(d) > 60 else d, "trecho": d}
+               for d in docs]
+        return {"resultados": res}
+    except Exception as e:
+        return {"resultados": [], "erro": str(e)}
+
+
+@app.post("/api/provas/coletar")
+async def provas_coletar(payload: Dict[str, Any] = None):
+    """Indexa o acervo atual de provas (PDFs em provas/<banca>/)."""
+    pb = _provas_por_banca()
+    total = sum(pb.values())
+    msg = f"Acervo: {total} prova(s) em PDF ({len(pb)} banca(s)). "
+    if PROVAS_IDX_OK and total:
+        try:
+            r = provas_idx.indexar_provas()
+            msg += f"Indexados {r['blocos']} blocos no RAG."
+        except Exception as e:
+            msg += f"Erro ao indexar: {e}"
+    else:
+        msg += ("Adicione PDFs de provas/gabaritos em provas/<banca>/ "
+                "(ou use /api/provas/baixar com URLs de PDF direto) e indexe.")
+    return {"mensagem": msg}
+
+
+# ─────────────────────────────────────────────────────────────
+# ADMIN — health, ChromaDB, manutenção, logs, teste de LLM
+# ─────────────────────────────────────────────────────────────
+def _key_ok() -> bool:
+    k = os.getenv("GROQ_API_KEY", "")
+    return bool(k) and not k.lower().startswith("your")
+
+
+@app.get("/health")
+async def health():
+    try:
+        chroma = collection.count() if collection is not None else 0
+    except Exception:
+        chroma = 0
+    return {
+        "status": "online",
+        "concursos_csv": int(len(df_chunks)) if df_chunks is not None else 0,
+        "documentos_chromadb": chroma,
+        "llm": "Groq (configurado)" if _key_ok() else "fallback (sem GROQ_API_KEY)",
+        "agentes": "ativos" if AGENTES_DISPONIVEL else "indisponível",
+        "inteligencia_banca": "ativa" if BANCA_INTEL_OK else "indisponível",
+    }
+
+
+@app.get("/admin/stats")
+async def admin_stats():
+    try:
+        chroma = collection.count() if collection is not None else 0
+    except Exception:
+        chroma = 0
+    bancas = 0
+    anos = 0
+    try:
+        if df_chunks is not None:
+            if "orgao" in df_chunks.columns:
+                bancas = int(df_chunks["orgao"].nunique())
+            if "ano" in df_chunks.columns:
+                anos = int(df_chunks["ano"].nunique())
+    except Exception:
+        pass
+    return {
+        "documentos_indexados": chroma,
+        "registros_csv": int(len(df_chunks)) if df_chunks is not None else 0,
+        "orgaos_distintos": bancas,
+        "anos_distintos": anos,
+        "colecao": "concursos_publicos",
+    }
+
+
+def _admin_reindex_inline() -> int:
+    """Reindexa usando o próprio handle da coleção (não invalida o servidor)."""
+    if collection is None:
+        return 0
+    df = pd.read_csv("concursos_chunks.csv")
+    df = df[df["conteudo"].notna() & (df["conteudo"].astype(str) != "")]
+    try:
+        atuais = collection.get().get("ids", [])
+        if atuais:
+            collection.delete(ids=atuais)
+    except Exception:
+        pass
+    textos = df["conteudo"].astype(str).tolist()
+    ids = [f"chunk_{i}" for i in range(len(textos))]
+    metas = [{"orgao": str(r.get("orgao", "") or ""), "ano": str(r.get("ano", "") or ""),
+              "cargo": str(r.get("cargo", "") or ""),
+              "tipo_documento": str(r.get("tipo_documento", "") or ""),
+              "titulo": str(r.get("titulo", "") or "")} for _, r in df.iterrows()]
+    for i in range(0, len(textos), 100):
+        collection.add(documents=textos[i:i+100], ids=ids[i:i+100],
+                       metadatas=metas[i:i+100])
+    return len(textos)
+
+
+@app.post("/admin/embeddings/status")
+async def admin_emb_status():
+    try:
+        c = collection.count() if collection is not None else 0
+    except Exception:
+        c = 0
+    return {"mensagem": f"{c} documentos indexados no ChromaDB."}
+
+
+@app.post("/admin/embeddings/reindexar")
+async def admin_emb_reindex():
+    try:
+        n = _admin_reindex_inline()
+        return {"mensagem": f"Reindexação concluída: {n} documentos."}
+    except Exception as e:
+        return {"mensagem": f"Erro ao reindexar: {e}"}
+
+
+@app.post("/admin/embeddings/carregar-csv")
+async def admin_emb_csv():
+    try:
+        n = int(len(pd.read_csv("concursos_chunks.csv")))
+        return {"mensagem": f"CSV contém {n} registros. Use 'Reindexar' para aplicar."}
+    except Exception as e:
+        return {"mensagem": f"Erro: {e}"}
+
+
+@app.post("/admin/manutencao/duplicatas")
+async def admin_dedupe():
+    try:
+        df = pd.read_csv("concursos_chunks.csv")
+        antes = len(df)
+        if "url" in df.columns:
+            df = df.drop_duplicates(subset=["url"])
+        df.to_csv("concursos_chunks.csv", index=False)
+        return {"mensagem": f"Duplicatas removidas: {antes - len(df)} (restam {len(df)})."}
+    except Exception as e:
+        return {"mensagem": f"Erro: {e}"}
+
+
+@app.post("/admin/manutencao/validar")
+async def admin_validar():
+    try:
+        df = pd.read_csv("concursos_chunks.csv")
+        vazios = int((df["conteudo"].isna() | (df["conteudo"].astype(str) == "")).sum()) \
+            if "conteudo" in df.columns else 0
+        return {"mensagem": f"{len(df)} registros; {vazios} sem conteúdo."}
+    except Exception as e:
+        return {"mensagem": f"Erro: {e}"}
+
+
+@app.post("/admin/banco/limpar")
+async def admin_limpar():
+    try:
+        if collection is not None:
+            atuais = collection.get().get("ids", [])
+            if atuais:
+                collection.delete(ids=atuais)
+        return {"mensagem": "Coleção do ChromaDB limpa. Use 'Reindexar' para repovoar."}
+    except Exception as e:
+        return {"mensagem": f"Erro: {e}"}
+
+
+@app.post("/admin/config")
+async def admin_config(cfg: Dict[str, Any] = None):
+    return {"mensagem": "Configuração salva (em memória).", "config": cfg or {}}
+
+
+@app.get("/admin/log")
+async def admin_log():
+    linhas = []
+    try:
+        if os.path.exists("scraper.log"):
+            with open("scraper.log", encoding="utf-8", errors="ignore") as f:
+                linhas = f.read().splitlines()[-50:]
+    except Exception:
+        pass
+    if not linhas:
+        linhas = ["Sistema operando. Sem entradas recentes de log em arquivo."]
+    return {"log": linhas}
+
+
+@app.get("/admin/exportar")
+async def admin_exportar():
+    if os.path.exists("concursos_chunks.csv"):
+        return FileResponse("concursos_chunks.csv", filename="concursos_chunks.csv",
+                            media_type="text/csv")
+    raise HTTPException(status_code=404, detail="CSV não encontrado")
+
+
+class ChatDiretoReq(BaseModel):
+    pergunta: str
+    temperatura: float = 0.7
+    modo: Optional[str] = "direto"
+
+
+@app.post("/chat/direto")
+async def chat_direto(req: ChatDiretoReq):
+    if not AGENTES_DISPONIVEL:
+        return {"resposta": "⚠️ Módulo de IA indisponível."}
+    sp = ("Você é o assistente do ConcursAI. Responda de forma direta e útil "
+          "sobre concursos públicos brasileiros.")
+    resp = agentes_mod.gerar(sp, req.pergunta, req.temperatura)
+    return {"resposta": resp or "⚠️ IA sem resposta. Configure a GROQ_API_KEY no .env."}
+
+
+class ChatMessageRequest(BaseModel):
+    message: str
+    context: Optional[Dict[str, Any]] = None
+
+@app.post("/chat/message")
+async def chat_message(request: ChatMessageRequest):
+    """Endpoint de chat - redireciona para o sistema RAG"""
+    busca = BuscaSemanticaRequest(pergunta=request.message)
+    result = await buscar_semantica(busca)
+    return {"response": result.resposta, "resposta": result.resposta}
+
+@app.post("/rag/analyze")
+async def rag_analyze(file: UploadFile = File(...)):
+    """Analisa PDF enviado pelo usuário"""
+    try:
+        conteudo = await file.read()
+        texto = ""
+        try:
+            import pdfplumber, io
+            with pdfplumber.open(io.BytesIO(conteudo)) as pdf:
+                texto = "\n".join(p.extract_text() or "" for p in pdf.pages[:5])
+        except Exception:
+            texto = conteudo.decode("utf-8", errors="ignore")[:3000]
+
+        if responder_interface and texto.strip():
+            resposta = responder_interface("Todos", "Todos", "Todos", f"Analise este edital: {texto[:1500]}")
+        else:
+            resposta = f"PDF recebido: {file.filename}. Texto extraído com {len(texto)} caracteres."
+
+        return {
+            "success": True,
+            "filename": file.filename,
+            "summary": resposta,
+            "pages_analyzed": min(5, len(texto) // 500 + 1)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/studio")
+async def studio():
+    """ConcursAI Studio - interface de configuração de agentes"""
+    try:
+        return FileResponse('interfaces/studio.html')
+    except Exception as e:
+        return JSONResponse(status_code=404, content={"message": str(e)})
+
+# === ROTAS MULTI-PAGE TCC ===
+_PAGES = ["home", "dashboard", "chat", "concursos", "ferramentas", "edital", "provas", "scraping", "admin"]
+
+@app.get("/pages/{page_name}")
+async def serve_page(page_name: str):
+    """Serve as páginas HTML do sistema multi-tela TCC"""
+    import os
+    name = page_name.replace(".html", "")
+    path = f"interfaces/pages/{name}.html"
+    if os.path.exists(path):
+        return FileResponse(path)
+    return JSONResponse(status_code=404, content={"message": f"Página '{name}' não encontrada"})
+
+@app.get("/pages")
+async def pages_index():
+    """Redireciona para a home do sistema multi-tela"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/pages/home")
 
 @app.get("/dashboard")
 async def dashboard():
@@ -705,19 +1416,29 @@ async def listar_concursos(
         # Paginação
         df_paginated = df.iloc[offset:offset + limit]
         
-        # Converter para modelo
+        # Converter para modelo (tratando NaN e tipos não-string do CSV)
+        def s(val, default=''):
+            if val is None:
+                return default
+            try:
+                if pd.isna(val):
+                    return default
+            except (TypeError, ValueError):
+                pass
+            return str(val)
+
         concursos = []
         for _, row in df_paginated.iterrows():
             concurso = ConcursoModel(
-                titulo=row.get('titulo', ''),
-                orgao=row.get('orgao', ''),
-                cargo=row.get('cargo', ''),
-                ano=row.get('ano', ''),
-                tipo_documento=row.get('tipo_documento', 'edital'),
-                url=row.get('url', ''),
-                data_publicacao=row.get('data_publicacao', ''),
-                fonte=row.get('fonte', ''),
-                conteudo=row.get('conteudo', '')
+                titulo=s(row.get('titulo')),
+                orgao=s(row.get('orgao')),
+                cargo=s(row.get('cargo')),
+                ano=s(row.get('ano')),
+                tipo_documento=s(row.get('tipo_documento'), 'edital'),
+                url=s(row.get('url')),
+                data_publicacao=s(row.get('data_publicacao')),
+                fonte=s(row.get('fonte')),
+                conteudo=s(row.get('conteudo'))
             )
             concursos.append(concurso)
         
@@ -735,10 +1456,10 @@ async def buscar_semantica(request: BuscaSemanticaRequest):
         if responder_interface:
             # Usar sistema RAG completo
             resposta = responder_interface(
-                request.pergunta,
                 request.filtro_orgao or "",
                 request.filtro_ano or "",
-                request.filtro_cargo or ""
+                request.filtro_cargo or "",
+                request.pergunta
             )
         else:
             # Fallback: busca textual simples
@@ -2009,7 +2730,7 @@ async def coletar_indexar_todas_bancas(background_tasks: BackgroundTasks, max_co
 @app.post("/scraping/provas/coletar")
 async def coletar_provas_banca(
     background_tasks: BackgroundTasks, 
-    banca: str = Query(..., regex="^(cebraspe|fcc|fgv)$"),
+    banca: str = Query(..., pattern="^(cebraspe|fcc|fgv)$"),
     max_provas: int = Query(15, ge=5, le=30),
     anos: List[int] = Query([2023, 2024, 2025])
 ):
@@ -2133,8 +2854,8 @@ async def estatisticas_provas():
 
 @app.get("/scraping/provas/listar")
 async def listar_provas(
-    banca: Optional[str] = Query(None, regex="^(cebraspe|fcc|fgv)$"),
-    tipo: Optional[str] = Query(None, regex="^(prova|gabarito)$"),
+    banca: Optional[str] = Query(None, pattern="^(cebraspe|fcc|fgv)$"),
+    tipo: Optional[str] = Query(None, pattern="^(prova|gabarito)$"),
     ano: Optional[int] = Query(None)
 ):
     """

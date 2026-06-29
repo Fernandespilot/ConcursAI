@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Provas Anteriores</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">assignment</span> Provas Anteriores</div>
+      <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+
+        <!-- Stat cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-primary/10 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[18px]">picture_as_pdf</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="pv-total">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Total PDFs</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center text-emerald-600"><span class="material-symbols-outlined text-[18px]">database</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="pv-indexados">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Indexados RAG</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-slate-500/10 flex items-center justify-center text-slate-600"><span class="material-symbols-outlined text-[18px]">apartment</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="pv-bancas">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Bancas</p></div>
+          <div class="bg-surface border border-line p-5 rounded-lg"><div class="flex justify-between items-start mb-3"><div class="w-9 h-9 rounded-md bg-amber-500/10 flex items-center justify-center text-amber-600"><span class="material-symbols-outlined text-[18px]">help</span></div></div><h3 class="text-2xl font-bold tracking-tight" id="pv-questoes">—</h3><p class="text-[10px] text-ink-4 uppercase tracking-wider font-semibold mt-0.5">Questões</p></div>
+        </section>
+
+        <!-- Busca RAG -->
+        <section class="bg-surface border border-line rounded-xl p-5">
+          <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">search</span> Busca RAG em Provas</h3>
+          <div class="flex gap-2">
+            <input id="rag-q" type="text" placeholder="Ex: questões de direito constitucional, princípios CESPE..." class="flex-1 bg-surface border border-line rounded-lg px-3 py-2.5 text-[14px] focus:ring-1 focus:ring-primary outline-none" onkeydown="if(event.key==='Enter')buscarRAG()"/>
+            <button onclick="buscarRAG()" class="bg-primary text-white px-5 py-2.5 rounded-lg text-[14px] font-medium flex items-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">search</span> Buscar</button>
+          </div>
+          <div id="ra-rag" class="hidden mt-3 space-y-2"></div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Coletar provas -->
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">download</span> Coletar Provas</h3>
+            <p class="text-[12px] text-ink-3 mb-3">Coleta provas de concursos anteriores de fontes públicas.</p>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              <div><label class="text-[11px] text-ink-3">Banca</label><select id="cp-banca" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"><option value="">Todas</option><option>CESPE/CEBRASPE</option><option>FCC</option><option>VUNESP</option><option>FGV</option><option>IBFC</option></select></div>
+              <div><label class="text-[11px] text-ink-3">Limite</label><input id="cp-limit" type="number" value="10" min="1" max="100" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+            </div>
+            <button onclick="coletarProvas()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">download</span> Iniciar Coleta</button>
+            <div id="ra-coletar" class="hidden mt-3 text-[13px] text-ink-2 bg-canvas border border-line rounded-lg p-3"></div>
+          </section>
+
+          <!-- PDFs disponíveis -->
+          <section class="bg-surface border border-line rounded-xl overflow-hidden">
+            <div class="p-4 border-b border-line flex items-center justify-between">
+              <h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">folder_open</span> PDFs Disponíveis</h3>
+              <button onclick="listarPDFs()" class="text-[12px] text-ink-3 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">refresh</span> Listar</button>
+            </div>
+            <div class="max-h-56 overflow-y-auto">
+              <table class="w-full text-[12px]">
+                <thead><tr class="text-[10px] uppercase tracking-wide text-ink-4"><th class="text-left px-4 py-2 font-semibold">Arquivo</th><th class="text-left px-4 py-2 font-semibold">Banca</th><th class="text-left px-4 py-2 font-semibold">Tamanho</th></tr></thead>
+                <tbody id="tb-pdfs"><tr><td colspan="3" class="text-center text-ink-4 py-6">Clique em Listar</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Estatísticas por banca -->
+          <section class="bg-surface border border-line rounded-xl overflow-hidden">
+            <div class="p-4 border-b border-line flex items-center justify-between">
+              <h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">bar_chart</span> Estatísticas por Banca</h3>
+              <button onclick="loadBancaStats()" class="text-[12px] text-ink-3 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">refresh</span></button>
+            </div>
+            <div class="max-h-56 overflow-y-auto">
+              <table class="w-full text-[12px]">
+                <thead><tr class="text-[10px] uppercase tracking-wide text-ink-4"><th class="text-left px-4 py-2 font-semibold">Banca</th><th class="text-left px-4 py-2 font-semibold">Provas</th><th class="text-left px-4 py-2 font-semibold">Questões</th></tr></thead>
+                <tbody id="tb-bancas"><tr><td colspan="3" class="text-center text-ink-4 py-6">Carregando...</td></tr></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Histórico -->
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">history</span> Histórico de Coletas</h3>
+            <div id="historico" class="text-[13px] text-ink-3">Nenhum histórico disponível.</div>
+          </section>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+async function loadStats(){
+  try{
+    const r=await fetch(API+'/api/provas/stats',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    G('pv-total').textContent=d.total_pdfs??d.total??'0';
+    G('pv-indexados').textContent=d.indexados??'0';
+    G('pv-bancas').textContent=d.bancas??'0';
+    G('pv-questoes').textContent=d.questoes??'0';
+    if(d.historico&&d.historico.length)G('historico').innerHTML=d.historico.map(h=>`<div class="py-1.5 border-b border-line last:border-0">${esc(h.data||'')} — ${esc(h.descricao||'')}</div>`).join('');
+  }catch(e){['pv-total','pv-indexados','pv-bancas','pv-questoes'].forEach(id=>G(id).textContent='0');}
+}
+async function coletarProvas(){
+  const ra=G('ra-coletar');ra.classList.remove('hidden');
+  ra.innerHTML='<span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> Coletando provas...';
+  try{
+    const body={banca:G('cp-banca').value||undefined,limite:parseInt(G('cp-limit').value)};
+    const r=await fetch(API+'/api/provas/coletar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(120000)});
+    const d=await r.json();ra.textContent=d.mensagem||d.message||JSON.stringify(d);loadStats();
+  }catch(e){ra.innerHTML='<span class="text-red-600">Erro: '+esc(e.message)+'</span>';}
+}
+async function listarPDFs(){
+  try{
+    const r=await fetch(API+'/api/provas/listar',{signal:AbortSignal.timeout(10000)});const d=await r.json();
+    const pdfs=d.pdfs||d.arquivos||d||[];
+    G('tb-pdfs').innerHTML=Array.isArray(pdfs)&&pdfs.length?pdfs.map(p=>`<tr class="border-t border-line hover:bg-canvas"><td class="px-4 py-2 text-ink-2">${esc(p.nome||p.name||p)}</td><td class="px-4 py-2 text-ink-3">${esc(p.banca||'—')}</td><td class="px-4 py-2 text-ink-3">${esc(p.tamanho||p.size||'—')}</td></tr>`).join(''):'<tr><td colspan="3" class="text-center text-ink-4 py-6">Nenhum PDF encontrado</td></tr>';
+  }catch(e){G('tb-pdfs').innerHTML='<tr><td colspan="3" class="text-red-600 px-4 py-3">Erro: '+esc(e.message)+'</td></tr>';}
+}
+async function buscarRAG(){
+  const q=G('rag-q').value.trim();if(!q)return;
+  const ra=G('ra-rag');ra.classList.remove('hidden');
+  ra.innerHTML='<div class="text-ink-3 text-[13px]"><span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> Buscando nas provas...</div>';
+  try{
+    const r=await fetch(API+'/api/provas/buscar?q='+encodeURIComponent(q)+'&limit=5',{signal:AbortSignal.timeout(15000)});const d=await r.json();
+    const res=d.resultados||d.results||[];
+    ra.innerHTML=res.length?res.map(x=>`<div class="p-3 border border-line rounded-lg bg-canvas"><p class="text-[13px] font-semibold text-ink">${esc(x.titulo||x.fonte||'')}</p><p class="text-[12px] text-ink-3 mt-1">${esc((x.trecho||x.texto||'').slice(0,220))}...</p></div>`).join(''):'<p class="text-[13px] text-ink-3">Nenhum resultado encontrado.</p>';
+  }catch(e){ra.innerHTML='<p class="text-red-600 text-[13px]">Erro: '+esc(e.message)+'</p>';}
+}
+async function loadBancaStats(){
+  try{
+    const r=await fetch(API+'/api/provas/bancas',{signal:AbortSignal.timeout(8000)});const d=await r.json();
+    const bancas=d.bancas||d||[];
+    G('tb-bancas').innerHTML=Array.isArray(bancas)&&bancas.length?bancas.map(b=>`<tr class="border-t border-line hover:bg-canvas"><td class="px-4 py-2 text-ink-2">${esc(b.banca||b.nome||b)}</td><td class="px-4 py-2 text-ink-3">${esc(b.provas??b.total??'—')}</td><td class="px-4 py-2 text-ink-3">${esc(b.questoes??'—')}</td></tr>`).join(''):'<tr><td colspan="3" class="text-center text-ink-4 py-6">Sem dados</td></tr>';
+  }catch(e){G('tb-bancas').innerHTML='<tr><td colspan="3" class="text-center text-ink-4 py-6">Sem dados</td></tr>';}
+}
+checkAPI();loadStats();loadBancaStats();
+</script>
+</body></html>

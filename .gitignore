@@ -59,7 +59,7 @@ tmp/
 provas/
 editais/
 export_*.csv
-concursos_chunks.csv
+# concursos_chunks.csv  # removido do gitignore — arquivo necessário para o sistema
 editais_chunks.csv
 
 # ChromaDB adicional

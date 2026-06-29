@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Administração</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; display:inline-block; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb", terminal:"#161b22" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4"><span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">settings_applications</span> Painel de Administração</div>
+      <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+      <div class="max-w-[1280px] mx-auto space-y-5">
+        <div>
+          <h1 class="text-xl font-semibold text-ink">Painel de Administração</h1>
+          <p class="text-[13px] text-ink-3 mt-0.5">Gerenciamento de infraestrutura, banco de vetores e modelos LLM.</p>
+        </div>
+
+        <!-- Health stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <section class="bg-surface border border-line rounded-xl overflow-hidden">
+            <div class="p-4 border-b border-line flex items-center justify-between">
+              <h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">monitor_heart</span> Health do Sistema</h3>
+              <button onclick="loadHealth()" class="text-[12px] text-ink-3 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">refresh</span></button>
+            </div>
+            <div id="health-body" class="p-4 space-y-1 text-[13px]"><p class="text-ink-4">Carregando...</p></div>
+          </section>
+          <section class="bg-surface border border-line rounded-xl overflow-hidden">
+            <div class="p-4 border-b border-line flex items-center justify-between">
+              <h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">database</span> Estatísticas ChromaDB</h3>
+              <button onclick="loadStats()" class="text-[12px] text-ink-3 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">refresh</span></button>
+            </div>
+            <div id="db-stats" class="p-4 space-y-1 text-[13px]"><p class="text-ink-4">Carregando...</p></div>
+          </section>
+        </div>
+
+        <!-- Management -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">tune</span> Embeddings / ChromaDB</h3>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="statusEmb()" class="px-3 py-2 bg-surface border border-line rounded-lg text-[12px] text-ink-2 hover:bg-canvas transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">info</span> Status</button>
+              <button onclick="reindexar()" class="px-3 py-2 bg-surface border border-line rounded-lg text-[12px] text-ink-2 hover:bg-canvas transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">autorenew</span> Reindexar</button>
+              <button onclick="carregarEmb()" class="px-3 py-2 bg-surface border border-line rounded-lg text-[12px] text-ink-2 hover:bg-canvas transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">upload_file</span> Carregar CSV</button>
+            </div>
+            <div id="ra-emb" class="hidden mt-3 text-[13px] text-ink-2 bg-canvas border border-line rounded-lg p-3"></div>
+          </section>
+
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">build</span> Manutenção</h3>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="limparDupl()" class="px-3 py-2 bg-surface border border-line rounded-lg text-[12px] text-ink-2 hover:bg-canvas transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">filter_alt_off</span> Duplicatas</button>
+              <button onclick="validarDados()" class="px-3 py-2 bg-surface border border-line rounded-lg text-[12px] text-ink-2 hover:bg-canvas transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">fact_check</span> Validar</button>
+              <button onclick="exportarDados()" class="px-3 py-2 bg-surface border border-line rounded-lg text-[12px] text-ink-2 hover:bg-canvas transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">download</span> Exportar</button>
+              <button onclick="confirmLimpar()" class="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-[12px] text-red-700 hover:bg-red-100 transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">delete</span> Limpar Banco</button>
+            </div>
+            <div id="ra-manut" class="hidden mt-3 text-[13px] text-ink-2 bg-canvas border border-line rounded-lg p-3"></div>
+          </section>
+        </div>
+
+        <!-- LLM Sandbox + Config -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">science</span> LLM Sandbox (Teste)</h3>
+            <textarea id="llm-prompt" rows="3" placeholder="Digite seu prompt de teste aqui..." class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none resize-none mb-2"></textarea>
+            <button onclick="testarLLM()" class="w-full bg-primary text-white py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">play_arrow</span> Executar Teste</button>
+            <div id="llm-out" class="hidden mt-3 bg-terminal font-mono text-[12px] text-[#7ee787] rounded-lg p-3 whitespace-pre-wrap max-h-48 overflow-y-auto"></div>
+          </section>
+
+          <section class="bg-surface border border-line rounded-xl p-5">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-[18px] text-primary">settings</span> Configurações</h3>
+            <div class="space-y-3">
+              <div><label class="text-[11px] text-ink-3">Modelo de Embeddings</label><input id="cfg-model" type="text" value="all-MiniLM-L6-v2" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+              <div class="grid grid-cols-2 gap-2">
+                <div><label class="text-[11px] text-ink-3">Chunk Size</label><input id="cfg-chunk" type="number" value="500" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+                <div><label class="text-[11px] text-ink-3">Top K</label><input id="cfg-topk" type="number" value="5" class="w-full bg-surface border border-line rounded-lg px-3 py-2 text-[13px] focus:ring-1 focus:ring-primary outline-none"/></div>
+              </div>
+              <button onclick="salvarCfg()" class="w-full bg-surface border border-line text-ink-2 py-2.5 rounded-lg text-[13px] font-medium flex items-center justify-center gap-2 hover:bg-canvas active:scale-95 transition-all"><span class="material-symbols-outlined text-[18px]">save</span> Salvar Alterações</button>
+              <div id="ra-cfg" class="hidden text-[13px] text-ink-2 bg-canvas border border-line rounded-lg p-3"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Log -->
+        <section class="bg-surface border border-line rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-line flex items-center justify-between">
+            <h3 class="text-[15px] font-medium text-ink flex items-center gap-2"><span class="material-symbols-outlined text-[18px] text-primary">terminal</span> Logs do Sistema</h3>
+            <button onclick="G('log-box').textContent='Logs limpos.'" class="text-[12px] text-ink-3 hover:text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[15px]">clear_all</span> Limpar</button>
+          </div>
+          <div id="log-box" class="bg-terminal font-mono text-[12px] text-[#8b949e] p-4 h-44 overflow-y-auto whitespace-pre-wrap leading-relaxed">Sistema administrativo inicializado.</div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast" class="fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-0 translate-y-2 transition-all pointer-events-none z-50"></div>
+
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(m,ok=true){const t=G('toast');t.textContent=m;t.className='fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-100 translate-y-0 transition-all z-50 '+(ok?'bg-emerald-700':'bg-red-600');setTimeout(()=>t.className='fixed bottom-5 right-5 px-4 py-2.5 rounded-lg text-[13px] font-medium text-white opacity-0 translate-y-2 transition-all pointer-events-none z-50',2500);}
+function show(el,html){el.innerHTML=html;el.classList.remove('hidden');}
+function loading(el,msg){el.classList.remove('hidden');el.innerHTML=`<span class="spin material-symbols-outlined text-[14px] text-primary align-middle">progress_activity</span> ${esc(msg)}`;}
+function log(m){const b=G('log-box');const t=new Date().toLocaleTimeString('pt-BR');b.textContent+=`\n[${t}] ${m}`;b.scrollTop=b.scrollHeight;}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+function row(k,v){return `<div class="flex items-center justify-between py-1.5 border-b border-line last:border-0"><span class="text-ink-3">${esc(k)}</span><span class="font-medium text-ink">${esc(String(v))}</span></div>`;}
+async function loadHealth(){
+  try{const r=await fetch(API+'/health',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    G('health-body').innerHTML=Object.entries(d).map(([k,v])=>row(k,v)).join('');
+  }catch(e){G('health-body').innerHTML='<p class="text-red-600">Erro: '+esc(e.message)+'</p>';}
+}
+async function loadStats(){
+  try{const r=await fetch(API+'/admin/stats',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    G('db-stats').innerHTML=Object.entries(d).map(([k,v])=>row(k,v)).join('');
+  }catch(e){G('db-stats').innerHTML='<p class="text-red-600">Erro: '+esc(e.message)+'</p>';}
+}
+async function apiAction(endpoint,body,raEl,loadMsg,successMsg){
+  loading(raEl,loadMsg);log(loadMsg);
+  try{
+    const r=await fetch(API+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(120000)});
+    const d=await r.json();const msg=d.mensagem||d.message||d.resultado||JSON.stringify(d);
+    show(raEl,esc(msg));log((successMsg||'Concluído')+': '+msg);toast(successMsg||'Concluído!');
+  }catch(e){show(raEl,'<span class="text-red-600">Erro: '+esc(e.message)+'</span>');log('ERRO: '+e.message);toast('Erro',false);}
+}
+function statusEmb(){apiAction('/admin/embeddings/status',null,G('ra-emb'),'Verificando embeddings...','Status OK');}
+function reindexar(){apiAction('/admin/embeddings/reindexar',{},G('ra-emb'),'Reindexando...','Reindexação concluída');}
+function carregarEmb(){apiAction('/admin/embeddings/carregar-csv',{},G('ra-emb'),'Carregando de CSV...','CSV carregado');}
+function limparDupl(){apiAction('/admin/manutencao/duplicatas',{},G('ra-manut'),'Removendo duplicatas...','Duplicatas removidas');}
+function validarDados(){apiAction('/admin/manutencao/validar',{},G('ra-manut'),'Validando dados...','Validação concluída');}
+function exportarDados(){log('Iniciando exportação...');window.open(API+'/admin/exportar','_blank');toast('Download iniciado!');}
+function confirmLimpar(){if(confirm('Tem certeza que deseja limpar todo o banco? Esta ação não pode ser desfeita.'))apiAction('/admin/banco/limpar',{},G('ra-manut'),'Limpando banco...','Banco limpo');}
+function salvarCfg(){apiAction('/admin/config',{modelo_embeddings:G('cfg-model').value,chunk_size:parseInt(G('cfg-chunk').value),top_k:parseInt(G('cfg-topk').value)},G('ra-cfg'),'Salvando configuração...','Configuração salva');}
+async function testarLLM(){
+  const p=G('llm-prompt').value.trim();if(!p)return toast('Digite um prompt',false);
+  const out=G('llm-out');out.classList.remove('hidden');out.innerHTML='<span class="spin material-symbols-outlined text-[14px] align-middle">progress_activity</span> Executando...';out.style.color='#8b949e';
+  try{
+    const r=await fetch(API+'/chat/direto',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pergunta:p,temperatura:0.7,modo:'direto'}),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();out.style.color='#7ee787';out.textContent=d.resposta||d.response||d.answer||JSON.stringify(d);
+  }catch(e){out.style.color='#f85149';out.textContent='Erro: '+e.message;}
+}
+async function loadLog(){
+  try{const r=await fetch(API+'/admin/log',{signal:AbortSignal.timeout(5000)});const d=await r.json();
+    const lines=d.log||d.logs||d||[];if(Array.isArray(lines)&&lines.length){G('log-box').textContent=lines.join('\n');G('log-box').scrollTop=G('log-box').scrollHeight;}
+  }catch(e){}
+}
+checkAPI();loadHealth();loadStats();loadLog();
+</script>
+</body></html>

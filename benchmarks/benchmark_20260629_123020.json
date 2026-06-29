@@ -1,0 +1,1303 @@
+{
+  "timestamp": "2026-06-29T12:30:20.990007",
+  "configuracao": {
+    "modelo": "llama-3.3-70b-versatile (Groq)",
+    "sistema": "agentes + RAG + ChromaDB",
+    "num_perguntas": 50
+  },
+  "estatisticas": {
+    "total_perguntas": 50,
+    "perguntas_com_sucesso": 4,
+    "taxa_sucesso": 0.08,
+    "qualidade": {
+      "keyword_match_score_medio": 0.453,
+      "precision": 0.455,
+      "recall": 0.455,
+      "f1_score": 0.455
+    },
+    "performance": {
+      "latency_media_ms": 4727,
+      "latency_min_ms": 3527,
+      "latency_max_ms": 6293,
+      "latency_p50_ms": 4650,
+      "latency_p95_ms": 6173
+    },
+    "distribuicao": {
+      "por_banca": {
+        "cebraspe": {
+          "total": 21,
+          "sucesso": 0
+        },
+        "fcc": {
+          "total": 7,
+          "sucesso": 0
+        },
+        "fgv": {
+          "total": 7,
+          "sucesso": 1
+        },
+        "null": {
+          "total": 15,
+          "sucesso": 3
+        }
+      },
+      "por_area": {
+        "tecnologia": {
+          "total": 17,
+          "sucesso": 3
+        },
+        "jurídica": {
+          "total": 6,
+          "sucesso": 0
+        },
+        "conhecimentos_gerais": {
+          "total": 6,
+          "sucesso": 0
+        },
+        "geral": {
+          "total": 15,
+          "sucesso": 1
+        },
+        "português": {
+          "total": 5,
+          "sucesso": 0
+        },
+        "administrativa": {
+          "total": 1,
+          "sucesso": 0
+        }
+      },
+      "por_tipo": {
+        "o_que_mais_cai": {
+          "total": 21,
+          "sucesso": 3
+        },
+        "como_estudar": {
+          "total": 12,
+          "sucesso": 0
+        },
+        "dificuldade": {
+          "total": 1,
+          "sucesso": 0
+        },
+        "tempo_estudo": {
+          "total": 1,
+          "sucesso": 0
+        },
+        "tipo_questao": {
+          "total": 6,
+          "sucesso": 0
+        },
+        "comparacao": {
+          "total": 2,
+          "sucesso": 0
+        },
+        "geral": {
+          "total": 7,
+          "sucesso": 1
+        }
+      },
+      "por_dificuldade": {
+        "fácil": {
+          "total": 21,
+          "sucesso": 1
+        },
+        "média": {
+          "total": 29,
+          "sucesso": 3
+        }
+      }
+    }
+  },
+  "resultados_detalhados": [
+    {
+      "id": 1,
+      "pergunta": "O que o CESPE mais cobra em Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Introdução ao CESPE**\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras de concursos públicos no Brasil. Embora o contexto fornecido não contenha informações específicas sobre o CESPE, posso fornecer informações gerais sobre o estilo de cobrança e format",
+      "latency_ms": 6293.0,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "redes",
+          "segurança",
+          "banco de dados"
+        ],
+        "missing_keywords": [
+          "python"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 2,
+      "pergunta": "Como estudar para FCC na área de Direito?",
+      "banca": "fcc",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Estudando para a FCC na Área de Direito**\n\nA Fundação Carlos Chagas (FCC) é uma das principais bancas examinadoras de concursos públicos no Brasil, conhecida por sua rigorosidade e qualidade nas provas. Para estudar para a FCC na área de Direito, é fundamental entender o estilo de cobrança e o for",
+      "latency_ms": 6205.0,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "legislação"
+        ],
+        "missing_keywords": [
+          "lei",
+          "questões anteriores"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 3,
+      "pergunta": "Qual a dificuldade do CESPE em Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "dificuldade",
+      "resposta": "**Dificuldade do CESPE em Tecnologia**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e rigorosas. Em relação à área de Tecnologia, o CESPE é particularmente exigente, pois busca avaliar não apenas a teoria, mas também a prática e",
+      "latency_ms": 5428.9,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "pegadinhas"
+        ],
+        "missing_keywords": [
+          "certo/errado",
+          "atenção"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 4,
+      "pergunta": "O que a FGV mais cobra em Conhecimentos Gerais?",
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Conhecimento Geral na FGV**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por suas provas desafiadoras e bem estruturadas. Embora o contexto fornecido não mencione explicitamente a FGV, posso fornecer informações gerais sobre o que a FGV costuma cobrar em Conhecimentos Gerais.",
+      "latency_ms": 5722.7,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "história",
+          "geografia",
+          "política"
+        ],
+        "missing_keywords": [
+          "atualidades"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 5,
+      "pergunta": "Quanto tempo estudar para CESPE Jurídica?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "tempo_estudo",
+      "resposta": "**Tempo de Estudo para CESPE Jurídica**\n\nO tempo de estudo necessário para se preparar para a CESPE (CESPE/CEBRASPE) Jurídica depende de vários fatores, como o nível de conhecimento prévio do candidato, a complexidade do concurso e a disponibilidade de tempo para estudar.\n\n**Fatores a Considerar**\n\n",
+      "latency_ms": 4447.5,
+      "validation": {
+        "keyword_match_score": 0.667,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "meses",
+          "horas"
+        ],
+        "missing_keywords": [
+          "focado"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 6,
+      "pergunta": "Quais linguagens de programação o CESPE mais cobra?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "Esta informação não está nos trechos analisados. Os trechos fornecidos apenas apresentam informações sobre vagas de concursos em diferentes instituições, como UNESP, Câmara de Cataguases, Prefeitura de Barra do Bugres, Câmara de Vereadores de Xavantina e IASEP, incluindo detalhes sobre vagas, salári",
+      "latency_ms": 4886.9,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "python",
+          "java",
+          "javascript",
+          "sql"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 7,
+      "pergunta": "Como é o estilo de questões da FCC?",
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "**Estilo de Questões da FCC**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora brasileira que realiza provas para concursos públicos em diversas áreas, incluindo a de Técnico em Radiologia. Embora o contexto fornecido não contenha informações específicas sobre o estilo de questões da FCC para",
+      "latency_ms": 5994.4,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "objetivas",
+          "lei"
+        ],
+        "missing_keywords": [
+          "diretas",
+          "literalidade"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 8,
+      "pergunta": "O que mais cai em Português no CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**CESPE: Estilo de Cobrança em Português**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras de concursos públicos no Brasil. Em relação à disciplina de Português, a CESPE é conhecida por sua abordagem rigorosa e detalhista.\n\n**Pontos Mais Cobrados**\n\nEm ",
+      "latency_ms": 6133.0,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "interpretação",
+          "concordância"
+        ],
+        "missing_keywords": [
+          "regência",
+          "crase"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 9,
+      "pergunta": "Compare FCC e FGV na área Administrativa",
+      "banca": null,
+      "area": "administrativa",
+      "dificuldade": "média",
+      "tipo": "comparacao",
+      "resposta": "**Introdução**\nA FCC (Fundação Carlos Chagas) e a FGV (Fundação Getúlio Vargas) são duas das principais bancas examinadoras de concursos públicos no Brasil. Ambas têm uma longa tradição em elaborar provas para cargos na área administrativa. Neste texto, vamos comparar o estilo de cobrança, formato d",
+      "latency_ms": 5518.1,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "fcc",
+          "fgv",
+          "raciocínio"
+        ],
+        "missing_keywords": [
+          "legislação"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 10,
+      "pergunta": "O que estudar em Redes para CESPE Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**CESPE/CEBRASPE: Estilo de Cobrança e Formato das Questões**\n\nA CESPE/CEBRASPE é uma banca examinadora conhecida por suas provas desafiadoras e cobrança rigorosa. Em relação à tecnologia, especialmente em Redes, a CESPE/CEBRASPE costuma abordar tópicos fundamentais e avançados, exigindo dos candida",
+      "latency_ms": 4931.6,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "tcp/ip",
+          "http",
+          "firewall"
+        ],
+        "missing_keywords": [
+          "dns"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 11,
+      "pergunta": "Qual a melhor estratégia para CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Estratégia para CESPE/CEBRASPE**\n\nA CESPE/CEBRASPE é uma das principais bancas examinadoras de concursos públicos no Brasil. Para se sair bem em uma prova aplicada por essa banca, é fundamental entender seu estilo de cobrança e formato das questões.\n\n**Características da CESPE/CEBRASPE:**\n\n* **Que",
+      "latency_ms": 4622.2,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "atenção",
+          "tempo"
+        ],
+        "missing_keywords": [
+          "palavras absolutas",
+          "anular"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 12,
+      "pergunta": "O que a FGV cobra em Tecnologia?",
+      "banca": "fgv",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**FGV: Estilo de Cobrança e Formato de Questões em Tecnologia**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por sua abordagem rigorosa e objetiva em provas de concurso público. Embora não haja informações específicas sobre o concurso de Tecnologia no contexto fornecido, posso ",
+      "latency_ms": 5050.4,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "banco de dados",
+          "redes"
+        ],
+        "missing_keywords": [
+          "programação",
+          "engenharia de software"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 13,
+      "pergunta": "Como funciona a prova de Português do CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "tipo_questao",
+      "resposta": "**Entendendo a Prova de Português do CESPE**\n\nA prova de Português do CESPE (Centro de Seleção e de Promoção de Eventos) é uma das etapas mais importantes nos concursos públicos brasileiros. Ela visa avaliar a compreensão e o domínio da língua portuguesa pelos candidatos.\n\n**Estrutura da Prova**\n\nA ",
+      "latency_ms": 4143.1,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "gramática"
+        ],
+        "missing_keywords": [
+          "interpretação",
+          "certo/errado",
+          "atenção"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 14,
+      "pergunta": "Quais frameworks o CESPE cobra em Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Frameworks em Tecnologia na CESPE**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora que realiza provas para concursos públicos em diversas áreas, incluindo Tecnologia. Embora o contexto fornecido não contenha informações específicas sobre a CESPE, posso fornecer infor",
+      "latency_ms": 4622.4,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "spring",
+          "django",
+          "react"
+        ],
+        "missing_keywords": [
+          "node"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 15,
+      "pergunta": "FCC cobra mais teoria ou prática?",
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "**FCC: Estilo de Cobrança**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora conhecida por sua abordagem equilibrada entre teoria e prática. No entanto, é importante destacar que o estilo de cobrança pode variar de acordo com o concurso e o cargo em questão.\n\n**Geralmente, a FCC:**\n\n* Cobranç",
+      "latency_ms": 4383.2,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "teoria"
+        ],
+        "missing_keywords": [
+          "legislação",
+          "menos prática"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 16,
+      "pergunta": "O que estudar em Segurança da Informação para CESPE?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Introdução à CESPE**\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras de concursos públicos no Brasil. Embora o contexto não forneça informações específicas sobre um concurso com a CESPE, posso fornecer informações gerais sobre o estilo de cobrança e o ",
+      "latency_ms": 5098.0,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "criptografia",
+          "vulnerabilidades"
+        ],
+        "missing_keywords": [
+          "ssl",
+          "firewall"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 17,
+      "pergunta": "Qual o percentual de Português nas provas do CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**Percentual de Português nas Provas do CESPE**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e diversificadas. No entanto, não há informações específicas no contexto fornecido sobre o percentual de Português nas provas do CESPE.",
+      "latency_ms": 4128.6,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "percentual",
+          "português"
+        ],
+        "missing_keywords": [
+          "20",
+          "25"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 18,
+      "pergunta": "FGV é mais difícil que FCC?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "comparacao",
+      "resposta": "**Comparação entre FGV e FCC**\n\nA pergunta sobre qual banca é mais difícil, FGV ou FCC, é subjetiva e depende de vários fatores, incluindo o tipo de concurso, o cargo e a área de conhecimento. No entanto, podemos fazer uma análise geral das características de cada banca.\n\n**FGV (Fundação Getúlio Var",
+      "latency_ms": 4495.1,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "fgv",
+          "fcc",
+          "raciocínio"
+        ],
+        "missing_keywords": [
+          "decoreba"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 19,
+      "pergunta": "O que estudar em Banco de Dados para concursos?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Banco de Dados para Concurso**\n\nPara concursos, é importante estudar os fundamentos de Banco de Dados, incluindo:\n\n* **Modelagem de Dados**: Entender como modelar dados para criar um banco de dados eficaz.\n* **Tipos de Bancos de Dados**: Conhecer os diferentes tipos de bancos de dados, como relaci",
+      "latency_ms": 4518.3,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "sql",
+          "normalização"
+        ],
+        "missing_keywords": [
+          "transações",
+          "índices"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 20,
+      "pergunta": "Como o CESPE avalia Direito Constitucional?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Avaliação do CESPE em Direito Constitucional**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e rigorosas. Em relação ao Direito Constitucional, o CESPE tende a avaliar os candidatos de forma ampla e profunda, abordando tanto os",
+      "latency_ms": 5366.5,
+      "validation": {
+        "keyword_match_score": 0.667,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "direitos fundamentais",
+          "organização"
+        ],
+        "missing_keywords": [
+          "constitucionalidade"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 21,
+      "pergunta": "Quais são as pegadinhas mais comuns do CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Pegadinhas Comuns do CESPE**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras do Brasil, responsável por realizar concursos públicos para diversas instituições. Embora o contexto fornecido não contenha informações específicas sobre o CESPE, posso forne",
+      "latency_ms": 4787.7,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sempre",
+          "nunca",
+          "todo",
+          "inversão",
+          "detalhes"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 22,
+      "pergunta": "O que a FGV cobra em Raciocínio Lógico?",
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Raciocínio Lógico na FGV**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por sua abordagem rigorosa e desafiadora em provas de concursos públicos. Embora o contexto fornecido não mencione explicitamente a FGV, posso fornecer informações gerais sobre o estilo de cobrança e form",
+      "latency_ms": 4649.8,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "lógica"
+        ],
+        "missing_keywords": [
+          "sequências",
+          "probabilidade",
+          "combinatória"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 23,
+      "pergunta": "Como preparar cronograma de estudos para CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Resumo Executivo**\nPara preparar um cronograma de estudos para o CESPE (Centro de Seleção e de Promoção de Eventos), é fundamental entender que o CESPE é uma instituição que realiza concursos públicos para várias entidades, incluindo a Prefeitura de Comodoro, mencionada no contexto. No entanto, os",
+      "latency_ms": 5337.8,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "questões",
+          "revisões"
+        ],
+        "missing_keywords": [
+          "disciplinas",
+          "tópicos"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 24,
+      "pergunta": "O que estudar em DevOps para concursos de TI?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Concursos de TI e DevOps**\n\nNão há informações específicas sobre o que estudar em DevOps para concursos de TI no contexto fornecido. No entanto, podemos destacar que os concursos mencionados não fornecem detalhes sobre o estudo de DevOps.\n\n**Concursos mencionados**\n\nAqui estão os concursos e links",
+      "latency_ms": 3771.9,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "docker",
+          "kubernetes",
+          "jenkins",
+          "git",
+          "ci/cd"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 25,
+      "pergunta": "FCC cobra jurisprudência ou só lei seca?",
+      "banca": "fcc",
+      "area": "jurídica",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "**FCC: Estilo de Cobrança e Formato de Questões**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora brasileira conhecida por sua abordagem rigorosa e detalhada em provas de concursos públicos. Embora o estilo de cobrança possa variar ligeiramente dependendo do concurso específico, a FCC geralm",
+      "latency_ms": 4648.1,
+      "validation": {
+        "keyword_match_score": 0.667,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "lei seca",
+          "jurisprudência"
+        ],
+        "missing_keywords": [
+          "raramente"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 26,
+      "pergunta": "Quais são os temas de Atualidades mais cobrados?",
+      "banca": null,
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Atualidades em Concurso Público**\n\nInfelizmente, não encontrei informações específicas sobre os temas de Atualidades mais cobrados nos concursos públicos no contexto fornecido. Os dados disponíveis se referem a vagas e editais de concursos, mas não fornecem informações sobre os temas de Atualidade",
+      "latency_ms": 3608.1,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "política",
+          "economia",
+          "meio ambiente",
+          "saúde"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 27,
+      "pergunta": "Como é a prova de Informática da FCC?",
+      "banca": "fcc",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "**Informações Gerais sobre a FCC**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora que atua em concursos públicos no Brasil. Embora o contexto fornecido não contenha informações específicas sobre a prova de Informática da FCC, posso fornecer informações gerais sobre o estilo de cobrança e fo",
+      "latency_ms": 4403.2,
+      "validation": {
+        "keyword_match_score": 0.2,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "redes"
+        ],
+        "missing_keywords": [
+          "windows",
+          "linux",
+          "office",
+          "segurança"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 28,
+      "pergunta": "O que estudar primeiro para CESPE Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**CESPE: Estilo de Cobrança e Formato de Questões**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e bem estruturadas. Para a área de Tecnologia, é importante entender que as questões abordam tanto conceitos teóricos quanto prátic",
+      "latency_ms": 4838.7,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "redes",
+          "banco de dados",
+          "segurança"
+        ],
+        "missing_keywords": [
+          "python"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 29,
+      "pergunta": "FGV cobra inglês nas provas de TI?",
+      "banca": "fgv",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**FGV e Inglês em Provas de TI**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora que atua em diversos concursos públicos no Brasil. Embora o contexto fornecido não mencione especificamente a FGV ou a cobrança de inglês em provas de TI, posso fornecer informações gerais sobre o estilo de cob",
+      "latency_ms": 4833.5,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "inglês",
+          "técnico",
+          "tecnologia"
+        ],
+        "missing_keywords": [
+          "sim"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 30,
+      "pergunta": "Qual a importância de fazer questões anteriores?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "**Importância de Fazer Questões Anteriores**\n\nFazer questões anteriores de provas de concursos públicos é uma estratégia fundamental para o sucesso nos estudos. Aqui estão algumas razões pelas quais isso é importante:\n\n*   **Conhecer o estilo da banca**: Cada banca examinadora tem um estilo próprio ",
+      "latency_ms": 4190.1,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "estilo",
+          "banca"
+        ],
+        "missing_keywords": [
+          "tópicos",
+          "tempo"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 31,
+      "pergunta": "O que o CESPE cobra em Direito Administrativo?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Introdução ao CESPE e Direito Administrativo**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por sua abordagem rigorosa e detalhada em provas de concursos públicos. Em Direito Administrativo, o CESPE costuma cobrar uma ampla gama de tópicos, visando avalia",
+      "latency_ms": 6173.1,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "servidores"
+        ],
+        "missing_keywords": [
+          "atos administrativos",
+          "licitações",
+          "improbidade"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 32,
+      "pergunta": "Como melhorar velocidade de leitura para CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Melhorando a Velocidade de Leitura para CESPE**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e complexas. Para melhorar a velocidade de leitura e ter sucesso em concursos organizados por essa banca, é fundamental desenvolver e",
+      "latency_ms": 5363.5,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "treinar"
+        ],
+        "missing_keywords": [
+          "cronometradas",
+          "leitura dinâmica"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 33,
+      "pergunta": "O que estudar em Algoritmos para concursos?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Algoritmos para Concurso**\n\nPara concursos, é importante estudar algoritmos básicos e fundamentais que são comumente utilizados em problemas de programação. Aqui estão alguns tópicos que você pode estudar:\n\n* **Estruturas de Dados**: \n + Listas\n + Pilhas\n + Filas\n + Árvores\n + Grafos\n* **Algoritmo",
+      "latency_ms": 4128.3,
+      "validation": {
+        "keyword_match_score": 1.0,
+        "has_expected_keywords": true,
+        "keywords_presentes": [
+          "estruturas de dados",
+          "ordenação",
+          "busca",
+          "complexidade"
+        ],
+        "missing_keywords": [],
+        "total_keywords": 4
+      },
+      "sucesso": true
+    },
+    {
+      "id": 34,
+      "pergunta": "FGV cobra mais direito ou administração?",
+      "banca": "fgv",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "geral",
+      "resposta": "**FGV: Estilo de Cobrança**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por sua abordagem rigorosa e objetiva. Embora não haja informações específicas sobre a FGV no contexto fornecido, posso fornecer uma visão geral sobre o estilo de cobrança da banca.\n\n**Direito vs. Administ",
+      "latency_ms": 4264.5,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "cargo"
+        ],
+        "missing_keywords": [
+          "equilibra",
+          "perfil"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 35,
+      "pergunta": "Quais certificações ajudam em concursos de TI?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Certificações em TI**\n\nInfelizmente, não encontrei informações específicas sobre certificações em TI no contexto fornecido. No entanto, posso fornecer algumas informações gerais sobre certificações que podem ser úteis em concursos de TI:\n\n* Certificações em áreas como desenvolvimento de software, ",
+      "latency_ms": 3963.7,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "itil",
+          "cobit",
+          "iso",
+          "cloud"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 36,
+      "pergunta": "Como o CESPE cobra Redação?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "tipo_questao",
+      "resposta": "**CESPE/CEBRASPE: Estilo de Cobrança em Redação**\n\nA CESPE/CEBRASPE é conhecida por sua abordagem rigorosa e objetiva em provas, incluindo a redação. Embora o contexto fornecido não contenha informações específicas sobre a banca CESPE/CEBRASPE, posso fornecer informações gerais sobre como essa banca",
+      "latency_ms": 5105.9,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "dissertativo",
+          "argumentativo",
+          "tema atual",
+          "norma culta"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 37,
+      "pergunta": "O que mais cai em Matemática para concursos?",
+      "banca": null,
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Matemática em Concursos**\n\nInfelizmente, não encontrei informações específicas sobre o que mais cai em Matemática para concursos nos dados fornecidos. Os links fornecidos se referem a descrições de cargos e profissões, como Arquiteto, Facilitador de TI, Técnico em Eletrotécnica, Assistente de Vend",
+      "latency_ms": 3628.0,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "porcentagem",
+          "regra de três",
+          "probabilidade",
+          "estatística"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 38,
+      "pergunta": "FCC é boa opção para iniciantes?",
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**Avaliando a FCC como opção para iniciantes**\n\nA FCC (Fundação Carlos Chagas) é uma das principais bancas examinadoras do Brasil, conhecida por sua experiência em elaborar provas para concursos públicos. No entanto, é importante considerar se a FCC é uma boa opção para iniciantes.\n\n**Estilo de cobr",
+      "latency_ms": 4666.0,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "sim",
+          "começar"
+        ],
+        "missing_keywords": [
+          "diretas",
+          "menos pegadinhas"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 39,
+      "pergunta": "O que estudar em Engenharia de Software?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Bem-vindo ao mundo da Engenharia de Software!**\n\nA Engenharia de Software é uma área fascinante que combina tecnologia, criatividade e resolução de problemas. Para estudar Engenharia de Software, é importante abordar uma variedade de tópicos, desde fundamentos teóricos até práticas práticas. Aqui ",
+      "latency_ms": 4366.2,
+      "validation": {
+        "keyword_match_score": 0.8,
+        "has_expected_keywords": true,
+        "keywords_presentes": [
+          "ágeis",
+          "scrum",
+          "testes",
+          "padrões"
+        ],
+        "missing_keywords": [
+          "uml"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": true
+    },
+    {
+      "id": 40,
+      "pergunta": "Como anotar durante os estudos?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "**Dicas para Anotar durante os Estudos**\n\nInfelizmente, não encontrei informações no contexto fornecido sobre como anotar durante os estudos. No entanto, posso fornecer algumas dicas gerais:\n\n*   **Organize suas anotações**: Utilize um sistema de organização que funcione para você, como pastas, cade",
+      "latency_ms": 3699.4,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "resumos"
+        ],
+        "missing_keywords": [
+          "mapas mentais",
+          "flashcards",
+          "erros"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 41,
+      "pergunta": "O CESPE desconta ponto errado?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**Resposta**\n\nSim, o CESPE (Centro de Seleção e de Promoção de Eventos) é conhecido por utilizar um sistema de correção que desconta pontos por respostas erradas em suas provas. Isso é uma característica comum em muitos concursos públicos no Brasil.\n\n**Estilo de Cobrança do CESPE**\n\nO CESPE é uma ba",
+      "latency_ms": 4788.2,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "sim",
+          "desconta"
+        ],
+        "missing_keywords": [
+          "certo/errado",
+          "anular"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 42,
+      "pergunta": "O que a FGV cobra em Economia?",
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Economia na FGV**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por suas provas desafiadoras e cobrança rigorosa. Embora não haja informações específicas sobre a FGV no contexto fornecido, posso fornecer informações gerais sobre o estilo de cobrança e o formato das questões de",
+      "latency_ms": 4926.7,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "indicadores",
+          "monetária"
+        ],
+        "missing_keywords": [
+          "macroeconomia",
+          "microeconomia"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 43,
+      "pergunta": "Como revisar para prova do CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Revisão para Prova do CESPE**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras de concursos públicos no Brasil. Para revisar para uma prova do CESPE, é importante entender o estilo de cobrança e o formato das questões.\n\n**Estilo de Cobrança**\n\n* O CESP",
+      "latency_ms": 4717.8,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "questões"
+        ],
+        "missing_keywords": [
+          "espaçada",
+          "erros",
+          "simulados"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 44,
+      "pergunta": "O que estudar em Cloud Computing?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Introdução ao Cloud Computing**\n=====================================\n\nO Cloud Computing é um modelo de entrega de serviços de tecnologia da informação (TI) pela internet, onde os recursos de computação, armazenamento e rede são fornecidos como serviços on-demand. Isso permite que as organizações ",
+      "latency_ms": 4399.9,
+      "validation": {
+        "keyword_match_score": 0.8,
+        "has_expected_keywords": true,
+        "keywords_presentes": [
+          "aws",
+          "azure",
+          "iaas",
+          "paas"
+        ],
+        "missing_keywords": [
+          "containers"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": true
+    },
+    {
+      "id": 45,
+      "pergunta": "FCC cobra atualidades?",
+      "banca": "fcc",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**FCC: Estilo de Cobrança e Atualidades**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora que realiza concursos públicos para várias instituições no Brasil. Embora o contexto fornecido não contenha informações específicas sobre a FCC, posso fornecer informações gerais sobre o estilo de cobra",
+      "latency_ms": 4401.2,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "atualidades"
+        ],
+        "missing_keywords": [
+          "sim",
+          "conhecimentos gerais"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 46,
+      "pergunta": "Qual a melhor hora para estudar?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "**Não há informações relevantes sobre a melhor hora para estudar no contexto fornecido**. O contexto apenas lista nomes de cidades ou órgãos (Câmaras e Guarda), sem fornecer detalhes sobre concursos, editais, horários de estudo ou qualquer outra informação relacionada à pergunta.\n\nSe você está procu",
+      "latency_ms": 3686.9,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "produtivo"
+        ],
+        "missing_keywords": [
+          "biotipo",
+          "manhã",
+          "consistência"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 47,
+      "pergunta": "O que o CESPE cobra em Direito Penal?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**CESPE/CEBRASPE: Estilo de Cobrança em Direito Penal**\n\nA CESPE/CEBRASPE é conhecida por sua abordagem rigorosa e detalhada em questões de Direito Penal. Aqui estão alguns pontos importantes sobre o estilo de cobrança da banca nessa área:\n\n* **Fundamentação Teórica**: A CESPE/CEBRASPE cobra uma sól",
+      "latency_ms": 4315.9,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "penas"
+        ],
+        "missing_keywords": [
+          "crimes",
+          "delitos",
+          "culpabilidade"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 48,
+      "pergunta": "Como gerenciar ansiedade na prova?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "**Gerenciando Ansiedade na Prova**\n\nEmbora o contexto fornecido contenha informações sobre concursos públicos, não há dados específicos sobre como gerenciar ansiedade na prova. No entanto, posso oferecer algumas **dicas gerais** para ajudar a lidar com a ansiedade durante as provas:\n\n*   **Preparaçã",
+      "latency_ms": 3526.9,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "respiração",
+          "confiança"
+        ],
+        "missing_keywords": [
+          "simulados",
+          "relaxamento"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 49,
+      "pergunta": "O que estudar em Sistemas Operacionais?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Sistemas Operacionais: Um Guia de Estudo**\n\nOlá! Estudar Sistemas Operacionais pode parecer um desafio, mas com um plano de estudo bem estruturado, você pode dominar essa matéria. Aqui está um guia para você começar:\n\n### **Introdução aos Sistemas Operacionais**\n\nUm Sistema Operacional (SO) é um s",
+      "latency_ms": 5017.7,
+      "validation": {
+        "keyword_match_score": 0.6,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "processos",
+          "threads",
+          "memória"
+        ],
+        "missing_keywords": [
+          "escalonamento",
+          "linux"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 50,
+      "pergunta": "FGV aceita recurso de questões?",
+      "banca": "fgv",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**FGV: Recurso de Questões**\n\nA Fundação Getúlio Vargas (FGV) é uma das principais bancas examinadoras de concursos públicos no Brasil. Embora o contexto fornecido não contenha informações específicas sobre a FGV, posso fornecer informações gerais sobre a banca.\n\n**Recurso de Questões**\n\nSim, a FGV ",
+      "latency_ms": 4163.8,
+      "validation": {
+        "keyword_match_score": 1.0,
+        "has_expected_keywords": true,
+        "keywords_presentes": [
+          "sim",
+          "recursos",
+          "prazo",
+          "edital",
+          "fundamentado"
+        ],
+        "missing_keywords": [],
+        "total_keywords": 5
+      },
+      "sucesso": true
+    }
+  ]
+}

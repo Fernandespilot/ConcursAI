@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ConcursAI — Chat IA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>
+    body { font-family: 'Inter', sans-serif; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { animation: spin .7s linear infinite; }
+</style>
+<script>
+    tailwind.config = { theme: { extend: {
+        colors: { primary:"#2563eb","primary-dark":"#1d4ed8","primary-light":"#eff6ff", surface:"#ffffff", canvas:"#f5f6f8", ink:"#111827","ink-2":"#374151","ink-3":"#6b7280","ink-4":"#9ca3af", line:"#e5e7eb", terminal:"#161b22" },
+        spacing: { "sidebar":"228px" } } } }
+</script>
+</head>
+<body class="bg-canvas text-ink antialiased">
+<div class="flex h-screen overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="w-sidebar min-w-[228px] bg-surface border-r border-line flex flex-col h-screen overflow-y-auto shrink-0">
+    <a href="/pages/home" class="flex items-center gap-2.5 px-4 pt-4 pb-3 border-b border-line">
+      <div class="w-8 h-8 bg-primary text-white rounded-md flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[18px]">school</span></div>
+      <span class="font-bold text-[15px] text-primary tracking-tight">ConcursAI</span>
+    </a>
+    <nav class="flex-1 py-2">
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Principal</p>
+      <a href="/pages/home" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">home</span> Início</a>
+      <a href="/pages/dashboard" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">dashboard</span> Dashboard</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">IA &amp; Busca</p>
+      <a href="/pages/chat" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-semibold bg-primary-light text-primary"><span class="material-symbols-outlined text-[18px]">smart_toy</span> Chat IA</a>
+      <a href="/pages/concursos" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">search</span> Concursos</a>
+      <a href="/pages/banca" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">account_balance</span> Análise de Banca</a>
+      <a href="/pages/ferramentas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">construction</span> Ferramentas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Documentos</p>
+      <a href="/pages/edital" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">description</span> Edital</a>
+      <a href="/pages/provas" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">assignment</span> Provas</a>
+      <p class="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-ink-4">Sistema</p>
+      <a href="/pages/scraping" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">sync_alt</span> Scraping</a>
+      <a href="/pages/admin" class="flex items-center gap-2.5 mx-2 my-0.5 px-3 py-2 rounded-md text-[13px] font-medium text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[18px]">settings_applications</span> Admin</a>
+    </nav>
+    <div class="px-4 py-3 border-t border-line">
+      <div class="flex items-center gap-1.5 text-[11px] text-ink-4">
+        <span id="sdot" class="w-1.5 h-1.5 rounded-full bg-ink-4"></span><span id="stxt">verificando...</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0">
+    <header class="h-[46px] min-h-[46px] flex items-center justify-between px-5 bg-surface border-b border-line shrink-0">
+      <div class="flex items-center gap-1.5 text-[13px] font-medium text-ink-3"><span class="material-symbols-outlined text-[16px] text-primary">smart_toy</span> Chat IA</div>
+      <div class="flex items-center gap-1">
+        <a href="/pages/dashboard" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">dashboard</span> Dashboard</a>
+        <a href="http://localhost:8000/docs" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[12px] text-ink-3 hover:bg-canvas hover:text-ink transition-colors"><span class="material-symbols-outlined text-[15px]">code</span> API</a>
+      </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+
+      <!-- Context panel -->
+      <section class="w-[260px] border-r border-line bg-surface flex flex-col shrink-0">
+        <div class="p-4 space-y-4 overflow-y-auto flex-1">
+          <button onclick="clearChat()" class="w-full py-2.5 px-4 bg-primary text-white rounded-lg text-[14px] font-medium flex items-center justify-center gap-2 hover:bg-primary-dark active:scale-[0.98] transition-all"><span class="material-symbols-outlined text-[20px]">add</span> Nova Sessão</button>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-semibold text-ink-4 uppercase tracking-wider">Agente Especializado</label>
+            <div id="agentes-list" class="space-y-1.5">
+              <button data-ag="" onclick="selAgente(this)" class="ag-btn w-full text-left px-3 py-2 rounded-lg border border-primary bg-primary-light text-primary text-[13px] font-medium flex items-center gap-2 transition-colors"><span class="material-symbols-outlined text-[18px]">hub</span> Supervisor (automático)</button>
+            </div>
+            <p class="text-[11px] text-ink-4 px-1 leading-snug">O supervisor escolhe o agente certo, ou fixe um você mesmo.</p>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[10px] font-semibold text-ink-4 uppercase tracking-wider px-1 block mb-1">Sugestões</label>
+            <button onclick="suggest('Quais concursos estão abertos para área de TI?')" class="w-full text-left px-3 py-2 rounded-lg text-ink-3 hover:bg-canvas text-[13px] transition-colors">Concursos abertos para TI</button>
+            <button onclick="suggest('Como estudar para CESPE/CEBRASPE?')" class="w-full text-left px-3 py-2 rounded-lg text-ink-3 hover:bg-canvas text-[13px] transition-colors">Como estudar para CESPE?</button>
+            <button onclick="suggest('Quais as principais bancas do Brasil?')" class="w-full text-left px-3 py-2 rounded-lg text-ink-3 hover:bg-canvas text-[13px] transition-colors">Principais bancas do Brasil</button>
+            <button onclick="suggest('Me explique o que é RAG aplicado a concursos')" class="w-full text-left px-3 py-2 rounded-lg text-ink-3 hover:bg-canvas text-[13px] transition-colors">O que é RAG?</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chat area -->
+      <section class="flex-1 flex flex-col bg-canvas relative min-w-0">
+        <div id="msgs" class="flex-1 overflow-y-auto p-6 space-y-5"></div>
+
+        <div class="p-4 bg-canvas border-t border-line">
+          <div class="max-w-3xl mx-auto">
+            <div class="bg-surface border-2 border-line focus-within:border-primary rounded-xl shadow-sm transition-all flex items-end p-2 gap-2">
+              <textarea id="inp" rows="1" placeholder="Pergunte qualquer coisa sobre concursos..." class="flex-1 bg-transparent border-none focus:ring-0 resize-none py-2.5 px-2 text-[14px] max-h-40 outline-none"></textarea>
+              <button id="send-btn" onclick="send()" class="bg-primary text-white p-2.5 rounded-lg flex items-center justify-center hover:bg-primary-dark active:scale-90 transition-all"><span class="material-symbols-outlined">send</span></button>
+            </div>
+            <p class="text-[10px] text-ink-4 mt-1.5 px-1">Pressione <strong>Enter</strong> para enviar · <strong>Shift + Enter</strong> para nova linha</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API='http://localhost:8000';
+function G(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(s){return esc(s).replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code class="bg-canvas px-1 rounded text-[12px]">$1</code>');}
+function ts(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+async function checkAPI(){
+  try{await fetch(API+'/status',{signal:AbortSignal.timeout(3000)});
+    G('sdot').className='w-1.5 h-1.5 rounded-full bg-emerald-500';G('stxt').textContent='API Online';
+  }catch(e){G('sdot').className='w-1.5 h-1.5 rounded-full bg-red-500';G('stxt').textContent='API Offline';}
+}
+let _agenteSel='';       // '' = supervisor automático
+const AG_ICON={busca:'search',edital:'description',banca:'account_balance',plano:'calendar_month',questoes:'quiz',tutor:'school'};
+async function carregarAgentes(){
+  try{
+    const r=await fetch(API+'/agentes',{signal:AbortSignal.timeout(4000)});
+    const d=await r.json();
+    if(!d.disponivel||!d.agentes)return;
+    const box=G('agentes-list');
+    d.agentes.forEach(a=>{
+      const b=document.createElement('button');
+      b.dataset.ag=a.id;b.title=a.descricao;
+      b.setAttribute('onclick','selAgente(this)');
+      b.className='ag-btn w-full text-left px-3 py-2 rounded-lg border border-line text-ink-3 hover:bg-canvas text-[13px] font-medium flex items-center gap-2 transition-colors';
+      b.innerHTML=`<span class="material-symbols-outlined text-[18px]">${AG_ICON[a.id]||'smart_toy'}</span> ${esc(a.nome.replace('Agente de ','').replace('Agente ',''))}`;
+      box.appendChild(b);
+    });
+  }catch(e){}
+}
+function selAgente(btn){
+  _agenteSel=btn.dataset.ag||'';
+  document.querySelectorAll('.ag-btn').forEach(b=>{
+    const on=b===btn;
+    b.className='ag-btn w-full text-left px-3 py-2 rounded-lg text-[13px] font-medium flex items-center gap-2 transition-colors '+(on?'border border-primary bg-primary-light text-primary':'border border-line text-ink-3 hover:bg-canvas');
+  });
+}
+function botRow(html,meta){
+  return `<div class="flex gap-3 max-w-3xl mx-auto w-full">
+    <div class="w-8 h-8 rounded-md bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-[18px]">smart_toy</span></div>
+    <div class="space-y-1 min-w-0"><div class="bg-surface border border-line p-3.5 rounded-xl rounded-tl-none text-[14px] leading-relaxed text-ink">${html}</div><span class="text-[10px] text-ink-4 font-medium px-1">${meta||ts()}</span></div></div>`;
+}
+function userRow(text){
+  return `<div class="flex gap-3 max-w-3xl mx-auto w-full flex-row-reverse">
+    <div class="w-8 h-8 rounded-md bg-ink-2 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-white text-[18px]">person</span></div>
+    <div class="space-y-1 text-right min-w-0"><div class="bg-primary text-white p-3.5 rounded-xl rounded-tr-none text-[14px] leading-relaxed inline-block text-left">${esc(text)}</div><br><span class="text-[10px] text-ink-4 font-medium px-1">${ts()}</span></div></div>`;
+}
+function addUser(text){const d=document.createElement('div');d.innerHTML=userRow(text);G('msgs').appendChild(d.firstElementChild);scrollDown();}
+function addBot(html,meta){const d=document.createElement('div');d.innerHTML=botRow(html,meta);const el=d.firstElementChild;G('msgs').appendChild(el);scrollDown();return el;}
+function scrollDown(){G('msgs').scrollTop=G('msgs').scrollHeight;}
+async function send(){
+  const inp=G('inp');const q=inp.value.trim();if(!q)return;
+  inp.value='';G('send-btn').disabled=true;
+  addUser(q);
+  const thinking=addBot('<span class="inline-block w-3.5 h-3.5 border-2 border-line border-t-primary rounded-full spin"></span> <span class="text-ink-3">Pensando...</span>','');
+  try{
+    const body={pergunta:q};
+    if(_agenteSel)body.agente=_agenteSel;
+    const r=await fetch(API+'/agente/perguntar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(60000)});
+    const d=await r.json();
+    const resp=d.resposta||d.response||d.answer||d.message||JSON.stringify(d);
+    const tag=d.agente_nome?`<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary-light px-2 py-0.5 rounded-full mb-1.5">${d.agente_emoji||''} ${esc(d.agente_nome)}${d.automatico?' · auto':''}</span><br>`:'';
+    thinking.querySelector('div').innerHTML=`<div class="bg-surface border border-line p-3.5 rounded-xl rounded-tl-none text-[14px] leading-relaxed text-ink">${tag}${fmt(resp)}</div><span class="text-[10px] text-ink-4 font-medium px-1">${ts()}</span>`;
+  }catch(e){
+    thinking.querySelector('div').innerHTML=`<div class="bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-xl rounded-tl-none text-[14px]">Erro: ${esc(e.message)}</div>`;
+  }
+  G('send-btn').disabled=false;scrollDown();
+}
+function suggest(q){G('inp').value=q;send();}
+function clearChat(){
+  G('msgs').innerHTML='';
+  addBot('Olá! Sou o assistente especializado da <strong>ConcursAI</strong>. Posso analisar editais, explicar conceitos e gerar simulados com base nos concursos indexados. Como posso ajudar hoje?','Agora');
+}
+G('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
+checkAPI();
+carregarAgentes();
+clearChat();
+const params=new URLSearchParams(location.search);
+if(params.get('q')){G('inp').value=params.get('q');send();}
+</script>
+</body></html>
