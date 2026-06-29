@@ -1,343 +1,212 @@
+# -*- coding: utf-8 -*-
 """
-🎯 BENCHMARK DO MODELO - ConcursAI
-===================================
-Testa o modelo contra ground truth e gera relatório de métricas
+BENCHMARK DO MODELO - ConcursAI
+================================
+Testa o sistema (agentes + Groq) contra ground truth e gera relatório.
 
 Uso:
-    python benchmark_modelo.py
+    python scripts/benchmark_modelo.py
+    python scripts/benchmark_modelo.py --num 10
 """
 
-import logging
 import json
+import time
+import sys
+import os
+import requests
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
-import time
 
-from modules.rag_banca_inteligente import get_rag_inteligente
-from modules.model_metrics import get_model_metrics
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+API_URL = "http://localhost:8000"
+GT_PATH = Path("datasets/ground_truth_rag.json")
+OUT_DIR = Path("benchmarks")
 
 
-def carregar_ground_truth() -> List[Dict]:
-    """Carrega dataset de ground truth"""
-    
-    gt_path = Path("datasets/ground_truth_rag.json")
-    
-    if not gt_path.exists():
-        logger.error(f"❌ Ground truth não encontrado: {gt_path}")
-        return []
-    
-    with open(gt_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    
-    perguntas = data.get('perguntas', [])
-    logger.info(f"✅ Carregadas {len(perguntas)} perguntas do ground truth")
-    
+def carregar_ground_truth(num=None, bancas=None, areas=None):
+    with open(GT_PATH, "r", encoding="utf-8") as f:
+        perguntas = json.load(f).get("perguntas", [])
+    if bancas:
+        bl = [b.lower() for b in bancas]
+        perguntas = [p for p in perguntas if p.get("banca", "").lower() in bl]
+    if areas:
+        al = [a.lower() for a in areas]
+        perguntas = [p for p in perguntas if p.get("area", "").lower() in al]
+    if num:
+        perguntas = perguntas[:num]
     return perguntas
 
 
-def executar_benchmark(
-    num_perguntas: int = None,
-    bancas: List[str] = None,
-    areas: List[str] = None,
-    usar_ollama: bool = False
-) -> Dict:
-    """
-    Executa benchmark do modelo
-    
-    Args:
-        num_perguntas: Número de perguntas a testar (None = todas)
-        bancas: Filtrar por bancas específicas
-        areas: Filtrar por áreas específicas
-        usar_ollama: Se True, usa Ollama (mais lento mas mais realista)
-        
-    Returns:
-        Dicionário com resultados do benchmark
-    """
-    
-    logger.info("🚀 Iniciando Benchmark do Modelo...")
-    logger.info(f"⚙️  Configuração: usar_ollama={usar_ollama}")
-    
-    # Carregar ground truth
-    perguntas_gt = carregar_ground_truth()
-    
-    if not perguntas_gt:
-        return {"erro": "Ground truth não carregado"}
-    
-    # Filtrar perguntas
-    if bancas:
-        perguntas_gt = [p for p in perguntas_gt if p.get('banca', '').lower() in [b.lower() for b in bancas]]
-        logger.info(f"🔍 Filtrado para bancas: {bancas}")
-    
-    if areas:
-        perguntas_gt = [p for p in perguntas_gt if p.get('area', '').lower() in [a.lower() for a in areas]]
-        logger.info(f"🔍 Filtrado para áreas: {areas}")
-    
-    if num_perguntas:
-        perguntas_gt = perguntas_gt[:num_perguntas]
-    
-    logger.info(f"📊 Testando {len(perguntas_gt)} perguntas...")
-    
-    # Inicializar RAG e métricas
-    rag = get_rag_inteligente()
-    metrics = get_model_metrics()
-    
-    # Executar perguntas
+def perguntar(pergunta: str) -> tuple[str, float]:
+    t0 = time.time()
+    r = requests.post(
+        f"{API_URL}/agente/perguntar",
+        json={"pergunta": pergunta},
+        timeout=120,
+    )
+    latency = (time.time() - t0) * 1000
+    if r.status_code != 200:
+        return f"[ERRO HTTP {r.status_code}]", latency
+    data = r.json()
+    return data.get("resposta", ""), latency
+
+
+def validar(resposta: str, gt_entry: dict) -> dict:
+    keywords = gt_entry.get("keywords_obrigatorias", [])
+    resp_lower = resposta.lower()
+    presentes = [kw for kw in keywords if kw.lower() in resp_lower]
+    faltando = [kw for kw in keywords if kw.lower() not in resp_lower]
+    score = len(presentes) / len(keywords) if keywords else 0.0
+    return {
+        "keyword_match_score": round(score, 3),
+        "has_expected_keywords": score >= 0.8,
+        "keywords_presentes": presentes,
+        "missing_keywords": faltando,
+        "total_keywords": len(keywords),
+    }
+
+
+def executar_benchmark(num=None, bancas=None, areas=None):
+    perguntas = carregar_ground_truth(num, bancas, areas)
+    total = len(perguntas)
+    print(f"\n{'='*70}")
+    print(f"  BENCHMARK ConcursAI — {total} perguntas via Groq (llama-3.3-70b)")
+    print(f"{'='*70}\n")
+
     resultados = []
-    
-    for i, pergunta_gt in enumerate(perguntas_gt, 1):
-        pergunta = pergunta_gt['pergunta']
-        
-        logger.info(f"\n{'='*70}")
-        logger.info(f"[{i}/{len(perguntas_gt)}] ❓ {pergunta}")
-        
-        start = time.time()
-        
-        try:
-            # Gerar resposta
-            resposta = rag.responder(pergunta, usar_ollama=usar_ollama)
-            
-            latency = (time.time() - start) * 1000
-            
-            # Validar contra ground truth
-            validation = metrics.validator.validate_response(pergunta, resposta)
-            
-            resultado = {
-                'id': pergunta_gt['id'],
-                'pergunta': pergunta,
-                'banca': pergunta_gt.get('banca', 'N/A'),
-                'area': pergunta_gt.get('area', 'N/A'),
-                'dificuldade': pergunta_gt.get('dificuldade', 'N/A'),
-                'tipo': pergunta_gt.get('tipo', 'N/A'),
-                'resposta': resposta[:200] + "..." if len(resposta) > 200 else resposta,
-                'resposta_esperada': pergunta_gt['resposta_esperada'][:100] + "...",
-                'latency_ms': latency,
-                'validation': validation,
-                'sucesso': validation['has_expected_keywords'] if validation else False
-            }
-            
-            resultados.append(resultado)
-            
-            # Log resultado
-            if validation:
-                score = validation['keyword_match_score']
-                match = "✅" if score >= 0.8 else "⚠️" if score >= 0.5 else "❌"
-                logger.info(f"{match} Score: {score:.2f} | Latência: {latency:.0f}ms")
-            else:
-                logger.info(f"⚠️  Sem validação | Latência: {latency:.0f}ms")
-        
-        except Exception as e:
-            logger.error(f"❌ Erro: {e}")
-            resultados.append({
-                'id': pergunta_gt['id'],
-                'pergunta': pergunta,
-                'erro': str(e),
-                'sucesso': False
-            })
-    
-    # Calcular estatísticas
-    logger.info(f"\n{'='*70}")
-    logger.info("📊 CALCULANDO ESTATÍSTICAS...")
-    
-    sucessos = [r for r in resultados if r.get('sucesso')]
-    total = len(resultados)
-    
-    # Métricas de qualidade
-    keyword_scores = [r['validation']['keyword_match_score'] for r in resultados if 'validation' in r and r['validation']]
-    exact_matches = sum(1 for r in resultados if r.get('validation', {}).get('exact_match'))
-    
-    # Métricas de performance
-    latencies = [r['latency_ms'] for r in resultados if 'latency_ms' in r]
-    
-    estatisticas = {
-        'total_perguntas': total,
-        'perguntas_com_sucesso': len(sucessos),
-        'taxa_sucesso': len(sucessos) / total if total > 0 else 0,
-        'qualidade': {
-            'keyword_match_score_medio': sum(keyword_scores) / len(keyword_scores) if keyword_scores else 0,
-            'exact_matches': exact_matches,
-            'exact_match_rate': exact_matches / total if total > 0 else 0,
-        },
-        'performance': {
-            'latency_media_ms': sum(latencies) / len(latencies) if latencies else 0,
-            'latency_min_ms': min(latencies) if latencies else 0,
-            'latency_max_ms': max(latencies) if latencies else 0,
-            'latency_p50_ms': sorted(latencies)[len(latencies)//2] if latencies else 0,
-            'latency_p95_ms': sorted(latencies)[int(len(latencies)*0.95)] if latencies else 0,
-        },
-        'distribuicao': {
-            'por_banca': {},
-            'por_area': {},
-            'por_dificuldade': {},
-            'por_tipo': {}
-        }
-    }
-    
+    for i, gt in enumerate(perguntas, 1):
+        p = gt["pergunta"]
+        print(f"[{i}/{total}] {p}")
+
+        resposta, latency = perguntar(p)
+        val = validar(resposta, gt)
+
+        icon = "✅" if val["has_expected_keywords"] else ("⚠️" if val["keyword_match_score"] >= 0.5 else "❌")
+        print(f"  {icon} score={val['keyword_match_score']:.2f}  latência={latency:.0f}ms  faltando={val['missing_keywords']}")
+
+        resultados.append({
+            "id": gt["id"],
+            "pergunta": p,
+            "banca": gt.get("banca", ""),
+            "area": gt.get("area", ""),
+            "dificuldade": gt.get("dificuldade", ""),
+            "tipo": gt.get("tipo", ""),
+            "resposta": resposta[:300],
+            "latency_ms": round(latency, 1),
+            "validation": val,
+            "sucesso": val["has_expected_keywords"],
+        })
+
+    # --- Estatísticas ---
+    sucessos = [r for r in resultados if r["sucesso"]]
+    scores = [r["validation"]["keyword_match_score"] for r in resultados]
+    latencies = [r["latency_ms"] for r in resultados]
+
+    # Precision/Recall por keywords
+    tp = sum(len(r["validation"]["keywords_presentes"]) for r in resultados)
+    fn = sum(len(r["validation"]["missing_keywords"]) for r in resultados)
+    total_kw = tp + fn
+    precision = tp / total_kw if total_kw else 0
+    recall = tp / total_kw if total_kw else 0
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0
+
     # Distribuições
-    for resultado in resultados:
-        banca = resultado.get('banca', 'N/A')
-        area = resultado.get('area', 'N/A')
-        dificuldade = resultado.get('dificuldade', 'N/A')
-        tipo = resultado.get('tipo', 'N/A')
-        sucesso = resultado.get('sucesso', False)
-        
-        # Por banca
-        if banca not in estatisticas['distribuicao']['por_banca']:
-            estatisticas['distribuicao']['por_banca'][banca] = {'total': 0, 'sucesso': 0}
-        estatisticas['distribuicao']['por_banca'][banca]['total'] += 1
-        if sucesso:
-            estatisticas['distribuicao']['por_banca'][banca]['sucesso'] += 1
-        
-        # Por área
-        if area not in estatisticas['distribuicao']['por_area']:
-            estatisticas['distribuicao']['por_area'][area] = {'total': 0, 'sucesso': 0}
-        estatisticas['distribuicao']['por_area'][area]['total'] += 1
-        if sucesso:
-            estatisticas['distribuicao']['por_area'][area]['sucesso'] += 1
-        
-        # Por dificuldade
-        if dificuldade not in estatisticas['distribuicao']['por_dificuldade']:
-            estatisticas['distribuicao']['por_dificuldade'][dificuldade] = {'total': 0, 'sucesso': 0}
-        estatisticas['distribuicao']['por_dificuldade'][dificuldade]['total'] += 1
-        if sucesso:
-            estatisticas['distribuicao']['por_dificuldade'][dificuldade]['sucesso'] += 1
-        
-        # Por tipo
-        if tipo not in estatisticas['distribuicao']['por_tipo']:
-            estatisticas['distribuicao']['por_tipo'][tipo] = {'total': 0, 'sucesso': 0}
-        estatisticas['distribuicao']['por_tipo'][tipo]['total'] += 1
-        if sucesso:
-            estatisticas['distribuicao']['por_tipo'][tipo]['sucesso'] += 1
-    
-    # Gerar relatório
-    relatorio = {
-        'timestamp': datetime.now().isoformat(),
-        'configuracao': {
-            'usar_ollama': usar_ollama,
-            'num_perguntas_testadas': total,
-            'bancas_filtradas': bancas,
-            'areas_filtradas': areas
+    dist = {"por_banca": {}, "por_area": {}, "por_tipo": {}, "por_dificuldade": {}}
+    for r in resultados:
+        for chave in dist:
+            campo = chave.replace("por_", "")
+            val_campo = r.get(campo, "N/A")
+            if val_campo not in dist[chave]:
+                dist[chave][val_campo] = {"total": 0, "sucesso": 0}
+            dist[chave][val_campo]["total"] += 1
+            if r["sucesso"]:
+                dist[chave][val_campo]["sucesso"] += 1
+
+    stats = {
+        "total_perguntas": total,
+        "perguntas_com_sucesso": len(sucessos),
+        "taxa_sucesso": round(len(sucessos) / total, 3) if total else 0,
+        "qualidade": {
+            "keyword_match_score_medio": round(sum(scores) / len(scores), 3) if scores else 0,
+            "precision": round(precision, 3),
+            "recall": round(recall, 3),
+            "f1_score": round(f1, 3),
         },
-        'estatisticas': estatisticas,
-        'resultados_detalhados': resultados
+        "performance": {
+            "latency_media_ms": round(sum(latencies) / len(latencies)) if latencies else 0,
+            "latency_min_ms": round(min(latencies)) if latencies else 0,
+            "latency_max_ms": round(max(latencies)) if latencies else 0,
+            "latency_p50_ms": round(sorted(latencies)[len(latencies) // 2]) if latencies else 0,
+            "latency_p95_ms": round(sorted(latencies)[int(len(latencies) * 0.95)]) if latencies else 0,
+        },
+        "distribuicao": dist,
     }
-    
+
+    relatorio = {
+        "timestamp": datetime.now().isoformat(),
+        "configuracao": {
+            "modelo": "llama-3.3-70b-versatile (Groq)",
+            "sistema": "agentes + RAG + ChromaDB",
+            "num_perguntas": total,
+        },
+        "estatisticas": stats,
+        "resultados_detalhados": resultados,
+    }
+
+    # Salvar
+    OUT_DIR.mkdir(exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    out = OUT_DIR / f"benchmark_{ts}.json"
+    with open(out, "w", encoding="utf-8") as f:
+        json.dump(relatorio, f, indent=2, ensure_ascii=False)
+
+    # Imprimir resumo
+    print(f"""
+{'='*70}
+  RESUMO DO BENCHMARK
+{'='*70}
+
+  Modelo: llama-3.3-70b-versatile (Groq)
+  Data:   {relatorio['timestamp']}
+
+  QUALIDADE
+  {'─'*40}
+  Total perguntas:       {stats['total_perguntas']}
+  Sucesso (≥80% kw):     {stats['perguntas_com_sucesso']} ({stats['taxa_sucesso']:.1%})
+  Keyword Match médio:   {stats['qualidade']['keyword_match_score_medio']:.1%}
+  Precision:             {stats['qualidade']['precision']:.1%}
+  Recall:                {stats['qualidade']['recall']:.1%}
+  F1 Score:              {stats['qualidade']['f1_score']:.1%}
+
+  PERFORMANCE
+  {'─'*40}
+  Latência média:        {stats['performance']['latency_media_ms']}ms
+  Latência P50:          {stats['performance']['latency_p50_ms']}ms
+  Latência P95:          {stats['performance']['latency_p95_ms']}ms
+  Latência min/max:      {stats['performance']['latency_min_ms']}/{stats['performance']['latency_max_ms']}ms
+
+  POR BANCA
+  {'─'*40}""")
+    for b, d in sorted(dist["por_banca"].items(), key=lambda x: str(x[0])):
+        t = d["sucesso"] / d["total"] if d["total"] else 0
+        print(f"  {str(b or 'N/A'):15s}  {d['sucesso']:2d}/{d['total']:2d}  ({t:.0%})")
+
+    print(f"\n  POR ÁREA\n  {'─'*40}")
+    for a, d in sorted(dist["por_area"].items(), key=lambda x: str(x[0])):
+        t = d["sucesso"] / d["total"] if d["total"] else 0
+        print(f"  {str(a or 'N/A'):20s}  {d['sucesso']:2d}/{d['total']:2d}  ({t:.0%})")
+
+    print(f"\n{'='*70}")
+    print(f"  Relatório salvo: {out}")
+    print(f"{'='*70}\n")
+
     return relatorio
 
 
-def salvar_relatorio(relatorio: Dict, nome_arquivo: str = None):
-    """Salva relatório em JSON"""
-    
-    if nome_arquivo is None:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        nome_arquivo = f"benchmark_resultado_{timestamp}.json"
-    
-    output_dir = Path("benchmarks")
-    output_dir.mkdir(exist_ok=True)
-    
-    output_path = output_dir / nome_arquivo
-    
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(relatorio, f, indent=2, ensure_ascii=False)
-    
-    logger.info(f"💾 Relatório salvo: {output_path}")
-    
-    return output_path
-
-
-def imprimir_resumo(relatorio: Dict):
-    """Imprime resumo do benchmark"""
-    
-    stats = relatorio['estatisticas']
-    
-    print(f"""
-{'='*70}
-🎯 RESUMO DO BENCHMARK
-{'='*70}
-
-📅 Data: {relatorio['timestamp']}
-⚙️  Ollama: {'Sim' if relatorio['configuracao']['usar_ollama'] else 'Não'}
-
-📊 QUALIDADE
-{'='*70}
-Total de Perguntas: {stats['total_perguntas']}
-Respostas com Sucesso: {stats['perguntas_com_sucesso']} ({stats['taxa_sucesso']:.1%})
-Keyword Match Score Médio: {stats['qualidade']['keyword_match_score_medio']:.2%}
-Exact Matches: {stats['qualidade']['exact_matches']} ({stats['qualidade']['exact_match_rate']:.1%})
-
-⚡ PERFORMANCE
-{'='*70}
-Latência Média: {stats['performance']['latency_media_ms']:.0f}ms
-Latência Mínima: {stats['performance']['latency_min_ms']:.0f}ms
-Latência Máxima: {stats['performance']['latency_max_ms']:.0f}ms
-Latência P50: {stats['performance']['latency_p50_ms']:.0f}ms
-Latência P95: {stats['performance']['latency_p95_ms']:.0f}ms
-
-📈 DISTRIBUIÇÃO POR BANCA
-{'='*70}
-""")
-    
-    for banca, dados in stats['distribuicao']['por_banca'].items():
-        taxa = dados['sucesso'] / dados['total'] if dados['total'] > 0 else 0
-        print(f"{banca:15s}: {dados['sucesso']:2d}/{dados['total']:2d} ({taxa:.1%})")
-    
-    print(f"""
-📈 DISTRIBUIÇÃO POR ÁREA
-{'='*70}
-""")
-    
-    for area, dados in stats['distribuicao']['por_area'].items():
-        taxa = dados['sucesso'] / dados['total'] if dados['total'] > 0 else 0
-        print(f"{area:20s}: {dados['sucesso']:2d}/{dados['total']:2d} ({taxa:.1%})")
-    
-    print(f"""
-📈 DISTRIBUIÇÃO POR TIPO
-{'='*70}
-""")
-    
-    for tipo, dados in stats['distribuicao']['por_tipo'].items():
-        taxa = dados['sucesso'] / dados['total'] if dados['total'] > 0 else 0
-        print(f"{tipo:20s}: {dados['sucesso']:2d}/{dados['total']:2d} ({taxa:.1%})")
-    
-    print(f"\n{'='*70}\n")
-
-
-def main():
-    """Função principal"""
-    
-    import argparse
-    
-    parser = argparse.ArgumentParser(description='Benchmark do Modelo ConcursAI')
-    parser.add_argument('--num', type=int, default=None, help='Número de perguntas a testar')
-    parser.add_argument('--banca', nargs='+', help='Filtrar por bancas específicas')
-    parser.add_argument('--area', nargs='+', help='Filtrar por áreas específicas')
-    parser.add_argument('--ollama', action='store_true', help='Usar Ollama (mais lento)')
-    parser.add_argument('--output', type=str, default=None, help='Nome do arquivo de saída')
-    
-    args = parser.parse_args()
-    
-    # Executar benchmark
-    relatorio = executar_benchmark(
-        num_perguntas=args.num,
-        bancas=args.banca,
-        areas=args.area,
-        usar_ollama=args.ollama
-    )
-    
-    # Salvar relatório
-    output_path = salvar_relatorio(relatorio, args.output)
-    
-    # Imprimir resumo
-    imprimir_resumo(relatorio)
-    
-    logger.info(f"✅ Benchmark concluído! Relatório: {output_path}")
-
-
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description="Benchmark ConcursAI")
+    parser.add_argument("--num", type=int, default=None)
+    parser.add_argument("--banca", nargs="+", default=None)
+    parser.add_argument("--area", nargs="+", default=None)
+    args = parser.parse_args()
+    executar_benchmark(num=args.num, bancas=args.banca, areas=args.area)

@@ -1,0 +1,1278 @@
+{
+  "timestamp": "2026-06-29T12:34:30.168247",
+  "configuracao": {
+    "modelo": "llama-3.3-70b-versatile (Groq)",
+    "sistema": "agentes + RAG + ChromaDB",
+    "num_perguntas": 50
+  },
+  "estatisticas": {
+    "total_perguntas": 50,
+    "perguntas_com_sucesso": 2,
+    "taxa_sucesso": 0.04,
+    "qualidade": {
+      "keyword_match_score_medio": 0.198,
+      "precision": 0.192,
+      "recall": 0.192,
+      "f1_score": 0.192
+    },
+    "performance": {
+      "latency_media_ms": 3472,
+      "latency_min_ms": 2369,
+      "latency_max_ms": 5360,
+      "latency_p50_ms": 2802,
+      "latency_p95_ms": 5118
+    },
+    "distribuicao": {
+      "por_banca": {
+        "cebraspe": {
+          "total": 21,
+          "sucesso": 2
+        },
+        "fcc": {
+          "total": 7,
+          "sucesso": 0
+        },
+        "fgv": {
+          "total": 7,
+          "sucesso": 0
+        },
+        "null": {
+          "total": 15,
+          "sucesso": 0
+        }
+      },
+      "por_area": {
+        "tecnologia": {
+          "total": 17,
+          "sucesso": 2
+        },
+        "jurídica": {
+          "total": 6,
+          "sucesso": 0
+        },
+        "conhecimentos_gerais": {
+          "total": 6,
+          "sucesso": 0
+        },
+        "geral": {
+          "total": 15,
+          "sucesso": 0
+        },
+        "português": {
+          "total": 5,
+          "sucesso": 0
+        },
+        "administrativa": {
+          "total": 1,
+          "sucesso": 0
+        }
+      },
+      "por_tipo": {
+        "o_que_mais_cai": {
+          "total": 21,
+          "sucesso": 2
+        },
+        "como_estudar": {
+          "total": 12,
+          "sucesso": 0
+        },
+        "dificuldade": {
+          "total": 1,
+          "sucesso": 0
+        },
+        "tempo_estudo": {
+          "total": 1,
+          "sucesso": 0
+        },
+        "tipo_questao": {
+          "total": 6,
+          "sucesso": 0
+        },
+        "comparacao": {
+          "total": 2,
+          "sucesso": 0
+        },
+        "geral": {
+          "total": 7,
+          "sucesso": 0
+        }
+      },
+      "por_dificuldade": {
+        "fácil": {
+          "total": 21,
+          "sucesso": 1
+        },
+        "média": {
+          "total": 29,
+          "sucesso": 1
+        }
+      }
+    }
+  },
+  "resultados_detalhados": [
+    {
+      "id": 1,
+      "pergunta": "O que o CESPE mais cobra em Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Introdução ao CESPE**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras do Brasil, responsável por realizar concursos públicos para diversas instituições. Embora o contexto fornecido não contenha informações específicas sobre o CESPE, posso fornecer uma",
+      "latency_ms": 4996.1,
+      "validation": {
+        "keyword_match_score": 1.0,
+        "has_expected_keywords": true,
+        "keywords_presentes": [
+          "python",
+          "redes",
+          "segurança",
+          "banco de dados"
+        ],
+        "missing_keywords": [],
+        "total_keywords": 4
+      },
+      "sucesso": true
+    },
+    {
+      "id": 2,
+      "pergunta": "Como estudar para FCC na área de Direito?",
+      "banca": "fcc",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Estudando para a FCC na Área de Direito**\n\nA Fundação Carlos Chagas (FCC) é uma das principais bancas examinadoras de concursos públicos no Brasil, conhecida por sua rigorosidade e exigência. Para estudar para a FCC na área de Direito, é fundamental entender o estilo de cobrança, o formato das que",
+      "latency_ms": 5360.3,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "legislação",
+          "lei",
+          "questões anteriores"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 3,
+      "pergunta": "Qual a dificuldade do CESPE em Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "dificuldade",
+      "resposta": "**Dificuldade do CESPE em Tecnologia**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e rigorosas. Em relação à área de Tecnologia, o CESPE é conhecido por cobrar conhecimentos teóricos e práticos em profundidade.\n\n**Estilo de Cob",
+      "latency_ms": 4752.0,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "pegadinhas"
+        ],
+        "missing_keywords": [
+          "certo/errado",
+          "atenção"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 4,
+      "pergunta": "O que a FGV mais cobra em Conhecimentos Gerais?",
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Conhecimento Geral na FGV**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por sua abordagem rigorosa e diversificada em provas de concurso público. Embora o contexto fornecido não mencione explicitamente a FGV como a banca responsável por nenhum dos concursos listados, posso f",
+      "latency_ms": 4905.9,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "atualidades",
+          "história",
+          "geografia"
+        ],
+        "missing_keywords": [
+          "política"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 5,
+      "pergunta": "Quanto tempo estudar para CESPE Jurídica?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "tempo_estudo",
+      "resposta": "**Tempo de Estudo para CESPE Jurídica**\n\nO tempo de estudo necessário para a CESPE (CESPE/CEBRASPE) Jurídica depende de vários fatores, como o nível de conhecimento prévio do candidato, a complexidade do edital e a dedicação diária ao estudo.\n\n**Fatores a Considerar**\n\n*   **Conhecimento Prévio**: S",
+      "latency_ms": 4364.9,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "meses"
+        ],
+        "missing_keywords": [
+          "horas",
+          "focado"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 6,
+      "pergunta": "Quais linguagens de programação o CESPE mais cobra?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "Esta informação não está nos trechos analisados. Os trechos fornecidos apenas apresentam informações sobre vagas de concurso em diferentes instituições, como UNESP, Câmara de Cataguases, Prefeitura de Barra do Bugres, Câmara de Vereadores de Xavantina e IASEP, mas não mencionam o CESPE ou linguagens",
+      "latency_ms": 3718.0,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "python",
+          "java",
+          "javascript",
+          "sql"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 7,
+      "pergunta": "Como é o estilo de questões da FCC?",
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "**Estilo de Questões da FCC**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora conhecida por sua abordagem objetiva e direta nas questões. Aqui estão algumas características do estilo de questões da FCC:\n\n* **Questões objetivas**: A FCC é especializada em questões de múltipla escolha, com 4 o",
+      "latency_ms": 4428.6,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "objetivas"
+        ],
+        "missing_keywords": [
+          "diretas",
+          "literalidade",
+          "lei"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 8,
+      "pergunta": "O que mais cai em Português no CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**CESPE: Estilo de Cobrança em Português**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma das principais bancas examinadoras de concursos públicos no Brasil. Em Português, a CESPE é conhecida por cobrar questões que exigem uma boa compreensão da língua portuguesa, incluindo gramática, s",
+      "latency_ms": 4873.1,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "interpretação",
+          "concordância",
+          "regência"
+        ],
+        "missing_keywords": [
+          "crase"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 9,
+      "pergunta": "Compare FCC e FGV na área Administrativa",
+      "banca": null,
+      "area": "administrativa",
+      "dificuldade": "média",
+      "tipo": "comparacao",
+      "resposta": "**Comparação entre FCC e FGV na Área Administrativa**\n\nA FCC (Fundação Carlos Chagas) e a FGV (Fundação Getúlio Vargas) são duas das principais bancas examinadoras de concursos públicos no Brasil. Embora ambas tenham experiência em elaborar provas para diversos cargos, incluindo os da área administr",
+      "latency_ms": 4984.8,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "fcc",
+          "fgv"
+        ],
+        "missing_keywords": [
+          "legislação",
+          "raciocínio"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 10,
+      "pergunta": "O que estudar em Redes para CESPE Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**CESPE/CEBRASPE: Estilo de Cobrança e Formato de Questões**\n\nA CESPE/CEBRASPE é uma banca examinadora conhecida por suas provas desafiadoras e cobrança rigorosa. Em relação às questões de Redes, é importante destacar que a banca costuma abordar tópicos específicos e detalhados.\n\n**Tópicos de Redes ",
+      "latency_ms": 5306.1,
+      "validation": {
+        "keyword_match_score": 1.0,
+        "has_expected_keywords": true,
+        "keywords_presentes": [
+          "tcp/ip",
+          "dns",
+          "http",
+          "firewall"
+        ],
+        "missing_keywords": [],
+        "total_keywords": 4
+      },
+      "sucesso": true
+    },
+    {
+      "id": 11,
+      "pergunta": "Qual a melhor estratégia para CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Estratégia para CESPE/CEBRASPE**\n\nA CESPE/CEBRASPE é uma das principais bancas examinadoras do Brasil, conhecida por suas provas desafiadoras e bem elaboradas. Para se sair bem em uma prova da CESPE, é fundamental adotar uma estratégia eficaz. Aqui estão algumas dicas:\n\n### **Conheça o estilo de c",
+      "latency_ms": 4643.0,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "atenção",
+          "tempo"
+        ],
+        "missing_keywords": [
+          "palavras absolutas",
+          "anular"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 12,
+      "pergunta": "O que a FGV cobra em Tecnologia?",
+      "banca": "fgv",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**FGV: Estilo de Cobrança em Tecnologia**\n\nA Fundação Getúlio Vargas (FGV) é uma banca examinadora conhecida por sua abordagem rigorosa e objetiva. Em provas de tecnologia, a FGV tende a cobrar conhecimentos teóricos e práticos, com foco em conceitos e habilidades específicas.\n\n**Formato das Questõe",
+      "latency_ms": 4292.8,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "programação",
+          "banco de dados",
+          "engenharia de software",
+          "redes"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 13,
+      "pergunta": "Como funciona a prova de Português do CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "tipo_questao",
+      "resposta": "**Entendendo a Prova de Português do CESPE**\n\nA prova de Português do CESPE (Centro de Seleção e de Promoção de Eventos) é uma das disciplinas mais importantes em concursos públicos no Brasil. Ela visa avaliar a capacidade do candidato de compreender e utilizar a língua portuguesa de forma correta e",
+      "latency_ms": 4220.6,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "interpretação",
+          "gramática"
+        ],
+        "missing_keywords": [
+          "certo/errado",
+          "atenção"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 14,
+      "pergunta": "Quais frameworks o CESPE cobra em Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Frameworks em Tecnologia na CESPE**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora que cobra uma ampla gama de conhecimentos em tecnologia, incluindo frameworks. No entanto, não há informações específicas no contexto fornecido sobre os frameworks cobrados pela CESPE.",
+      "latency_ms": 4130.1,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "spring",
+          "react"
+        ],
+        "missing_keywords": [
+          "django",
+          "node"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 15,
+      "pergunta": "FCC cobra mais teoria ou prática?",
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "**FCC: Estilo de Cobrança**\n\nA Fundação Carlos Chagas (FCC) é uma banca examinadora conhecida por sua abordagem equilibrada entre teoria e prática. No entanto, é importante destacar que o estilo de cobrança pode variar dependendo do cargo e do concurso.\n\n**Geralmente, a FCC:**\n\n* Cobrança de conceit",
+      "latency_ms": 4045.4,
+      "validation": {
+        "keyword_match_score": 0.333,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "teoria"
+        ],
+        "missing_keywords": [
+          "legislação",
+          "menos prática"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 16,
+      "pergunta": "O que estudar em Segurança da Informação para CESPE?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Segurança da Informação para CESPE**\n\nA CESPE (Centro de Seleção e de Promoção de Eventos) é uma banca examinadora conhecida por suas provas desafiadoras e cobrança rigorosa. Embora o contexto fornecido não mencione explicitamente a CESPE, posso fornecer informações gerais sobre o que estudar em S",
+      "latency_ms": 4890.3,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "criptografia",
+          "vulnerabilidades"
+        ],
+        "missing_keywords": [
+          "ssl",
+          "firewall"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 17,
+      "pergunta": "Qual o percentual de Português nas provas do CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "**Resposta do Agente de Banca**\n\nOlá! É um prazer ajudá-lo a entender melhor sobre as provas do CESPE (Centro de Seleção e de Promoção de Eventos).\n\nInfelizmente, não há informações específicas no contexto fornecido sobre o percentual de Português nas provas do CESPE. No entanto, posso fornecer uma ",
+      "latency_ms": 4489.0,
+      "validation": {
+        "keyword_match_score": 0.75,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "20",
+          "percentual",
+          "português"
+        ],
+        "missing_keywords": [
+          "25"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 18,
+      "pergunta": "FGV é mais difícil que FCC?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "comparacao",
+      "resposta": "**Comparação entre FGV e FCC**\n\nA pergunta sobre qual banca é mais difícil, FGV ou FCC, é subjetiva e depende de vários fatores, como o tipo de concurso, o cargo e a disciplina. No entanto, posso fornecer algumas informações gerais sobre as duas bancas.\n\n**FGV (Fundação Getúlio Vargas)**\n\n* A FGV é ",
+      "latency_ms": 4363.4,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "fgv",
+          "fcc"
+        ],
+        "missing_keywords": [
+          "raciocínio",
+          "decoreba"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 19,
+      "pergunta": "O que estudar em Banco de Dados para concursos?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Banco de Dados para Concurso**\n\nPara concursos, é importante estudar os fundamentos de Banco de Dados, incluindo:\n\n* **Modelagem de Dados**: Entender como modelar dados de forma eficiente e escalável.\n* **Sistemas de Gerenciamento de Banco de Dados (SGBD)**: Conhecer os principais SGBD, como MySQL",
+      "latency_ms": 4210.7,
+      "validation": {
+        "keyword_match_score": 0.5,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "sql",
+          "normalização"
+        ],
+        "missing_keywords": [
+          "transações",
+          "índices"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 20,
+      "pergunta": "Como o CESPE avalia Direito Constitucional?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "**Avaliação do CESPE em Direito Constitucional**\n\nO CESPE (Centro de Seleção e de Promoção de Eventos da Universidade de Brasília) é uma banca examinadora conhecida por suas provas desafiadoras e bem estruturadas. No que diz respeito ao Direito Constitucional, o CESPE tende a avaliar os candidatos d",
+      "latency_ms": 5118.5,
+      "validation": {
+        "keyword_match_score": 0.667,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "direitos fundamentais",
+          "organização"
+        ],
+        "missing_keywords": [
+          "constitucionalidade"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 21,
+      "pergunta": "Quais são as pegadinhas mais comuns do CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "**Pegadinhas Comuns do CESPE**\n\nEmbora o contexto não forneça informações específicas sobre provas ou editais relacionados ao CESPE, posso fornecer informações gerais sobre as pegadinhas comuns encontradas nas provas aplicadas por essa banca.\n\nO CESPE (Centro de Seleção e de Promoção de Eventos) é c",
+      "latency_ms": 4772.4,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sempre",
+          "nunca",
+          "todo",
+          "inversão",
+          "detalhes"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 22,
+      "pergunta": "O que a FGV cobra em Raciocínio Lógico?",
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** FSA - Fundação Santo André SP 1 vaga até R$ 1.705,05 Operador de Máquina Copiadora Ensino Médio 02/07/2026...\n\n**2.** Prefeitura de Nova Iguaçu RJ 313 vagas até R$ 1.902,34 Agente de Apoio à Inclusão Ensino Médio 26/06/2026...\n\n*",
+      "latency_ms": 2618.4,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "lógica",
+          "sequências",
+          "probabilidade",
+          "combinatória"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 23,
+      "pergunta": "Como preparar cronograma de estudos para CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "📄 **Agente de Edital** — resultados encontrados (modo sem IA):\n\n**1.** Prefeitura de Comodoro...\n\n**2.** Concurso: Auxiliar de Serviços Gerais: o que faz, quanto ganha e requisitos mínimos | Link: https://concursosnobrasil.com/cargos/auxiliar-de-servicos-gerais-o-que-faz-quanto-ganha-e-requisitos-mi",
+      "latency_ms": 2598.6,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "disciplinas",
+          "tópicos",
+          "questões",
+          "revisões"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 24,
+      "pergunta": "O que estudar em DevOps para concursos de TI?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Facilitador de TI é uma das profissões do futuro; veja requisitos e salário | Link: https://concursosnobrasil.com/cargos/facilitador-de-ti-e-uma-das-profissoes-do-futuro-veja-requisitos-e-salario/...\n\n**2.**",
+      "latency_ms": 2637.5,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "docker",
+          "kubernetes",
+          "jenkins",
+          "git",
+          "ci/cd"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 25,
+      "pergunta": "FCC cobra jurisprudência ou só lei seca?",
+      "banca": "fcc",
+      "area": "jurídica",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** TCE - Tribunal de Contas do Estado do Acre AC 1 vaga até R$ 39.753,22 Auditor - Conselheiro Substituto Superior 30/06/2026...\n\n**2.** Concurso: Técnico em Radiologia: formação necessária, o que faz e quanto ganha | Link: https://",
+      "latency_ms": 2659.3,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "lei seca",
+          "raramente",
+          "jurisprudência"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 26,
+      "pergunta": "Quais são os temas de Atualidades mais cobrados?",
+      "banca": null,
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Associação das Pioneiras Sociais...\n\n**2.** Concurso: Repositor de mercado: o que faz, quanto ganha e requisitos gerais | Link: https://concursosnobrasil.com/cargos/repositor-de-mercado-o-que-faz-quanto-ganha-e-requis",
+      "latency_ms": 2682.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "política",
+          "economia",
+          "meio ambiente",
+          "saúde"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 27,
+      "pergunta": "Como é a prova de Informática da FCC?",
+      "banca": "fcc",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "tipo_questao",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Técnico em Radiologia: formação necessária, o que faz e quanto ganha | Link: https://concursosnobrasil.com/cargos/tecnico-em-radiologia/...\n\n**2.** Concurso: Tecnologia da Informação: quais são os 7 principais cargos ne",
+      "latency_ms": 2561.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "windows",
+          "linux",
+          "office",
+          "segurança",
+          "redes"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 28,
+      "pergunta": "O que estudar primeiro para CESPE Tecnologia?",
+      "banca": "cebraspe",
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Técnico em Radiologia: formação necessária, o que faz e quanto ganha | Link: https://concursosnobrasil.com/cargos/tecnico-em-radiologia/...\n\n**2.** Câmara de Lindóia do Sul...\n\n**3.** FAHECE - Fundação de Apoio ao Hemos",
+      "latency_ms": 2582.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "python",
+          "redes",
+          "banco de dados",
+          "segurança"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 29,
+      "pergunta": "FGV cobra inglês nas provas de TI?",
+      "banca": "fgv",
+      "area": "tecnologia",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Água Doce do Norte...\n\n**2.** Câmara de Capetinga MG 1 vaga + CR até R$ 5.500,00 Procurador Jurídico Superior 02/07/2026...\n\n**3.** Câmara de Cataguases...\n\n---\n⚠️ *Configure uma GROQ_API_KEY válida no .env para respost",
+      "latency_ms": 2709.5,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sim",
+          "inglês",
+          "técnico",
+          "tecnologia"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 30,
+      "pergunta": "Qual a importância de fazer questões anteriores?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "📝 **Agente de Questões** precisa do modelo de IA para esta tarefa.\n\n⚠️ *Configure uma GROQ_API_KEY válida no arquivo .env (chave gratuita em groq.com) e reinicie o servidor.*",
+      "latency_ms": 2449.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "estilo",
+          "banca",
+          "tópicos",
+          "tempo"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 31,
+      "pergunta": "O que o CESPE cobra em Direito Administrativo?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Lindoia do Sul SC 2 vagas até R$ 5.931,49 Analista Administrativo, Contador Superior 15/07/2026...\n\n**2.** Câmara de Botelhos MG 2 vagas até R$ 4.155,88 Auxiliar Administrativo, Controlador Interno Médio / Superior 09/0",
+      "latency_ms": 2543.6,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "atos administrativos",
+          "licitações",
+          "servidores",
+          "improbidade"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 32,
+      "pergunta": "Como melhorar velocidade de leitura para CESPE?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Mãe d'Água...\n\n**2.** Câmara de Botelhos...\n\n**3.** Câmara de Água Doce do Norte...\n\n---\n⚠️ *Configure uma GROQ_API_KEY válida no .env para respostas elaboradas pela IA.*",
+      "latency_ms": 2613.5,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "treinar",
+          "cronometradas",
+          "leitura dinâmica"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 33,
+      "pergunta": "O que estudar em Algoritmos para concursos?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Assistente de Vendas: O que faz, salário médio, formação | Link: https://concursosnobrasil.com/cargos/assistente-de-vendas-salario-medio-formacao-e-atribuicoes-do-cargo/...\n\n**2.** Concurso: Programador: o q",
+      "latency_ms": 2606.4,
+      "validation": {
+        "keyword_match_score": 0.25,
+        "has_expected_keywords": false,
+        "keywords_presentes": [
+          "busca"
+        ],
+        "missing_keywords": [
+          "estruturas de dados",
+          "ordenação",
+          "complexidade"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 34,
+      "pergunta": "FGV cobra mais direito ou administração?",
+      "banca": "fgv",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "geral",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Botelhos MG 2 vagas até R$ 4.155,88 Auxiliar Administrativo, Controlador Interno Médio / Superior 09/07/2026...\n\n**2.** FJP - Fundação João Pinheiro MG 30 vagas até R$ 5.226,60 Especialista em Políticas Públicas e Gestã",
+      "latency_ms": 2696.5,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "cargo",
+          "equilibra",
+          "perfil"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 35,
+      "pergunta": "Quais certificações ajudam em concursos de TI?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Facilitador de TI é uma das profissões do futuro; veja requisitos e salário | Link: https://concursosnobrasil.com/cargos/facilitador-de-ti-e-uma-das-profissoes-do-futuro-veja-requisitos-e-salario/...\n\n**2.**",
+      "latency_ms": 2714.4,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "itil",
+          "cobit",
+          "iso",
+          "cloud"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 36,
+      "pergunta": "Como o CESPE cobra Redação?",
+      "banca": "cebraspe",
+      "area": "português",
+      "dificuldade": "média",
+      "tipo": "tipo_questao",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Prefeitura de Nova Iguaçu RJ 313 vagas até R$ 1.902,34 Agente de Apoio à Inclusão Ensino Médio 26/06/2026...\n\n**2.** FUNCAMP - Fundação de Desenvolvimento da Unicamp SP 1 vaga até R$ 5.767,82 Analista de Redes Pleno Superior 01/0",
+      "latency_ms": 2802.1,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "dissertativo",
+          "argumentativo",
+          "tema atual",
+          "norma culta"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 37,
+      "pergunta": "O que mais cai em Matemática para concursos?",
+      "banca": null,
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Arquiteto: o que geralmente faz, quanto ganha e formação | Link: https://concursosnobrasil.com/cargos/arquiteto/...\n\n**2.** Concurso: Facilitador de TI é uma das profissões do futuro; veja requisitos e salár",
+      "latency_ms": 2846.1,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "porcentagem",
+          "regra de três",
+          "probabilidade",
+          "estatística"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 38,
+      "pergunta": "FCC é boa opção para iniciantes?",
+      "banca": "fcc",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Técnico em Radiologia: formação necessária, o que faz e quanto ganha | Link: https://concursosnobrasil.com/cargos/tecnico-em-radiologia/...\n\n**2.** CIALAR - Consórcio Intermunicipal de Acolhimento Institucional da Comar",
+      "latency_ms": 3233.5,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sim",
+          "diretas",
+          "menos pegadinhas",
+          "começar"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 39,
+      "pergunta": "O que estudar em Engenharia de Software?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "👨‍🏫 **Agente Tutor** precisa do modelo de IA para esta tarefa.\n\n⚠️ *Configure uma GROQ_API_KEY válida no arquivo .env (chave gratuita em groq.com) e reinicie o servidor.*",
+      "latency_ms": 2519.1,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "uml",
+          "ágeis",
+          "scrum",
+          "testes",
+          "padrões"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 40,
+      "pergunta": "Como anotar durante os estudos?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Governo do Espírito Santo...\n\n**2.** Prefeitura de Comodoro...\n\n**3.** Câmara de Água Doce do Norte...\n\n---\n⚠️ *Configure uma GROQ_API_KEY válida no .env para respostas elaboradas pela IA.*",
+      "latency_ms": 2645.0,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "resumos",
+          "mapas mentais",
+          "flashcards",
+          "erros"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 41,
+      "pergunta": "O CESPE desconta ponto errado?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Concurso: Prefeitura de Ponta Porã (MS) abre mais de 200 vagas em edital de seleção | Link: https://concursosnobrasil.com/concursos/ms/2025/10/16/prefeitura-de-ponta-pora-ms-abre-mais-de-200-vagas-em-edital-de-selecao/...\n\n**2.**",
+      "latency_ms": 2610.1,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sim",
+          "desconta",
+          "certo/errado",
+          "anular"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 42,
+      "pergunta": "O que a FGV cobra em Economia?",
+      "banca": "fgv",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Prefeitura de Nova Iguaçu RJ 313 vagas até R$ 1.902,34 Agente de Apoio à Inclusão Ensino Médio 26/06/2026...\n\n**2.** IPECE - Instituto de Pesquisa e Estratégia Econômica do Ceará CE 9 vagas até R$ 5.428,69 Analista de Políticas P",
+      "latency_ms": 2583.4,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "macroeconomia",
+          "microeconomia",
+          "indicadores",
+          "monetária"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 43,
+      "pergunta": "Como revisar para prova do CESPE?",
+      "banca": "cebraspe",
+      "area": "geral",
+      "dificuldade": "média",
+      "tipo": "como_estudar",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Água Doce do Norte...\n\n**2.** Prefeitura de Almirante Tamandaré PR 24 vagas até R$ 1.977,90 Agente de Operações I Fundamental 29/06 a 10/07/2026...\n\n**3.** Prefeitura de Travesseiro RS 2 vagas até R$ 4.395,65 Assistente",
+      "latency_ms": 2590.4,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "espaçada",
+          "questões",
+          "erros",
+          "simulados"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 44,
+      "pergunta": "O que estudar em Cloud Computing?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "👨‍🏫 **Agente Tutor** precisa do modelo de IA para esta tarefa.\n\n⚠️ *Configure uma GROQ_API_KEY válida no arquivo .env (chave gratuita em groq.com) e reinicie o servidor.*",
+      "latency_ms": 2368.6,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "aws",
+          "azure",
+          "iaas",
+          "paas",
+          "containers"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 45,
+      "pergunta": "FCC cobra atualidades?",
+      "banca": "fcc",
+      "area": "conhecimentos_gerais",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** FUNCAMP - Fundação de Desenvolvimento da Unicamp SP 2 vagas até R$ 3.063,08 Técnico em Radiologia, Oficial de Manutenção Fundamental / Técnico 08/07/2026...\n\n**2.** Concurso: Técnico em Radiologia: formação necessária, o que faz ",
+      "latency_ms": 2573.4,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sim",
+          "atualidades",
+          "conhecimentos gerais"
+        ],
+        "total_keywords": 3
+      },
+      "sucesso": false
+    },
+    {
+      "id": 46,
+      "pergunta": "Qual a melhor hora para estudar?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Mãe d'Água...\n\n**2.** Câmara de Lindóia do Sul...\n\n**3.** Câmara de Botelhos...\n\n---\n⚠️ *Configure uma GROQ_API_KEY válida no .env para respostas elaboradas pela IA.*",
+      "latency_ms": 2587.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "biotipo",
+          "manhã",
+          "consistência",
+          "produtivo"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 47,
+      "pergunta": "O que o CESPE cobra em Direito Penal?",
+      "banca": "cebraspe",
+      "area": "jurídica",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Botelhos...\n\n**2.** Prefeitura de Nova Iguaçu RJ 313 vagas até R$ 1.902,34 Agente de Apoio à Inclusão Ensino Médio 26/06/2026...\n\n**3.** Câmara de Capão do Leão...\n\n---\n⚠️ *Configure uma GROQ_API_KEY válida no .env para",
+      "latency_ms": 2625.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "crimes",
+          "penas",
+          "delitos",
+          "culpabilidade"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 48,
+      "pergunta": "Como gerenciar ansiedade na prova?",
+      "banca": null,
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "como_estudar",
+      "resposta": "🔍 **Agente de Busca de Concursos** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Água Doce do Norte...\n\n**2.** PND - Prova Nacional Docente Cadastro Reserva Professor Superior 03/07/2026...\n\n**3.** APS - Associação das Pioneiras Sociais/Rede SARAH 5 vagas até R$ 14.700,93 Engenheiro de M",
+      "latency_ms": 2636.2,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "respiração",
+          "simulados",
+          "confiança",
+          "relaxamento"
+        ],
+        "total_keywords": 4
+      },
+      "sucesso": false
+    },
+    {
+      "id": 49,
+      "pergunta": "O que estudar em Sistemas Operacionais?",
+      "banca": null,
+      "area": "tecnologia",
+      "dificuldade": "média",
+      "tipo": "o_que_mais_cai",
+      "resposta": "👨‍🏫 **Agente Tutor** precisa do modelo de IA para esta tarefa.\n\n⚠️ *Configure uma GROQ_API_KEY válida no arquivo .env (chave gratuita em groq.com) e reinicie o servidor.*",
+      "latency_ms": 2547.6,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "processos",
+          "threads",
+          "memória",
+          "escalonamento",
+          "linux"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    },
+    {
+      "id": 50,
+      "pergunta": "FGV aceita recurso de questões?",
+      "banca": "fgv",
+      "area": "geral",
+      "dificuldade": "fácil",
+      "tipo": "geral",
+      "resposta": "🏛️ **Agente de Banca** — resultados encontrados (modo sem IA):\n\n**1.** Câmara de Mãe d'Água...\n\n**2.** Concurso: Acupunturista: o que faz, formação necessária e média salarial | Link: https://concursosnobrasil.com/cargos/acupunturista/...\n\n**3.** Concurso: Auxiliar de Logística: o que faz, quanto ga",
+      "latency_ms": 2892.7,
+      "validation": {
+        "keyword_match_score": 0.0,
+        "has_expected_keywords": false,
+        "keywords_presentes": [],
+        "missing_keywords": [
+          "sim",
+          "recursos",
+          "prazo",
+          "edital",
+          "fundamentado"
+        ],
+        "total_keywords": 5
+      },
+      "sucesso": false
+    }
+  ]
+}
